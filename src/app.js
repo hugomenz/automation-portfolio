@@ -8,23 +8,39 @@ const projectMeta = {
   rfq: {
     image: 'rfq.png', workflow: 'rfq-workflow.png', n8n: 'n8n-rfq.jpg', index: '01', short: 'RFQ',
     demo: 'https://hugomenz.github.io/rfq-intelligence-live/', repo: 'https://github.com/hugomenz/rfq-intelligence-live',
+    platforms: ['custom', 'n8n', 'github'],
   },
   rag: {
     image: 'rag-security.png', workflow: 'rag-workflow.png', n8n: 'n8n-rag.jpg', index: '02', short: 'RAG',
     demo: 'https://hugomenz.github.io/second-brain/', repo: 'https://github.com/hugomenz/second-brain',
+    platforms: ['custom', 'n8n', 'supabase', 'obsidian', 'github'],
   },
   fridge: {
     image: 'fridgeflow.png', workflow: 'fridge-workflow.png', n8n: 'n8n-fridge.jpg', index: '03', short: 'FRIDGE',
     demo: 'https://hugomenz.github.io/fridge-flow/', repo: 'https://github.com/hugomenz/fridge-flow',
+    platforms: ['custom', 'n8n', 'telegram', 'supabase'],
   },
   agent: {
     image: 'agent-observatory.png', workflow: 'agent-workflow.png', n8n: 'n8n-agent.jpg', index: '04', short: 'AGENTS',
-    demo: 'https://hugomenz.github.io/agent-chaos-lab/logger/', repo: 'https://github.com/hugomenz/agent-chaos-lab',
+    demo: 'https://hugomenz.github.io/agent-chaos-lab/exp-app/', secondaryDemo: 'https://hugomenz.github.io/agent-chaos-lab/logger/',
+    imageLink: 'https://hugomenz.github.io/agent-chaos-lab/logger/', repo: 'https://github.com/hugomenz/agent-chaos-lab',
+    platforms: ['custom', 'n8n', 'supabase', 'github'],
   },
   music: {
     image: 'music-school.png', workflow: 'music-workflow.png', n8n: null, index: '05', short: 'MUSIC',
     demo: 'https://hugomenz.github.io/music-school-automation/', repo: 'https://github.com/hugomenz/music-school-automation',
+    platforms: ['custom', 'n8n', 'telegram'], extensionPlatform: 'twilio',
   },
+};
+
+const platformMeta = {
+  custom: { mark: 'HM', label: 'custom' },
+  n8n: { icon: 'https://cdn.simpleicons.org/n8n/EA4B71', label: 'n8n' },
+  telegram: { icon: 'https://cdn.simpleicons.org/telegram/26A5E4', label: 'telegram' },
+  supabase: { icon: 'https://cdn.simpleicons.org/supabase/3FCF8E', label: 'supabase' },
+  obsidian: { icon: 'https://cdn.simpleicons.org/obsidian/7C3AED', label: 'obsidian' },
+  github: { icon: 'https://cdn.simpleicons.org/github/FFFFFF', label: 'github' },
+  twilio: { icon: 'https://cdn.simpleicons.org/twilio/F22F46', label: 'twilio' },
 };
 
 let messages = null;
@@ -71,8 +87,15 @@ function updateRouteLinks(language) {
   });
 }
 
-function statusRow(label, value, type) {
-  return `<div class="truth-row"><span><i class="${type}"></i>${label}</span><p>${value}</p></div>`;
+function renderPlatforms(keys) {
+  return `<ul class="platform-list">${keys.map((key) => {
+    const platform = platformMeta[key];
+    const label = messages.platforms[platform.label];
+    const visual = platform.icon
+      ? `<img src="${platform.icon}" alt="" loading="lazy" />`
+      : `<span class="platform-mark" aria-hidden="true">${platform.mark}</span>`;
+    return `<li>${visual}<span>${label}</span></li>`;
+  }).join('')}</ul>`;
 }
 
 function updateHeroSlide(position) {
@@ -83,7 +106,7 @@ function updateHeroSlide(position) {
   const frame = document.querySelector('#hero-frame');
   if (!frame) return;
 
-  frame.href = meta.demo;
+  frame.href = meta.imageLink || meta.demo;
   frame.setAttribute('aria-label', `${messages.actions.openDemo}: ${project.name}`);
   document.querySelector('#hero-frame-index').textContent = `${messages.hero.frame} ${meta.index} · ${project.role}`;
   document.querySelector('#hero-image').src = assetUrl(meta.image);
@@ -137,29 +160,34 @@ function renderProjects() {
     const project = messages.projects[key];
     const meta = projectMeta[key];
     return `<article id="project-${key}" class="project ${key === 'rfq' ? 'principal' : ''}" data-scroll-section data-nav-label="${project.name}">
+      <header class="project-heading">
+        <div class="project-number">${meta.index}</div>
+        <div><p class="eyebrow">${project.role}</p><h2>${project.name}</h2><p class="summary">${project.summary}</p></div>
+      </header>
       <div class="project-visuals">
-        <a class="project-image" href="${meta.demo}" aria-label="${messages.actions.openDemo}: ${project.name}">
-          <span>${messages.hero.frame} ${meta.index} · ${project.role}</span><img src="${assetUrl(meta.image)}" alt="${project.imageAlt}" loading="lazy" />
+        <a class="project-image" href="${meta.imageLink || meta.demo}" aria-label="${messages.actions.openDemo}: ${project.name}">
+          <span>${messages.hero.frame} ${meta.index} · ${project.visualLabel}</span><img src="${assetUrl(meta.image)}" alt="${project.imageAlt}" loading="lazy" />
         </a>
         <button class="workflow-image workflow-zoom" type="button" data-open-dialog="${key}" data-dialog-kind="diagram" aria-label="${messages.workflow.zoom}: ${project.name}">
           <span>${messages.workflow.label} · ${messages.workflow.zoom}</span><img src="${assetUrl(meta.workflow)}" alt="${messages.workflow.diagramAlt}: ${project.name}" loading="lazy" />
         </button>
       </div>
-      <div class="project-copy">
-        <div class="project-number">${meta.index}</div><h2>${project.name}</h2><p class="summary">${project.summary}</p>
-        <dl>
-          <div><dt>${messages.labels.problem}</dt><dd>${project.problem}</dd></div>
-          <div><dt>${messages.labels.solution}</dt><dd>${project.solution}</dd></div>
-          <div><dt>${messages.labels.how}</dt><dd>${project.how}</dd></div>
-          <div><dt>${messages.labels.try}</dt><dd>${project.try}</dd></div>
-        </dl>
-        <div class="truth-table">
-          ${statusRow(messages.status.working, project.working, 'working')}
-          ${statusRow(messages.status.simulated, project.simulated, 'simulated')}
-          ${statusRow(messages.status.experimental, project.experimental, 'experimental')}
+      <div class="project-content-grid">
+        <div class="project-copy">
+          <dl>
+            <div><dt>${messages.labels.problem}</dt><dd>${project.problem}</dd></div>
+            <div><dt>${messages.labels.solution}</dt><dd>${project.solution}</dd></div>
+            <div><dt>${messages.labels.how}</dt><dd>${project.how}</dd></div>
+          </dl>
+          <div class="demo-note"><p class="eyebrow">${messages.labels.try}</p><p>${project.try}</p></div>
         </div>
-        <p class="tech"><b>${messages.labels.technology}</b> ${project.tech}</p>
-        <div class="project-actions"><a class="primary" href="${meta.demo}">${messages.actions.openDemo}</a><a href="${routeUrl('workflows', document.documentElement.lang, `workflow-${key}`)}">${messages.actions.viewWorkflow}</a><a href="${meta.repo}">${messages.actions.openRepo}</a></div>
+        <aside class="project-details">
+          <div class="flow-card"><p class="eyebrow">${messages.labels.flow}</p><ol>${project.flow.map((item) => `<li>${item}</li>`).join('')}</ol></div>
+          <div class="scope-note"><p class="eyebrow">${messages.labels.scope}</p><p>${project.scope}</p></div>
+          <div class="platforms"><p class="eyebrow">${messages.labels.platforms}</p>${renderPlatforms(meta.platforms)}</div>
+          ${project.extension ? `<div class="project-extension"><div>${renderPlatforms([meta.extensionPlatform])}</div><p><b>${messages.labels.extension}</b> ${project.extension}</p></div>` : ''}
+          <div class="project-actions"><a class="primary" href="${meta.demo}">${messages.actions.openDemo}</a>${meta.secondaryDemo ? `<a href="${meta.secondaryDemo}">${messages.actions.openObservatory}</a>` : ''}<a href="${routeUrl('workflows', document.documentElement.lang, `workflow-${key}`)}">${messages.actions.viewWorkflow}</a><a href="${meta.repo}">${messages.actions.openRepo}</a></div>
+        </aside>
       </div>
     </article>`;
   }).join('');
@@ -176,20 +204,23 @@ function renderWorkflowCases() {
     const visualLabel = meta.n8n ? messages.workflowPage.labels.editor : messages.workflowPage.labels.diagram;
     return `<article id="workflow-${key}" class="workflow-case" data-scroll-section data-nav-label="${project.name}">
       <header class="workflow-case-head"><p class="eyebrow">${meta.index} · ${project.name}</p><h2>${data.title}</h2><p>${data.summary}</p></header>
-      <div class="workflow-case-grid">
-        <button class="workflow-screenshot" type="button" data-open-dialog="${key}" data-dialog-kind="workflow" aria-label="${messages.workflow.zoom}: ${data.title}">
-          <span>${visualLabel} · ${messages.workflow.zoom}</span><img src="${assetUrl(visual)}" alt="${data.imageAlt}" loading="lazy" />
-        </button>
-        <div class="workflow-explanation">
+      <button class="workflow-screenshot" type="button" data-open-dialog="${key}" data-dialog-kind="workflow" aria-label="${messages.workflow.zoom}: ${data.title}">
+        <span>${visualLabel} · ${messages.workflow.zoom}</span><img src="${assetUrl(visual)}" alt="${data.imageAlt}" loading="lazy" />
+      </button>
+      <div class="workflow-explanation">
+        <div>
           <dl>
             <div><dt>${messages.workflowPage.labels.why}</dt><dd>${data.why}</dd></div>
             <div><dt>${messages.workflowPage.labels.purpose}</dt><dd>${data.purpose}</dd></div>
             <div><dt>${messages.workflowPage.labels.how}</dt><dd>${data.how}</dd></div>
           </dl>
+        </div>
+        <aside class="workflow-details">
           <div class="workflow-set"><p class="eyebrow">${messages.workflowPage.labels.set}</p><ul>${data.set.map((item) => `<li>${item}</li>`).join('')}</ul></div>
           <p class="workflow-state"><b>${messages.workflowPage.labels.state}</b> ${data.state}</p>
-          <div class="project-actions"><a class="primary" href="${meta.demo}">${messages.actions.openDemo}</a><a href="${meta.repo}">${messages.actions.openRepo}</a></div>
-        </div>
+          <div class="platforms"><p class="eyebrow">${messages.labels.platforms}</p>${renderPlatforms(meta.platforms)}</div>
+          <div class="project-actions"><a class="primary" href="${meta.demo}">${messages.actions.openDemo}</a>${meta.secondaryDemo ? `<a href="${meta.secondaryDemo}">${messages.actions.openObservatory}</a>` : ''}<a href="${meta.repo}">${messages.actions.openRepo}</a></div>
+        </aside>
       </div>
     </article>`;
   }).join('');
