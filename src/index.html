@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Five inspectable automation and AI workflow case studies by Hugo Menz." />
+    <title>Hugo Menz · Working Systems</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./app.css" />
+  </head>
+  <body>
+    <!--
+      THESIS: The portfolio is an inspection contact sheet; it refuses a generic agency landing page.
+      OWN-WORLD: Black proof sheet, white film frames, vermilion grease-pencil marks and compact evidence captions.
+      STORY: See the working surface first, then inspect what is real, simulated or experimental and open the proof.
+      FIRST VIEWPORT: RFQ fills the principal frame; statement and actions sit on the black margin to its left.
+      FORM: Grounded candidate 3, inspection contact sheet; seed 52d1ed7f.
+      FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+    -->
+    <header class="topbar">
+      <a href="#top" class="brand">HUGO MENZ <span>AUTOMATION</span></a>
+      <nav><a href="#work" data-i18n="nav.work">Casos</a><a href="#approach" data-i18n="nav.approach">Cómo trabajo</a></nav>
+      <label class="language"><span data-i18n="nav.language">Idioma</span><select id="language-selector" aria-label="Language"><option value="es">ES</option><option value="en">EN</option><option value="de">DE</option></select></label>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <h1 data-i18n="hero.title">Sistemas que se pueden abrir, probar e inspeccionar.</h1>
+          <p data-i18n="hero.lead">Cinco casos reales de automatización, aplicaciones y flujos de trabajo. Sin resultados inventados y con el estado técnico visible.</p>
+          <div class="hero-actions"><a class="primary" href="https://hugomenz.github.io/rfq-intelligence-live/" data-i18n="hero.openPrimary">Abrir RFQ Copilot</a><a href="#work" data-i18n="hero.seeAll">Ver los cinco casos</a></div>
+          <div class="legend"><span><i class="working"></i><b data-i18n="status.working">Funciona</b></span><span><i class="simulated"></i><b data-i18n="status.simulated">Simulado</b></span><span><i class="experimental"></i><b data-i18n="status.experimental">Experimental</b></span></div>
+        </div>
+        <a class="hero-frame" href="https://hugomenz.github.io/rfq-intelligence-live/" aria-label="Open Menz RFQ Copilot demo">
+          <span class="frame-index">FRAME 01 · PRIMARY CASE</span>
+          <img src="./assets/rfq.png" alt="Menz RFQ Copilot running with a synthetic technical request" />
+          <b data-i18n="projects.rfq.name">Menz RFQ Copilot</b>
+        </a>
+      </section>
+
+      <div class="index-strip" id="work"><span>01 RFQ</span><span>02 RAG SECURITY</span><span>03 FRIDGEFLOW</span><span>04 AGENT OBSERVATORY</span><span>05 MUSIC SCHOOL</span></div>
+      <div id="projects" class="projects" aria-live="polite"></div>
+
+      <section id="approach" class="approach">
+        <div><h2 data-i18n="approach.title">La diferencia está en los límites.</h2><p data-i18n="approach.copy">Cada caso explica qué está construido, qué usa datos sintéticos y qué sigue siendo arquitectura. Las demos públicas no necesitan credenciales ni contienen datos reales.</p></div>
+        <div class="principles"><span data-i18n="approach.one">Interfaz que demuestra el flujo</span><span data-i18n="approach.two">Automatización con revisión humana</span><span data-i18n="approach.three">Seguridad y estado documentados</span></div>
+      </section>
+    </main>
+
+    <footer><span>Hugo Menz · Stuttgart</span><a href="https://hugomenz.de">hugomenz.de</a><a href="https://github.com/hugomenz">GitHub</a></footer>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
