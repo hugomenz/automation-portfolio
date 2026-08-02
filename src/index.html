@@ -21,7 +21,7 @@
     -->
     <header class="topbar">
       <a href="#top" class="brand">HUGO MENZ <span>AUTOMATION</span></a>
-      <nav><a href="#work" data-i18n="nav.work">Casos</a><a href="#approach" data-i18n="nav.approach">Cómo trabajo</a></nav>
+      <nav><a href="#work" data-i18n="nav.work">Casos</a><a href="#automation" data-i18n="nav.workflows">Workflows</a><a href="#approach" data-i18n="nav.approach">Cómo trabajo</a></nav>
       <label class="language"><span data-i18n="nav.language">Idioma</span><select id="language-selector" aria-label="Language"><option value="es">ES</option><option value="en">EN</option><option value="de">DE</option></select></label>
     </header>
 
@@ -42,6 +42,20 @@
 
       <div class="index-strip" id="work"><span>01 RFQ</span><span>02 RAG SECURITY</span><span>03 FRIDGEFLOW</span><span>04 AGENT OBSERVATORY</span><span>05 MUSIC SCHOOL</span></div>
       <div id="projects" class="projects" aria-live="polite"></div>
+
+      <section id="automation" class="workflow-proof">
+        <div class="workflow-proof-copy">
+          <p class="proof-kicker" data-i18n="automation.kicker">N8N · WORKFLOW PROOF</p>
+          <h2 data-i18n="automation.title">Dentro de las automatizaciones.</h2>
+          <p data-i18n="automation.copy">Capturas reales del editor local de n8n con los workflows JSON versionados. Muestran la arquitectura importada, no ejecuciones de producción.</p>
+        </div>
+        <div class="n8n-gallery">
+          <figure><img src="./assets/n8n-rfq.jpg" alt="n8n editor with the RFQ multimodal workflow" loading="lazy" /><figcaption data-i18n="automation.rfq">RFQ multimodal · evidencia, revisión comercial y guardrails</figcaption></figure>
+          <figure><img src="./assets/n8n-fridge.jpg" alt="n8n editor with the FridgeFlow Telegram workflow" loading="lazy" /><figcaption data-i18n="automation.fridge">FridgeFlow · voz de Telegram, validación e inventario</figcaption></figure>
+          <figure><img src="./assets/n8n-rag.jpg" alt="n8n editor with the secure RAG workflow" loading="lazy" /><figcaption data-i18n="automation.rag">Second Brain · recuperación, cuarentena y citas</figcaption></figure>
+          <figure><img src="./assets/n8n-agent.jpg" alt="n8n editor with the agent orchestrator workflow" loading="lazy" /><figcaption data-i18n="automation.agent">Agent Observatory · bucle, despliegue y control externo</figcaption></figure>
+        </div>
+      </section>
 
       <section id="approach" class="approach">
         <div><h2 data-i18n="approach.title">La diferencia está en los límites.</h2><p data-i18n="approach.copy">Cada caso explica qué está construido, qué usa datos sintéticos y qué sigue siendo arquitectura. Las demos públicas no necesitan credenciales ni contienen datos reales.</p></div>
