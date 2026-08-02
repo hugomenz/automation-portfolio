@@ -45,7 +45,7 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 3px solid
 
 main { max-width: 1600px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 64px); }
 .eyebrow { margin: 0; color: var(--red); font-size: .75rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-.primary { display: inline-flex; align-items: center; justify-content: center; padding: 14px 18px; background: var(--red); color: white; font-weight: 700; text-decoration: none; }
+.primary { display: inline-flex; align-items: center; justify-content: center; padding: 14px 18px; background: var(--red); color: var(--black); font-weight: 700; text-decoration: none; }
 .primary:hover, .primary:focus-visible { background: white; color: var(--black); }
 
 .hero { display: grid; grid-template-columns: minmax(390px, .9fr) minmax(520px, 1.1fr); gap: clamp(30px, 5vw, 80px); min-height: calc(100vh - 72px); padding: 64px 0; }
@@ -65,10 +65,10 @@ main { max-width: 1600px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 64px); }
 .slider-controls { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; margin-top: 18px; }
 .slider-arrow, .slider-dots button { border: 1px solid var(--rule); background: transparent; cursor: pointer; }
 .slider-arrow { width: 44px; height: 44px; font-size: 1.25rem; }
-.slider-arrow:hover { border-color: var(--red); background: var(--red); }
-.slider-dots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+.slider-arrow:hover { border-color: var(--red); background: var(--red); color: var(--black); }
+.slider-dots { display: grid; grid-template-columns: repeat(auto-fit, minmax(32px, 1fr)); gap: 7px; }
 .slider-dots button { min-height: 36px; color: #999; font-size: .72rem; font-weight: 700; }
-.slider-dots button:hover, .slider-dots button.is-active { border-color: var(--red); background: var(--red); color: white; }
+.slider-dots button:hover, .slider-dots button.is-active { border-color: var(--red); background: var(--red); color: var(--black); }
 
 .index-strip { display: flex; gap: 0; overflow: auto; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); white-space: nowrap; }
 .index-strip a { display: flex; gap: 9px; padding: 18px 22px 18px 0; font-size: .75rem; font-weight: 700; letter-spacing: .05em; text-decoration: none; }
@@ -104,7 +104,7 @@ main { max-width: 1600px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 64px); }
 .platform-list { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 0; padding: 0; list-style: none; }
 .platform-list li { display: inline-flex; align-items: center; gap: 9px; min-height: 42px; padding: 8px 12px; border: 1px solid var(--rule); background: var(--panel); color: #ddd; font-size: .86rem; font-weight: 700; }
 .platform-list img, .platform-mark { width: 24px; height: 24px; flex: 0 0 auto; }
-.platform-mark { display: grid; place-items: center; background: var(--red); color: white; font-size: .62rem; }
+.platform-mark { display: grid; place-items: center; background: var(--red); color: var(--black); font-size: .62rem; font-weight: 700; }
 .project-extension { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 16px; margin-top: 22px; padding: 16px; border: 1px dashed #777; }
 .project-extension .platform-list { margin: 0; }
 .project-extension .platform-list li { padding: 7px 10px; }
@@ -144,7 +144,7 @@ main { max-width: 1600px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 64px); }
 .dialog-bar { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; align-items: start; gap: 20px; padding: 20px 24px; border-bottom: 1px solid var(--rule); background: rgba(11, 13, 13, .97); }
 .dialog-bar h2 { margin: 6px 0 0; font-family: 'Archivo Black', sans-serif; font-size: clamp(1.4rem, 3vw, 2.7rem); }
 .dialog-close { width: 44px; height: 44px; flex: 0 0 auto; border: 1px solid var(--rule); background: transparent; font-size: 1.8rem; cursor: pointer; }
-.dialog-close:hover { border-color: var(--red); background: var(--red); }
+.dialog-close:hover { border-color: var(--red); background: var(--red); color: var(--black); }
 .dialog-canvas { overflow: auto; padding: 18px; background: #050606; }
 .dialog-canvas img { display: block; width: max(100%, 1180px); height: auto; margin: 0 auto; background: white; }
 .dialog-footer { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 30px; padding: 20px 24px; border-top: 1px solid var(--rule); }

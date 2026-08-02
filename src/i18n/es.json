@@ -7,7 +7,8 @@
     }
   },
   "nav": { "work": "Casos", "workflows": "N8N Workflows", "approach": "Cómo trabajo", "language": "Idioma" },
-  "hero": { "kicker": "PORTFOLIO · CINCO CASOS", "title": "Sistemas que se pueden abrir, probar e inspeccionar.", "lead": "Cinco productos y experimentos de automatización explicados desde la entrada hasta el resultado. Cada demo indica su alcance sin esconder el flujo real.", "openCase": "Abrir", "viewCase": "Ver este caso", "previous": "Caso anterior", "next": "Caso siguiente", "frame": "FRAME" },
+  "a11y": { "primaryNavigation": "Navegación principal", "languageSelector": "Seleccionar idioma", "closeDialog": "Cerrar diálogo" },
+  "hero": { "kicker": "PORTFOLIO · CINCO CASOS", "title": "Sistemas que se pueden abrir, probar e inspeccionar.", "lead": "Cinco productos y experimentos de automatización explicados desde la entrada hasta el resultado. Cada demo indica su alcance sin esconder el flujo real.", "openCase": "Abrir", "viewCase": "Ver este caso", "previous": "Caso anterior", "next": "Caso siguiente", "frame": "FRAME", "indexLabel": "Cinco casos" },
   "labels": { "problem": "Problema", "solution": "Solución", "how": "Cómo funciona", "try": "Qué puedes probar", "flow": "Recorrido", "scope": "Alcance de la demo", "platforms": "Plataformas", "extension": "Posible ampliación:" },
   "actions": { "openDemo": "Abrir demo", "openObservatory": "Abrir Observatory", "openRepo": "Ver repositorio", "viewWorkflow": "Ver N8N workflow" },
   "platforms": { "custom": "Aplicación propia", "n8n": "n8n", "telegram": "Telegram", "supabase": "Supabase", "obsidian": "Obsidian", "github": "GitHub", "twilio": "Twilio" },
