@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Cómo trabaja Hugo Menz: demos verificables, revisión humana y límites visibles." />
+    <title>Hugo Menz · Cómo trabajo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../app.css" />
+  </head>
+  <body data-page="approach">
+    <header class="topbar">
+      <a data-route="home" class="brand">HUGO MENZ <span>AUTOMATION</span></a>
+      <nav aria-label="Navegación principal">
+        <a data-route="home" data-i18n="nav.work">Casos</a>
+        <a data-route="workflows" data-i18n="nav.workflows">N8N Workflows</a>
+        <a data-route="approach" data-i18n="nav.approach" aria-current="page">Cómo trabajo</a>
+      </nav>
+      <label class="language"><span data-i18n="nav.language">Idioma</span><select id="language-selector" aria-label="Language"><option value="es">ES</option><option value="en">EN</option><option value="de">DE</option></select></label>
+    </header>
+
+    <main id="top">
+      <section class="page-hero approach-hero">
+        <p class="eyebrow" data-i18n="approachPage.kicker">MÉTODO · LÍMITES VISIBLES</p>
+        <h1 data-i18n="approachPage.title">La diferencia está en cómo se comprueba el sistema.</h1>
+        <div class="page-hero-copy"><p data-i18n="approachPage.lead">Construyo una superficie que permite entender el flujo, separo las decisiones de los efectos y documento lo que todavía no está validado.</p></div>
+      </section>
+      <div id="approach-sections" class="approach-sections"></div>
+      <section class="approach-closing"><p class="eyebrow" data-i18n="approachPage.closingKicker">EL RESULTADO</p><h2 data-i18n="approachPage.closingTitle">Una demo que se puede abrir y una arquitectura que se puede discutir.</h2><a data-route="home" class="primary" data-i18n="approachPage.backToCases">Ver los cinco casos</a></section>
+    </main>
+
+    <div id="section-navigation"></div>
+
+    <footer>
+      <span>Hugo Menz · Stuttgart</span>
+      <a href="https://hugomenz.de">hugomenz.de</a>
+      <a href="https://github.com/hugomenz">GitHub</a>
+      <a href="https://www.linkedin.com/in/hugomartin-menz/">LinkedIn</a>
+    </footer>
+    <script type="module" src="../app.js"></script>
+  </body>
+</html>

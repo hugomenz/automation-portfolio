@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Workflows n8n reales y versionados de cinco proyectos de automatización." />
+    <title>Hugo Menz · N8N Workflows</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../app.css" />
+  </head>
+  <body data-page="workflows">
+    <header class="topbar">
+      <a data-route="home" class="brand">HUGO MENZ <span>AUTOMATION</span></a>
+      <nav aria-label="Navegación principal">
+        <a data-route="home" data-i18n="nav.work">Casos</a>
+        <a data-route="workflows" data-i18n="nav.workflows" aria-current="page">N8N Workflows</a>
+        <a data-route="approach" data-i18n="nav.approach">Cómo trabajo</a>
+      </nav>
+      <label class="language"><span data-i18n="nav.language">Idioma</span><select id="language-selector" aria-label="Language"><option value="es">ES</option><option value="en">EN</option><option value="de">DE</option></select></label>
+    </header>
+
+    <main id="top">
+      <section class="page-hero workflow-hero">
+        <p class="eyebrow" data-i18n="workflowPage.kicker">N8N · ARQUITECTURA REAL</p>
+        <h1 data-i18n="workflowPage.title">Workflows que separan decisiones, controles y efectos.</h1>
+        <div class="page-hero-copy"><p data-i18n="workflowPage.lead">Cada automatización está dividida según su responsabilidad. Aquí se ven los workflows más grandes, para qué existen y qué queda todavía por validar.</p><p class="truth-note" data-i18n="workflowPage.truth">Las capturas proceden del editor local de n8n con JSON versionados. No representan ejecuciones de producción.</p></div>
+      </section>
+      <div id="workflow-cases" class="workflow-cases"></div>
+    </main>
+
+    <div id="section-navigation"></div>
+
+    <dialog id="workflow-dialog" class="workflow-dialog" aria-labelledby="workflow-dialog-title">
+      <div class="dialog-bar">
+        <div><p class="eyebrow" data-i18n="workflow.zoomLabel">Vista ampliada</p><h2 id="workflow-dialog-title"></h2></div>
+        <button class="dialog-close" type="button" data-dialog-close aria-label="Cerrar">×</button>
+      </div>
+      <div class="dialog-canvas"><img id="workflow-dialog-image" alt="" /></div>
+      <div class="dialog-footer"><p id="workflow-dialog-copy"></p><a id="workflow-dialog-link" class="primary"></a></div>
+    </dialog>
+
+    <footer>
+      <span>Hugo Menz · Stuttgart</span>
+      <a href="https://hugomenz.de">hugomenz.de</a>
+      <a href="https://github.com/hugomenz">GitHub</a>
+      <a href="https://www.linkedin.com/in/hugomartin-menz/">LinkedIn</a>
+    </footer>
+    <script type="module" src="../app.js"></script>
+  </body>
+</html>

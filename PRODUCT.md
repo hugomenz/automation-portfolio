@@ -24,7 +24,7 @@ The portfolio proves work through inspectable applications and workflows. Menz R
 
 ## Operating Context
 
-Visitors scan the five cases, open a demo or repository, and switch between Spanish, English and German. GitHub Pages is the public deployment target.
+Visitors scan the five cases on the home route, inspect implementation detail on `/workflows/`, review the delivery method on `/approach/`, and switch between Spanish, English and German without losing their route. GitHub Pages is the public deployment target.
 
 ## Capabilities and Constraints
 
@@ -32,6 +32,8 @@ Visitors scan the five cases, open a demo or repository, and switch between Span
 - Translations live in separate `src/i18n/*.json` files.
 - Commercial results, customers, metrics and production-readiness are not claimed.
 - External integrations that require credentials are labelled template, simulated or experimental.
+- High-level diagrams open in a native zoom dialog. They never send visitors to an external design tool.
+- A scroll-aware section index remains available after the header leaves the first viewport.
 
 ## Evidence on Hand
 
@@ -43,3 +45,4 @@ Evidence consists of the five repositories, deployed demos, local build/test out
 - Put real, simulated and experimental status beside the relevant claim.
 - Use ordinary language before implementation details.
 - Keep the principal action visible: open the demo or inspect the repository.
+- Explain workflow purpose and boundaries before listing nodes or services.

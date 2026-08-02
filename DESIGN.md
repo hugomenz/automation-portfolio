@@ -10,17 +10,17 @@ Archivo Black carries the brand, oversized thesis and project identities with ti
 
 ## Composition and spacing
 
-The content is centered at a maximum width of 1600px with fluid 20–64px gutters. Menz RFQ Copilot occupies the principal first-viewport frame beside the thesis and actions. A ruled, horizontally scrollable index strip introduces five projects, which then alternate screenshot and evidence copy in a numbered sequence with roughly 90px section padding and fluid 34–90px column gaps. The approach statement and principles form the closing two-column spread.
+The content is centered at a maximum width of 1600px with fluid 20–64px gutters. The first viewport pairs the thesis with a five-project slider; its image, title, demo CTA and case anchor change together. A ruled index introduces five project sections, which alternate screenshot and evidence copy. N8N Workflows and the delivery approach live on separate routes so the home page remains focused on the cases.
 
-Below 1050px the hero, project rows and approach stack, all frames lose their alternating grid placement and the hero frame loses its slight rotation. Below 780px navigation links are hidden, the language selector remains, the index becomes a two-column list, definition and truth rows stack, and the portfolio reads as a vertical proof strip without changing evidence order.
+Below 1050px the hero, project rows, workflow explanations and approach sections stack, and the hero frame loses its slight rotation. Below 780px the primary navigation moves to a second sticky row, the index becomes a two-column list, definition and truth rows stack, and the portfolio reads as a vertical proof strip without changing evidence order.
 
 ## Components and interaction
 
-The system uses proof frames, frame captions, a fixed status legend, ruled definition lists, repeated truth rows and direct rectangular actions. Screenshots are the visual evidence; there are no decorative capability cards or invented statistics. Links remain visibly underlined unless promoted to the vermilion primary action. The only persistent control is the compact native language selector; language changes rerender the project evidence and update document metadata.
+The system uses proof frames, frame captions, a status legend, ruled definition lists, repeated truth rows and direct rectangular actions. A sticky top bar provides route navigation. After 220px of scroll, a section index follows the active project; narrower viewports receive a fixed section selector. High-level workflow images are buttons that open a native dialog with a larger canvas and a route link to the matching n8n explanation. Screenshots remain visual evidence rather than decoration.
 
 ## Accessibility
 
-The implementation provides semantic navigation and sections, descriptive localized image alt text, labelled image links, a labelled language selector, visible focus outlines and an `aria-live` project region. Status colours always appear with translated text labels. Native links and select controls preserve keyboard operation. Reduced-motion preferences disable smooth scrolling; the rotated hero frame is also removed at narrower layouts.
+The implementation provides semantic navigation and sections, descriptive localized image alt text, labelled image buttons, a labelled language selector, visible focus outlines and an `aria-live` slider and project region. Status colours always appear with translated text labels. The zoom surface uses native `dialog`, supports Escape and backdrop close, and keeps a visible close action. Reduced-motion preferences disable smooth scrolling and transitions.
 
 ## Truth and internationalisation rules
 

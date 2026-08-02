@@ -3,67 +3,69 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Five inspectable automation and AI workflow case studies by Hugo Menz." />
-    <title>Hugo Menz · Working Systems</title>
+    <meta name="description" content="Cinco casos verificables de automatización, aplicaciones y workflows." />
+    <title>Hugo Menz · Sistemas que funcionan</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./app.css" />
   </head>
-  <body>
-    <!--
-      THESIS: The portfolio is an inspection contact sheet; it refuses a generic agency landing page.
-      OWN-WORLD: Black proof sheet, white film frames, vermilion grease-pencil marks and compact evidence captions.
-      STORY: See the working surface first, then inspect what is real, simulated or experimental and open the proof.
-      FIRST VIEWPORT: RFQ fills the principal frame; statement and actions sit on the black margin to its left.
-      FORM: Grounded candidate 3, inspection contact sheet; seed 52d1ed7f.
-      FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
-    -->
+  <body data-page="home">
     <header class="topbar">
-      <a href="#top" class="brand">HUGO MENZ <span>AUTOMATION</span></a>
-      <nav><a href="#work" data-i18n="nav.work">Casos</a><a href="#automation" data-i18n="nav.workflows">Workflows</a><a href="#approach" data-i18n="nav.approach">Cómo trabajo</a></nav>
+      <a data-route="home" class="brand">HUGO MENZ <span>AUTOMATION</span></a>
+      <nav aria-label="Navegación principal">
+        <a data-route="home" data-i18n="nav.work" aria-current="page">Casos</a>
+        <a data-route="workflows" data-i18n="nav.workflows">N8N Workflows</a>
+        <a data-route="approach" data-i18n="nav.approach">Cómo trabajo</a>
+      </nav>
       <label class="language"><span data-i18n="nav.language">Idioma</span><select id="language-selector" aria-label="Language"><option value="es">ES</option><option value="en">EN</option><option value="de">DE</option></select></label>
     </header>
 
     <main id="top">
-      <section class="hero">
+      <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <h1 data-i18n="hero.title">Sistemas que se pueden abrir, probar e inspeccionar.</h1>
-          <p data-i18n="hero.lead">Cinco casos reales de automatización, aplicaciones y flujos de trabajo. Sin resultados inventados y con el estado técnico visible.</p>
-          <div class="hero-actions"><a class="primary" href="https://hugomenz.github.io/rfq-intelligence-live/" data-i18n="hero.openPrimary">Abrir RFQ Copilot</a><a href="#work" data-i18n="hero.seeAll">Ver los cinco casos</a></div>
+          <p class="eyebrow" data-i18n="hero.kicker">PORTFOLIO · CINCO CASOS</p>
+          <h1 id="hero-title" data-i18n="hero.title">Sistemas que se pueden abrir, probar e inspeccionar.</h1>
+          <p data-i18n="hero.lead">Cinco casos reales de automatización, aplicaciones y workflows. Sin resultados inventados y con el estado técnico visible.</p>
+          <div class="hero-actions"><a id="hero-open" class="primary"></a><a id="hero-view"></a></div>
           <div class="legend"><span><i class="working"></i><b data-i18n="status.working">Funciona</b></span><span><i class="simulated"></i><b data-i18n="status.simulated">Simulado</b></span><span><i class="experimental"></i><b data-i18n="status.experimental">Experimental</b></span></div>
         </div>
-        <a class="hero-frame" href="https://hugomenz.github.io/rfq-intelligence-live/" aria-label="Open Menz RFQ Copilot demo">
-          <span class="frame-index">FRAME 01 · PRIMARY CASE</span>
-          <img src="./assets/rfq.png" alt="Menz RFQ Copilot running with a synthetic technical request" />
-          <b data-i18n="projects.rfq.name">Menz RFQ Copilot</b>
-        </a>
+
+        <div class="hero-showcase" aria-live="polite">
+          <a id="hero-frame" class="hero-frame">
+            <span id="hero-frame-index" class="frame-index"></span>
+            <img id="hero-image" alt="" />
+            <b id="hero-project-name"></b>
+          </a>
+          <div class="slider-controls">
+            <button id="hero-prev" class="slider-arrow" type="button" aria-label="Anterior">←</button>
+            <div id="hero-dots" class="slider-dots" aria-label="Casos del portfolio"></div>
+            <button id="hero-next" class="slider-arrow" type="button" aria-label="Siguiente">→</button>
+          </div>
+        </div>
       </section>
 
-      <div class="index-strip" id="work"><span>01 RFQ</span><span>02 RAG SECURITY</span><span>03 FRIDGEFLOW</span><span>04 AGENT OBSERVATORY</span><span>05 MUSIC SCHOOL</span></div>
+      <nav class="index-strip" id="work" aria-label="Cinco casos"></nav>
       <div id="projects" class="projects" aria-live="polite"></div>
-
-      <section id="automation" class="workflow-proof">
-        <div class="workflow-proof-copy">
-          <p class="proof-kicker" data-i18n="automation.kicker">N8N · WORKFLOW PROOF</p>
-          <h2 data-i18n="automation.title">Dentro de las automatizaciones.</h2>
-          <p data-i18n="automation.copy">Capturas reales del editor local de n8n con los workflows JSON versionados. Muestran la arquitectura importada, no ejecuciones de producción.</p>
-        </div>
-        <div class="n8n-gallery">
-          <figure><img src="./assets/n8n-rfq.jpg" alt="n8n editor with the RFQ multimodal workflow" loading="lazy" /><figcaption data-i18n="automation.rfq">RFQ multimodal · evidencia, revisión comercial y guardrails</figcaption></figure>
-          <figure><img src="./assets/n8n-fridge.jpg" alt="n8n editor with the FridgeFlow Telegram workflow" loading="lazy" /><figcaption data-i18n="automation.fridge">FridgeFlow · voz de Telegram, validación e inventario</figcaption></figure>
-          <figure><img src="./assets/n8n-rag.jpg" alt="n8n editor with the secure RAG workflow" loading="lazy" /><figcaption data-i18n="automation.rag">Second Brain · recuperación, cuarentena y citas</figcaption></figure>
-          <figure><img src="./assets/n8n-agent.jpg" alt="n8n editor with the agent orchestrator workflow" loading="lazy" /><figcaption data-i18n="automation.agent">Agent Observatory · bucle, despliegue y control externo</figcaption></figure>
-        </div>
-      </section>
-
-      <section id="approach" class="approach">
-        <div><h2 data-i18n="approach.title">La diferencia está en los límites.</h2><p data-i18n="approach.copy">Cada caso explica qué está construido, qué usa datos sintéticos y qué sigue siendo arquitectura. Las demos públicas no necesitan credenciales ni contienen datos reales.</p></div>
-        <div class="principles"><span data-i18n="approach.one">Interfaz que demuestra el flujo</span><span data-i18n="approach.two">Automatización con revisión humana</span><span data-i18n="approach.three">Seguridad y estado documentados</span></div>
-      </section>
     </main>
 
-    <footer><span>Hugo Menz · Stuttgart</span><a href="https://hugomenz.de">hugomenz.de</a><a href="https://github.com/hugomenz">GitHub</a></footer>
+    <div id="section-navigation"></div>
+
+    <dialog id="workflow-dialog" class="workflow-dialog" aria-labelledby="workflow-dialog-title">
+      <div class="dialog-bar">
+        <div><p class="eyebrow" data-i18n="workflow.label">Flujo del proyecto</p><h2 id="workflow-dialog-title"></h2></div>
+        <button class="dialog-close" type="button" data-dialog-close aria-label="Cerrar">×</button>
+      </div>
+      <div class="dialog-canvas"><img id="workflow-dialog-image" alt="" /></div>
+      <div class="dialog-footer"><p id="workflow-dialog-copy"></p><a id="workflow-dialog-link" class="primary"></a></div>
+    </dialog>
+
+    <footer>
+      <span>Hugo Menz · Stuttgart</span>
+      <a href="https://hugomenz.de">hugomenz.de</a>
+      <a href="https://github.com/hugomenz">GitHub</a>
+      <a href="https://www.linkedin.com/in/hugomartin-menz/">LinkedIn</a>
+    </footer>
     <script type="module" src="./app.js"></script>
   </body>
 </html>

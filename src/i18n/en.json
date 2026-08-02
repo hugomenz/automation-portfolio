@@ -1,18 +1,96 @@
 {
-  "meta": { "title": "Hugo Menz · Working systems", "description": "Five inspectable automation, application and workflow case studies." },
-  "nav": { "work": "Work", "workflows": "Workflows", "approach": "Approach", "language": "Language" },
-  "hero": { "title": "Systems you can open, test and inspect.", "lead": "Five real cases across automation, applications and workflows. No invented results, with the technical state kept visible.", "openPrimary": "Open RFQ Copilot", "seeAll": "See all five cases" },
+  "meta": {
+    "pages": {
+      "home": { "title": "Hugo Menz · Working systems", "description": "Five inspectable automation, application and workflow case studies." },
+      "workflows": { "title": "Hugo Menz · N8N Workflows", "description": "Real, versioned n8n workflows from five automation projects." },
+      "approach": { "title": "Hugo Menz · How I work", "description": "Inspectable demos, human review and visible technical boundaries." }
+    }
+  },
+  "nav": { "work": "Cases", "workflows": "N8N Workflows", "approach": "How I work", "language": "Language" },
+  "hero": { "kicker": "PORTFOLIO · FIVE CASES", "title": "Systems you can open, test and inspect.", "lead": "Five real cases across automation, applications and workflows. No invented results, with the technical state kept visible.", "openCase": "Open", "viewCase": "View this case", "previous": "Previous case", "next": "Next case", "frame": "FRAME" },
   "status": { "working": "Working", "simulated": "Simulated", "experimental": "Experimental" },
-  "labels": { "problem": "Problem", "solution": "Solution", "how": "How it works", "technology": "Technology" },
-  "actions": { "openDemo": "Open demo", "openRepo": "View repository" },
-  "workflow": { "label": "Workflow", "openFigma": "Open editable diagram", "diagramAlt": "Visual workflow diagram" },
-  "automation": { "kicker": "N8N · WORKFLOW PROOF", "title": "Inside the automations.", "copy": "Real screenshots from a local n8n editor with the versioned workflow JSON files. They show the imported architecture, not production executions.", "rfq": "Multimodal RFQ · evidence, commercial review and guardrails", "fridge": "FridgeFlow · Telegram voice, validation and inventory", "rag": "Second Brain · retrieval, quarantine and citations", "agent": "Agent Observatory · loop, deployment and external control" },
-  "approach": { "title": "The boundaries are part of the work.", "copy": "Every case says what is built, what uses synthetic data and what remains architecture. Public demos need no credentials and contain no real data.", "one": "An interface that demonstrates the flow", "two": "Automation with human review", "three": "Security and state documented" },
+  "labels": { "problem": "Problem", "solution": "Solution", "how": "How it works", "try": "In the demo", "technology": "Technology" },
+  "actions": { "openDemo": "Open demo", "openRepo": "View repository", "viewWorkflow": "View N8N workflow" },
+  "workflow": { "label": "Project flow", "zoom": "Enlarge diagram", "diagramAlt": "Visual workflow diagram", "dialogCopy": "This diagram summarises the path without showing every check and node. The N8N Workflows page explains the real implementation.", "viewPage": "View N8N Workflows", "zoomLabel": "Enlarged view" },
+  "scrollNav": { "label": "Section navigation", "section": "Section", "jump": "Jump to a section" },
+  "workflowPage": {
+    "kicker": "N8N · REAL ARCHITECTURE",
+    "title": "Workflows that separate decisions, controls and effects.",
+    "lead": "Each automation is split by responsibility. Here are the largest workflows, why they exist and what still needs runtime validation.",
+    "truth": "The screenshots come from a local n8n editor with the versioned JSON files. They show imported architecture, not production executions.",
+    "labels": { "why": "Why", "purpose": "Purpose", "how": "How it works", "set": "Project workflows", "state": "Real state:", "editor": "Real n8n editor screenshot", "diagram": "Architecture diagram" },
+    "cases": {
+      "rfq": {
+        "title": "MA RFQ Multimodal Agents",
+        "summary": "The main workflow receives text, PDFs and images and prepares a decision package before sales and engineering create an offer.",
+        "why": "A technical RFQ mixes requirements, documents and internal knowledge. Handling it in one hidden prompt would conceal important steps.",
+        "purpose": "Separate evidence extraction, critical review and readiness decisions while keeping final approval with a person.",
+        "how": "The webhook normalises the input. Evidence Agent queries approved sources. Challenger finds contradictions. Deterministic rules calculate blockers and routing.",
+        "set": ["One main multimodal workflow", "Evidence Agent with approved Markdown knowledge", "Challenger Agent and deterministic guardrails"],
+        "state": "The workflow is versioned and connected to the public demo. Credentials and company-specific rules stay outside the repository.",
+        "imageAlt": "Multimodal RFQ workflow imported in the n8n editor"
+      },
+      "rag": {
+        "title": "Second Brain · Secure Ask",
+        "summary": "Second Brain uses two workflows. Capture prepares and indexes notes. Ask retrieves context, treats notes as untrusted data and validates the sources used.",
+        "why": "Capturing knowledge and answering questions have different risks and effects. Separating them exposes writes, retrieval and the trust boundary.",
+        "purpose": "Prevent a retrieved note from giving orders to the system and prevent decorative citations from being shown as real evidence.",
+        "how": "Ask validates identity and question, creates the embedding, retrieves owner-isolated matches, bounds the context and accepts only validated source IDs.",
+        "set": ["Capture: normalisation, chunking, embeddings and ingestion", "Ask: search, bounded context, answer and citations", "Contracts and RAG attack tests"],
+        "state": "Both JSON exports are versioned and inactive. The lab reproduces defences; end-to-end execution with real services still requires configuration.",
+        "imageAlt": "Second Brain Ask workflow imported in the n8n editor"
+      },
+      "fridge": {
+        "title": "Telegram Audio Intake v2",
+        "summary": "The large workflow converts a Telegram voice note into a validated inventory event without letting a model choose identity, SQL or credentials.",
+        "why": "A spoken instruction may be duplicated, incomplete or misheard. Applying it directly to inventory would be difficult to audit.",
+        "purpose": "Keep the original message, deduplicate, transcribe, extract a structured proposal and request review when confidence is low.",
+        "how": "It verifies Telegram, creates an ingestion record, transcribes, validates the event against a contract and only then prepares a deterministic Supabase change.",
+        "set": ["01 Audio Intake v2: receipt, voice, validation and inventory", "90 Error Handler: classification and safe notification", "InventoryEvent contract shared with the application"],
+        "state": "Both workflows are versioned and importable. Telegram, transcription and Supabase need credentials and a controlled test before activation.",
+        "imageAlt": "FridgeFlow audio workflow imported in the n8n editor"
+      },
+      "agent": {
+        "title": "03 Orchestrator",
+        "summary": "Agent Observatory splits an autonomous loop into nine workflows so start, control, agents, commit, observation and errors have independent boundaries.",
+        "why": "One giant workflow would hide the kill switch, GitHub permissions and the decision to continue another round.",
+        "purpose": "Make visible which agent proposes, which one builds, when GitHub is changed and which external control can stop the next round.",
+        "how": "Orchestrator calls Explorer, Builder, Commit and Observer in sequence. Before every round it checks Control Gate and stores messages and events in Supabase.",
+        "set": ["Public Start, Control Gate and Orchestrator", "Explorer, Builder, GitHub Commit and Observer", "External Control and Error Handler"],
+        "state": "Nine statically validated JSON files and a synthetic public trace. Combined execution in a production n8n runtime remains experimental.",
+        "imageAlt": "Agent Observatory Orchestrator workflow imported in the n8n editor"
+      },
+      "music": {
+        "title": "Music School Enquiry",
+        "summary": "A small workflow receives a structured enquiry, validates the fields and prepares a short notification for the person managing the school.",
+        "why": "A family needs to ask about a course and schedule without understanding internal planning or completing a long form.",
+        "purpose": "Turn the enquiry into a clear Telegram message while leaving the reply and final confirmation with a person.",
+        "how": "The webhook receives course, level, day and contact. A deterministic step validates the payload and the Telegram node notifies the configured administrator.",
+        "set": ["One enquiry and notification workflow", "Deterministic validation before Telegram", "The final reply is always human"],
+        "state": "Importable, inactive template. The public demo only shows a preview and sends no data.",
+        "imageAlt": "Music School enquiry workflow diagram"
+      }
+    }
+  },
+  "approachPage": {
+    "kicker": "METHOD · VISIBLE BOUNDARIES",
+    "title": "The difference is in how the system is checked.",
+    "lead": "I build a surface that makes the flow understandable, separate decisions from effects and document what has not been validated yet.",
+    "sections": {
+      "evidence": { "title": "Start with proof you can open", "copy": "The interface shows the path with synthetic data and lets people inspect the result without preparing private infrastructure.", "detail": "The demo is not the integration. It helps agree on behaviour, language and decisions before connecting real systems.", "result": "Something concrete to discuss from day one." },
+      "human": { "title": "Human review is part of the design", "copy": "When a decision can affect a customer, inventory or repository, the workflow prepares evidence and keeps final control with a person.", "detail": "Models can extract or propose. Rules control routing, and sensitive effects need an explicit boundary.", "result": "Automation without hiding who decides." },
+      "boundaries": { "title": "Working, simulated and experimental stay separate", "copy": "Each case distinguishes implemented behaviour, demo data and architecture that still needs a real environment.", "detail": "I do not present n8n imports as production runs or a Telegram preview as a real message.", "result": "The technical state can be read without guessing." },
+      "delivery": { "title": "Build, tests and documentation are the delivery", "copy": "Repositories include instructions, architecture, screenshots and reproducible checks before GitHub Pages publication.", "detail": "Credentials, customer documents and personal data stay out. Changes are checked on desktop and mobile and deployed from the repository.", "result": "A base another person can inspect and continue." }
+    },
+    "closingKicker": "THE RESULT",
+    "closingTitle": "A demo you can open and an architecture you can discuss.",
+    "backToCases": "View the five cases"
+  },
   "projects": {
-    "rfq": { "name": "Menz RFQ Copilot", "role": "Primary case", "summary": "A fit check for complex technical requests before an offer is prepared.", "problem": "Sales and engineering receive requirements spread across forms, email and documents. Contradictions can surface late.", "solution": "Structures the request, separates evidence from questions, flags contradictions and prepares customer questions.", "how": "Load the sample, run the analysis and inspect the decision, blockers, evidence and reply draft.", "working": "Interface, multimodal analysis, deterministic rules, evidence and review agents, and provider rate-limit fallback.", "simulated": "The demo uses a synthetic RFQ and does not represent a real customer.", "experimental": "Company-specific rules and knowledge need configuration before production use.", "tech": "React, TypeScript, Vite, n8n, PDF and image analysis.", "imageAlt": "Menz RFQ Copilot analysing a synthetic technical request" },
-    "rag": { "name": "Second Brain RAG Security Lab", "role": "Technical differentiator", "summary": "A visual lab showing how a malicious note can influence a RAG workflow.", "problem": "Retrieved content can contain instructions, and a valid citation does not prove an answer is grounded.", "solution": "Reproduces attacks with synthetic notes, exposes the chain of custody and compares original and hardened behavior.", "how": "Choose an attack, edit the note and follow retrieval, context, quarantine and answer validation.", "working": "Contracts, Supabase functions, n8n workflows, security tests and two reproduced mitigations.", "simulated": "The demo is deterministic in the browser and calls neither a model nor a private database.", "experimental": "Owner identity through a trusted header remains a conditional risk pending signing and expiry.", "tech": "Next.js, Supabase, n8n, OpenRouter, Python and contract tests.", "imageAlt": "RAG security lab comparing exposed and hardened retrieval workflows" },
-    "fridge": { "name": "FridgeFlow", "role": "Human-facing product", "summary": "A mobile view for deciding what food to use first without treating estimates as safety advice.", "problem": "A household inventory loses value when dates, prepared meals and uncertainty are mixed together.", "solution": "Prioritises use today, use soon, prepared and needs confirmation, with manual or Telegram input.", "how": "Explore the synthetic household, open items and inspect activity and connections. Mutations are disabled in the demo.", "working": "Responsive application, Supabase model, actions, events and a prepared Telegram integration.", "simulated": "The public Pages build and its screenshot use a synthetic household and require no login.", "experimental": "Voice interpretation and automation need configured services and credentials.", "tech": "Next.js, React, TypeScript, Supabase and n8n.", "imageAlt": "FridgeFlow showing food priorities with synthetic data" },
-    "agent": { "name": "Agent Observatory", "role": "Architecture and control", "summary": "An observatory for executions, conversations, commits, events and an external kill switch.", "problem": "An agent system is difficult to evaluate when decisions and changes are not visible.", "solution": "Brings conversation, evidence, commits and operating limits into one surface.", "how": "Select a synthetic run, read each agent, inspect the commit, the blocked event and the control boundary.", "working": "Two Angular applications, nine validated workflows, Supabase model and a public trace dashboard.", "simulated": "Pages uses a synthetic trace and disables controls that require administrator access.", "experimental": "The workflows have not yet been verified together in a production n8n runtime.", "tech": "Angular, TypeScript, Supabase, n8n and GitHub Actions.", "imageAlt": "Agent Observatory showing a synthetic multi-agent trace" },
-    "music": { "name": "Music School Automation", "role": "Architecture and automation", "summary": "A simple course and schedule enquiry with a structured Telegram handoff.", "problem": "A person wants to ask about lessons without understanding the internal timetable or completing a long form.", "solution": "Guides course, level, day and contact, then prepares one concise message for a human reply.", "how": "Choose a synthetic course, complete the enquiry and inspect the exact Telegram notification preview.", "working": "Responsive application, payload validation and an inactive, importable n8n workflow.", "simulated": "The demo sends no data and only prepares a browser preview.", "experimental": "A future conversational assistant is described as architecture, not implemented.", "tech": "HTML, CSS, JavaScript, n8n and Telegram.", "imageAlt": "Music School application with synthetic courses and enquiry form" }
+    "rfq": { "name": "Menz RFQ Copilot", "role": "Primary case", "summary": "A fit check for complex technical requests before an offer is prepared.", "problem": "Sales and engineering receive requirements spread across forms, email and documents. Contradictions can surface late.", "solution": "Structures the request, separates evidence from questions, flags contradictions and prepares customer questions.", "how": "Text, PDFs and images pass through evidence, critical review and readiness rules before a human decision package is created.", "try": "Load the synthetic RFQ and inspect the decision, blockers, sources and reply draft.", "working": "Interface, multimodal analysis, deterministic rules, evidence and review agents, and provider rate-limit fallback.", "simulated": "The demo uses a synthetic RFQ and does not represent a real customer.", "experimental": "Company-specific rules and knowledge need configuration before production use.", "tech": "React, TypeScript, Vite, n8n, PDF and image analysis.", "imageAlt": "Menz RFQ Copilot analysing a synthetic technical request" },
+    "rag": { "name": "Second Brain RAG Security Lab", "role": "Technical differentiator", "summary": "A visual lab for testing how a malicious note can influence a RAG workflow.", "problem": "Retrieved content can contain instructions, and a valid citation does not prove an answer is grounded.", "solution": "Reproduces attacks with synthetic notes, exposes the chain of custody and compares original and hardened behaviour.", "how": "The lab follows retrieval, context, quarantine and validation to show where an instruction is accepted or blocked.", "try": "Choose an attack, edit the note and compare exposed and hardened results.", "working": "Contracts, Supabase functions, n8n workflows, security tests and two reproduced mitigations.", "simulated": "The demo is deterministic in the browser and calls neither a model nor a private database.", "experimental": "Owner identity through a trusted header remains a conditional risk pending signing and expiry.", "tech": "Next.js, Supabase, n8n, OpenRouter, Python and contract tests.", "imageAlt": "RAG security lab comparing exposed and hardened retrieval workflows" },
+    "fridge": { "name": "FridgeFlow", "role": "Human-facing product", "summary": "A mobile view for deciding what food to use first without treating estimates as safety advice.", "problem": "A household inventory loses value when dates, prepared meals and uncertainty are mixed together.", "solution": "Prioritises use today, use soon, prepared and needs confirmation, with manual or Telegram input.", "how": "The application keeps inventory and events; the voice workflow proposes structured changes and routes uncertainty to review.", "try": "Explore the synthetic household and inspect items, priorities, activity and connections.", "working": "Responsive application, Supabase model, actions, events and a prepared Telegram integration.", "simulated": "The public Pages build and its screenshot use a synthetic household and require no login.", "experimental": "Voice interpretation and automation need configured services and credentials.", "tech": "Next.js, React, TypeScript, Supabase and n8n.", "imageAlt": "FridgeFlow showing food priorities with synthetic data" },
+    "agent": { "name": "Agent Observatory", "role": "Architecture and control", "summary": "An observatory for executions, conversations, commits, events and an external kill switch.", "problem": "An agent system is difficult to evaluate when decisions and changes are not visible.", "solution": "Brings conversation, evidence, commits and operating limits into one surface.", "how": "Nine workflows separate start, control, Explorer, Builder, commit, observation and errors; the UI brings the trace together.", "try": "Select a synthetic run and inspect messages, commit, blocked event and control limit.", "working": "Two Angular applications, nine validated workflows, Supabase model and a public trace dashboard.", "simulated": "Pages uses a synthetic trace and disables controls that require administrator access.", "experimental": "The workflows have not yet been verified together in a production n8n runtime.", "tech": "Angular, TypeScript, Supabase, n8n and GitHub Actions.", "imageAlt": "Agent Observatory showing a synthetic multi-agent trace" },
+    "music": { "name": "Music School Automation", "role": "Architecture and automation", "summary": "A simple course and schedule enquiry with a structured Telegram handoff.", "problem": "A person wants to ask about lessons without understanding the internal timetable or completing a long form.", "solution": "Guides course, level, day and contact, then prepares one concise message for a human reply.", "how": "The form creates a clear payload; n8n validates it and the prepared integration notifies the administrator on Telegram.", "try": "Choose a synthetic course, complete the enquiry and inspect the exact notification preview.", "working": "Responsive application, payload validation and an inactive, importable n8n workflow.", "simulated": "The demo sends no data and only prepares a browser preview.", "experimental": "A future conversational assistant is described as architecture, not implemented.", "tech": "HTML, CSS, JavaScript, n8n and Telegram.", "imageAlt": "Music School application with synthetic courses and enquiry form" }
   }
 }
