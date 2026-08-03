@@ -1,4 +1,5 @@
-const projectOrder = ['rfq', 'rag', 'fridge', 'agent', 'music'];
+const baseProjectOrder = ['rfq', 'rag', 'fridge', 'agent', 'music'];
+let projectOrder = baseProjectOrder;
 const approachOrder = ['evidence', 'human', 'boundaries', 'delivery'];
 const supportedLanguages = ['es', 'en', 'de'];
 const siteBase = new URL('./', import.meta.url);
@@ -10,24 +11,29 @@ const projectMeta = {
     demo: 'https://hugomenz.github.io/rfq-intelligence-live/', repo: 'https://github.com/hugomenz/rfq-intelligence-live',
     platforms: ['custom', 'n8n', 'github'],
   },
+  order: {
+    image: 'order-entry.jpg', workflow: 'order-entry-workflow.svg', n8n: null, index: '02', short: 'ORDER',
+    demo: 'https://www.hugomenz.de/leistungen/auftragserfassung-automatisierung/', repo: null,
+    platforms: ['custom', 'n8n'],
+  },
   rag: {
-    image: 'rag-security.png', workflow: 'rag-workflow.png', n8n: 'n8n-rag.jpg', index: '02', short: 'RAG',
+    image: 'rag-security.png', workflow: 'rag-workflow.png', n8n: 'n8n-rag.jpg', index: '03', short: 'RAG',
     demo: 'https://hugomenz.github.io/second-brain/', repo: 'https://github.com/hugomenz/second-brain',
     platforms: ['custom', 'n8n', 'supabase', 'obsidian', 'github'],
   },
   fridge: {
-    image: 'fridgeflow.png', workflow: 'fridge-workflow.png', n8n: 'n8n-fridge.jpg', index: '03', short: 'FRIDGE',
+    image: 'fridgeflow.png', workflow: 'fridge-workflow.png', n8n: 'n8n-fridge.jpg', index: '04', short: 'FRIDGE',
     demo: 'https://hugomenz.github.io/fridge-flow/', repo: 'https://github.com/hugomenz/fridge-flow',
     platforms: ['custom', 'n8n', 'telegram', 'supabase'],
   },
   agent: {
-    image: 'agent-observatory.png', workflow: 'agent-workflow.png', n8n: 'n8n-agent.jpg', index: '04', short: 'AGENTS',
+    image: 'agent-observatory.png', workflow: 'agent-workflow.png', n8n: 'n8n-agent.jpg', index: '05', short: 'AGENTS',
     demo: 'https://hugomenz.github.io/agent-chaos-lab/exp-app/', secondaryDemo: 'https://hugomenz.github.io/agent-chaos-lab/logger/',
     imageLink: 'https://hugomenz.github.io/agent-chaos-lab/logger/', repo: 'https://github.com/hugomenz/agent-chaos-lab',
     platforms: ['custom', 'n8n', 'supabase', 'github'],
   },
   music: {
-    image: 'music-school.png', workflow: 'music-workflow.png', n8n: null, index: '05', short: 'MUSIC',
+    image: 'music-school.png', workflow: 'music-workflow.png', n8n: null, index: '06', short: 'MUSIC',
     demo: 'https://hugomenz.github.io/music-school-automation/', repo: 'https://github.com/hugomenz/music-school-automation',
     platforms: ['custom', 'n8n', 'telegram'], extensionPlatform: 'twilio',
   },
@@ -130,6 +136,7 @@ function updateHeroSlide(position) {
 function renderHero() {
   const dots = document.querySelector('#hero-dots');
   if (!dots) return;
+  dots.setAttribute('aria-label', messages.hero.indexLabel);
   dots.innerHTML = projectOrder.map((key, index) => {
     const project = messages.projects[key];
     return `<button type="button" data-slide="${index}" aria-label="${project.name}">${projectMeta[key].index}</button>`;
@@ -150,6 +157,8 @@ function renderProjects() {
   const container = document.querySelector('#projects');
   const index = document.querySelector('#work');
   if (!container || !index) return;
+
+  index.setAttribute('aria-label', messages.hero.indexLabel);
 
   index.innerHTML = projectOrder.map((key) => {
     const meta = projectMeta[key];
@@ -186,7 +195,7 @@ function renderProjects() {
           <div class="scope-note"><p class="eyebrow">${messages.labels.scope}</p><p>${project.scope}</p></div>
           <div class="platforms"><p class="eyebrow">${messages.labels.platforms}</p>${renderPlatforms(meta.platforms)}</div>
           ${project.extension ? `<div class="project-extension"><div>${renderPlatforms([meta.extensionPlatform])}</div><p><b>${messages.labels.extension}</b> ${project.extension}</p></div>` : ''}
-          <div class="project-actions"><a class="primary" href="${meta.demo}">${messages.actions.openDemo}</a>${meta.secondaryDemo ? `<a href="${meta.secondaryDemo}">${messages.actions.openObservatory}</a>` : ''}<a href="${routeUrl('workflows', document.documentElement.lang, `workflow-${key}`)}">${messages.actions.viewWorkflow}</a><a href="${meta.repo}">${messages.actions.openRepo}</a></div>
+          <div class="project-actions"><a class="primary" href="${meta.demo}">${messages.actions.openDemo}</a>${meta.secondaryDemo ? `<a href="${meta.secondaryDemo}">${messages.actions.openObservatory}</a>` : ''}<a href="${routeUrl('workflows', document.documentElement.lang, `workflow-${key}`)}">${messages.actions.viewWorkflow}</a>${meta.repo ? `<a href="${meta.repo}">${messages.actions.openRepo}</a>` : ''}</div>
         </aside>
       </div>
     </article>`;
@@ -219,7 +228,7 @@ function renderWorkflowCases() {
           <div class="workflow-set"><p class="eyebrow">${messages.workflowPage.labels.set}</p><ul>${data.set.map((item) => `<li>${item}</li>`).join('')}</ul></div>
           <p class="workflow-state"><b>${messages.workflowPage.labels.state}</b> ${data.state}</p>
           <div class="platforms"><p class="eyebrow">${messages.labels.platforms}</p>${renderPlatforms(meta.platforms)}</div>
-          <div class="project-actions"><a class="primary" href="${meta.demo}">${messages.actions.openDemo}</a>${meta.secondaryDemo ? `<a href="${meta.secondaryDemo}">${messages.actions.openObservatory}</a>` : ''}<a href="${meta.repo}">${messages.actions.openRepo}</a></div>
+          <div class="project-actions"><a class="primary" href="${meta.demo}">${messages.actions.openDemo}</a>${meta.secondaryDemo ? `<a href="${meta.secondaryDemo}">${messages.actions.openObservatory}</a>` : ''}${meta.repo ? `<a href="${meta.repo}">${messages.actions.openRepo}</a>` : ''}</div>
         </aside>
       </div>
     </article>`;
@@ -336,10 +345,16 @@ async function setLanguage(language, { syncUrl = true } = {}) {
   const response = await fetch(new URL(`i18n/${language}.json`, siteBase));
   if (!response.ok) throw new Error(`Translation failed: ${response.status}`);
   messages = await response.json();
+  projectOrder = messages.projects.order
+    ? ['rfq', 'order', 'rag', 'fridge', 'agent', 'music']
+    : baseProjectOrder;
   document.documentElement.lang = language;
   document.title = messages.meta.pages[page].title;
   document.querySelector('meta[name="description"]').content = messages.meta.pages[page].description;
   document.querySelector('#language-selector').value = language;
+  document.querySelector('header nav').setAttribute('aria-label', messages.a11y.primaryNavigation);
+  document.querySelector('#language-selector').setAttribute('aria-label', messages.a11y.languageSelector);
+  document.querySelector('[data-dialog-close]').setAttribute('aria-label', messages.a11y.closeDialog);
   localStorage.setItem('portfolio-language', language);
   if (syncUrl) syncLanguageUrl(language);
   applyStaticTranslations();

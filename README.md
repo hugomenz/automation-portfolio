@@ -6,7 +6,7 @@
 
 [Home screenshot](docs/screenshots/desktop.png) · [workflow page screenshot](docs/screenshots/workflows-en.png)
 
-Trilingual GitHub Pages portfolio for five inspectable automation and workflow case studies.
+GitHub Pages portfolio with six inspectable German/English automation cases and five established Spanish cases.
 
 ![Portfolio with Menz RFQ Copilot as the principal case](docs/screenshots/desktop.png)
 
@@ -18,7 +18,7 @@ Trilingual GitHub Pages portfolio for five inspectable automation and workflow c
 4. Agent Chaos Lab, a webhook and CRUD experiment coordinated through n8n, with Agent Observatory as its runtime view.
 5. Music School Automation, course enquiries and an n8n-to-Telegram handoff, with Twilio documented only as a possible extension.
 
-Every case explains the complete product, its five-step flow, connected platforms and one concise public-demo scope note. The home page contains the five project cases, the dedicated `/workflows/` route explains how each n8n workflow set collaborates, and `/approach/` documents the delivery method. Screenshots in `src/assets` were captured from the current local builds and n8n editor.
+Every case explains the complete product, its five-step flow, connected platforms and one concise public-demo scope note. German and English add AuftragKlar as a secondary Order Entry research case after the primary RFQ case; Spanish intentionally keeps the established five-case set. The dedicated `/workflows/` route explains each implementation, and `/approach/` documents the delivery method. Screenshots in `src/assets` were captured from current local builds and n8n where applicable.
 
 ## Run
 
@@ -33,4 +33,4 @@ Translations are maintained independently in `src/i18n/es.json`, `en.json` and `
 
 The portfolio is a dependency-free multipage static application. `src/app.js` loads one of the three translation JSON files and renders the home cases, workflow explanations or approach sections according to the current route. Each case uses a full-width screenshot followed by two content columns, platform logos, project-specific actions and a zoomable workflow diagram. The home slider changes its project and CTAs, the section navigator follows scroll position, and native dialogs enlarge diagrams without leaving the site. No credential or personal dataset is required at runtime.
 
-`npm run check` verifies translation parity, five projects and workflow cases, complete project flows, platform logos, the absence of the old repeated status grid, three routes, slider, scroll navigation, native dialog, LinkedIn footer, responsive CSS, screenshot presence and common secret patterns before building `dist/` for GitHub Pages.
+`npm run check` verifies German/English parity, the intentional Spanish case boundary, complete flows, platform logos, route/navigation behaviour, responsive CSS, evidence assets and common secret patterns before building `dist/` for GitHub Pages.
