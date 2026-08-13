@@ -1,0 +1,102 @@
+{
+  "name": "LAB 08 - Supplier Document Control",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "48ed2b80-49ed-4d13-aaed-2ea64bed3039",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fixtures = [{\"id\":\"valid-docs\",\"label\":\"Dokumentensatz vollständig\",\"kind\":\"happy\",\"input\":{\"eventId\":\"DOC-DEMO-8001\",\"supplier\":\"Demo Sensorik GmbH\",\"expected\":[\"ISO 9001\",\"RoHS\",\"Kalibrierschein\"],\"documents\":[{\"type\":\"ISO 9001\",\"version\":\"2025-2\",\"validUntil\":\"2027-06-30\"},{\"type\":\"RoHS\",\"version\":\"2026-1\",\"validUntil\":\"2028-01-31\"},{\"type\":\"Kalibrierschein\",\"version\":\"K-260711\",\"validUntil\":\"2027-07-11\"}]}},{\"id\":\"expiring-cert\",\"label\":\"Zertifikat läuft ab\",\"kind\":\"edge\",\"input\":{\"eventId\":\"DOC-DEMO-8002\",\"supplier\":\"Fiktiv Messtechnik KG\",\"expected\":[\"ISO 9001\",\"Kalibrierschein\"],\"referenceDate\":\"2026-08-13\",\"documents\":[{\"type\":\"ISO 9001\",\"version\":\"2024-1\",\"validUntil\":\"2026-09-02\"},{\"type\":\"Kalibrierschein\",\"version\":\"K-260101\",\"validUntil\":\"2027-01-01\"}]}},{\"id\":\"missing-declaration\",\"label\":\"Erklärung fehlt\",\"kind\":\"error\",\"input\":{\"eventId\":\"DOC-DEMO-8003\",\"supplier\":\"Muster Kabeltechnik GmbH\",\"expected\":[\"ISO 9001\",\"RoHS\"],\"documents\":[{\"type\":\"ISO 9001\",\"version\":\"2025-4\",\"validUntil\":\"2028-04-20\"}]}}];\nreturn fixtures.map((fixture) => ({ json: { workflow: 'supplier-docs', ...fixture } }));"
+      },
+      "id": "7c6b9646-7d6b-47d9-aa6b-93207b6b94b3",
+      "name": "Synthetic Fixtures",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => {\n  const fixture = item.json;\n  const state = fixture.kind === 'happy' ? 'READY_FOR_REVIEW' : fixture.kind === 'edge' ? 'REVIEW_REQUIRED' : 'STOPPED_FOR_REVIEW';\n  return { json: {\n    workflow: fixture.workflow,\n    scenario: fixture.id,\n    evidenceType: 'Synthetic Demo',\n    status: state,\n    humanRequired: true,\n    correlationId: fixture.input.eventId,\n    idempotencyKey: fixture.input.eventId,\n    exceptions: fixture.kind === 'happy' ? [] : [{ code: fixture.kind === 'edge' ? 'REVIEW_RULE' : 'STOP_RULE', message: fixture.label }],\n    audit: ['INPUT_RECEIVED', 'NORMALIZED', 'RULES_CHECKED', state],\n    sourceInput: fixture.input\n  } };\n});"
+      },
+      "id": "5236286b-5136-46d8-a436-2b91533629fe",
+      "name": "Normalize & Evaluate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: {\n  ...item.json,\n  implementationStatus: 'Built and testable',\n  adapterStatus: 'Mocked adapter',\n  humanDecision: 'pending',\n  targetSystem: 'DMS/QMS bleibt führend',\n  preparedOutput: { target: 'DOC_DRAFT', sourceEvent: item.json.correlationId },\n  externalWritePerformed: false,\n  terminalMessage: 'Prepared for human review; no external write.'\n} }));"
+      },
+      "id": "242831f9-2328-4066-a228-2ed321282d40",
+      "name": "Human Review Boundary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Synthetic Fixtures",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Synthetic Fixtures": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Evaluate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize & Evaluate": {
+      "main": [
+        [
+          {
+            "node": "Human Review Boundary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "versionId": "7d39b2fc-7e39-448f-af39-b6228039b7b5",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "syntheticOnly": true
+  },
+  "tags": []
+}

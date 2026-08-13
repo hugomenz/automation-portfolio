@@ -1,0 +1,102 @@
+{
+  "name": "LAB 05 - Invoice / PO Matching",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "723c828b-713c-40f8-a43c-85b1733c841e",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fixtures = [{\"id\":\"three-way-match\",\"label\":\"3-Wege-Match\",\"kind\":\"happy\",\"input\":{\"eventId\":\"INV-DEMO-5001\",\"invoice\":{\"number\":\"RE-2026-0814\",\"supplier\":\"Demo Komponenten GmbH\",\"supplierId\":\"L-2044\",\"po\":\"PO-78031\",\"net\":4820,\"tax\":915.8,\"gross\":5735.8,\"iban\":\"DE02100100100000000002\",\"items\":[{\"sku\":\"KUG-25\",\"quantity\":20,\"unitPrice\":241}]},\"purchaseOrder\":{\"number\":\"PO-78031\",\"supplierId\":\"L-2044\",\"items\":[{\"sku\":\"KUG-25\",\"quantity\":20,\"unitPrice\":241}]},\"goodsReceipt\":{\"po\":\"PO-78031\",\"items\":[{\"sku\":\"KUG-25\",\"quantity\":20}]},\"supplierMaster\":{\"iban\":\"DE02100100100000000002\"},\"evidence\":[{\"source\":\"XRechnung_RE-2026-0814.xml\",\"field\":\"Beträge und IBAN\"},{\"source\":\"ERP PO-78031\",\"field\":\"Bestellposition\"}]}},{\"id\":\"quantity-delta\",\"label\":\"Mengenabweichung\",\"kind\":\"edge\",\"input\":{\"eventId\":\"INV-DEMO-5002\",\"invoice\":{\"number\":\"RE-2026-0820\",\"supplier\":\"Fiktiv Antriebstechnik KG\",\"supplierId\":\"L-2077\",\"po\":\"PO-78109\",\"net\":3200,\"tax\":608,\"gross\":3808,\"iban\":\"DE02100100100000000003\",\"items\":[{\"sku\":\"MOT-075\",\"quantity\":20,\"unitPrice\":160}]},\"purchaseOrder\":{\"number\":\"PO-78109\",\"supplierId\":\"L-2077\",\"items\":[{\"sku\":\"MOT-075\",\"quantity\":20,\"unitPrice\":160}]},\"goodsReceipt\":{\"po\":\"PO-78109\",\"items\":[{\"sku\":\"MOT-075\",\"quantity\":18}]},\"supplierMaster\":{\"iban\":\"DE02100100100000000003\"},\"evidence\":[{\"source\":\"RE-2026-0820.pdf\",\"field\":\"Position 1\"},{\"source\":\"ERP Wareneingang\",\"field\":\"18 Stück\"}]}},{\"id\":\"iban-change\",\"label\":\"Geänderte IBAN\",\"kind\":\"error\",\"input\":{\"eventId\":\"INV-DEMO-5003\",\"invoice\":{\"number\":\"RE-2026-0824\",\"supplier\":\"Muster Pneumatik GmbH\",\"supplierId\":\"L-2091\",\"po\":\"PO-78133\",\"net\":940,\"tax\":178.6,\"gross\":1118.6,\"iban\":\"DE02100100100000000999\",\"items\":[{\"sku\":\"VLV-24\",\"quantity\":10,\"unitPrice\":94}]},\"purchaseOrder\":{\"number\":\"PO-78133\",\"supplierId\":\"L-2091\",\"items\":[{\"sku\":\"VLV-24\",\"quantity\":10,\"unitPrice\":94}]},\"goodsReceipt\":{\"po\":\"PO-78133\",\"items\":[{\"sku\":\"VLV-24\",\"quantity\":10}]},\"supplierMaster\":{\"iban\":\"DE02100100100000000004\"},\"evidence\":[{\"source\":\"RE-2026-0824.pdf\",\"field\":\"IBAN\"},{\"source\":\"Lieferantenstamm L-2091\",\"field\":\"freigegebene IBAN\"}]}}];\nreturn fixtures.map((fixture) => ({ json: { workflow: 'invoice-match', ...fixture } }));"
+      },
+      "id": "2dc5614b-2cc5-4fb8-afc5-64712ec562de",
+      "name": "Synthetic Fixtures",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => {\n  const fixture = item.json;\n  const state = fixture.kind === 'happy' ? 'READY_FOR_REVIEW' : fixture.kind === 'edge' ? 'REVIEW_REQUIRED' : 'STOPPED_FOR_REVIEW';\n  return { json: {\n    workflow: fixture.workflow,\n    scenario: fixture.id,\n    evidenceType: 'Synthetic Demo',\n    status: state,\n    humanRequired: true,\n    correlationId: fixture.input.eventId,\n    idempotencyKey: fixture.input.eventId,\n    exceptions: fixture.kind === 'happy' ? [] : [{ code: fixture.kind === 'edge' ? 'REVIEW_RULE' : 'STOP_RULE', message: fixture.label }],\n    audit: ['INPUT_RECEIVED', 'NORMALIZED', 'RULES_CHECKED', state],\n    sourceInput: fixture.input\n  } };\n});"
+      },
+      "id": "365d33e2-375d-4575-a45d-30bc355d324f",
+      "name": "Normalize & Evaluate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: {\n  ...item.json,\n  implementationStatus: 'Built and testable',\n  adapterStatus: 'Mocked adapter',\n  humanDecision: 'pending',\n  targetSystem: 'ERP/Finanzsystem bleibt führend',\n  preparedOutput: { target: 'INV_DRAFT', sourceEvent: item.json.correlationId },\n  externalWritePerformed: false,\n  terminalMessage: 'Prepared for human review; no external write.'\n} }));"
+      },
+      "id": "58ce5e66-59ce-4ff9-a6ce-5b4057ce5cd3",
+      "name": "Human Review Boundary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Synthetic Fixtures",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Synthetic Fixtures": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Evaluate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize & Evaluate": {
+      "main": [
+        [
+          {
+            "node": "Human Review Boundary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "versionId": "7159130b-7059-4178-a359-16317259149e",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "syntheticOnly": true
+  },
+  "tags": []
+}

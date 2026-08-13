@@ -1,0 +1,32 @@
+{
+  "workflow": "spec-delta",
+  "scenario": "contradiction",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "LST-DEMO-4003",
+    "customerSpec": "Lastenheft_Linie7.pdf",
+    "internalStandard": "Werksstandard_WS-04.pdf",
+    "requirements": [
+      {
+        "id": "R-03",
+        "text": "Taktzeit 12 s",
+        "page": 3,
+        "standard": "≤ 20 s",
+        "state": "contradiction",
+        "conflictsWith": "R-44: Taktzeit 15 s auf Seite 28"
+      }
+    ],
+    "evidence": [
+      {
+        "source": "Lastenheft_Linie7.pdf",
+        "page": 3,
+        "field": "R-03"
+      },
+      {
+        "source": "Lastenheft_Linie7.pdf",
+        "page": 28,
+        "field": "R-44"
+      }
+    ]
+  }
+}

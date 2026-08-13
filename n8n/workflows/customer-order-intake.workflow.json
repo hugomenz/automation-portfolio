@@ -1,0 +1,102 @@
+{
+  "name": "LAB 01 - Customer Order Intake",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "f1c26de9-f0c2-4c56-afc2-6ac3eec26930",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fixtures = [{\"id\":\"clean-order\",\"label\":\"Passender Auftrag\",\"kind\":\"happy\",\"input\":{\"eventId\":\"ORD-DEMO-1001\",\"receivedAt\":\"2026-08-12T08:14:00Z\",\"document\":\"Bestellung_4500815.pdf\",\"customer\":{\"name\":\"Musterwerk Süd GmbH\",\"number\":\"K-1042\",\"address\":\"Werkstraße 18, 70191 Stuttgart\"},\"orderNumber\":\"4500815\",\"deliveryDate\":\"2026-09-18\",\"shipTo\":\"Tor 3, Werkstraße 18, 70191 Stuttgart\",\"terms\":\"30 Tage netto\",\"items\":[{\"sku\":\"HM-AX-240\",\"description\":\"Achseinheit 240\",\"quantity\":2,\"unitPrice\":1280,\"masterPrice\":1280},{\"sku\":\"HM-SEN-18\",\"description\":\"Näherungssensor M18\",\"quantity\":6,\"unitPrice\":84.5,\"masterPrice\":84.5}],\"evidence\":[{\"source\":\"Bestellung_4500815.pdf\",\"page\":1,\"field\":\"Bestellnummer, Kunde, Liefertermin\"},{\"source\":\"Bestellung_4500815.pdf\",\"page\":2,\"field\":\"Positionen und Preise\"}]}},{\"id\":\"price-deviation\",\"label\":\"Preisabweichung\",\"kind\":\"edge\",\"input\":{\"eventId\":\"ORD-DEMO-1002\",\"receivedAt\":\"2026-08-12T09:05:00Z\",\"document\":\"PO_900144.xlsx\",\"customer\":{\"name\":\"Neckar Montagebau GmbH\",\"number\":\"K-1088\",\"address\":\"Industriestraße 4, 71638 Ludwigsburg\"},\"orderNumber\":\"900144\",\"deliveryDate\":\"2026-09-04\",\"shipTo\":\"Industriestraße 4, 71638 Ludwigsburg\",\"terms\":\"45 Tage netto\",\"items\":[{\"sku\":\"HM-GRD-500\",\"description\":\"Schutzgitter 500\",\"quantity\":10,\"unitPrice\":221,\"masterPrice\":240.5}],\"evidence\":[{\"source\":\"PO_900144.xlsx\",\"page\":\"Tabelle 1\",\"field\":\"Position 10\"}]}},{\"id\":\"unknown-item\",\"label\":\"Unbekannter Artikel\",\"kind\":\"error\",\"input\":{\"eventId\":\"ORD-DEMO-1003\",\"receivedAt\":\"2026-08-12T10:22:00Z\",\"document\":\"Bestellung_7719.pdf\",\"customer\":{\"name\":\"Alb Automationssysteme GmbH\",\"number\":\"K-1097\",\"address\":\"Talweg 7, 72764 Reutlingen\"},\"orderNumber\":\"7719\",\"deliveryDate\":null,\"shipTo\":\"Talweg 7, 72764 Reutlingen\",\"terms\":\"30 Tage netto\",\"items\":[{\"sku\":\"CUSTOM-LINE-7B\",\"description\":\"Sonderhalter laut letzter Anlage\",\"quantity\":4,\"unitPrice\":310,\"masterPrice\":null}],\"evidence\":[{\"source\":\"Bestellung_7719.pdf\",\"page\":1,\"field\":\"Position 1\"}]}}];\nreturn fixtures.map((fixture) => ({ json: { workflow: 'order-intake', ...fixture } }));"
+      },
+      "id": "a38308d9-a283-4746-a183-05b3a0830420",
+      "name": "Synthetic Fixtures",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => {\n  const fixture = item.json;\n  const state = fixture.kind === 'happy' ? 'READY_FOR_REVIEW' : fixture.kind === 'edge' ? 'REVIEW_REQUIRED' : 'STOPPED_FOR_REVIEW';\n  return { json: {\n    workflow: fixture.workflow,\n    scenario: fixture.id,\n    evidenceType: 'Synthetic Demo',\n    status: state,\n    humanRequired: true,\n    correlationId: fixture.input.eventId,\n    idempotencyKey: fixture.input.eventId,\n    exceptions: fixture.kind === 'happy' ? [] : [{ code: fixture.kind === 'edge' ? 'REVIEW_RULE' : 'STOP_RULE', message: fixture.label }],\n    audit: ['INPUT_RECEIVED', 'NORMALIZED', 'RULES_CHECKED', state],\n    sourceInput: fixture.input\n  } };\n});"
+      },
+      "id": "42ddfd88-43dd-4f1b-a4de-00ae45de0241",
+      "name": "Normalize & Evaluate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: {\n  ...item.json,\n  implementationStatus: 'Built and testable',\n  adapterStatus: 'Mocked adapter',\n  humanDecision: 'pending',\n  targetSystem: 'ERP bleibt führend',\n  preparedOutput: { target: 'ORD_DRAFT', sourceEvent: item.json.correlationId },\n  externalWritePerformed: false,\n  terminalMessage: 'Prepared for human review; no external write.'\n} }));"
+      },
+      "id": "b6faaf28-b7fa-40bb-a8fa-b24eb9fab3e1",
+      "name": "Human Review Boundary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Synthetic Fixtures",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Synthetic Fixtures": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Evaluate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize & Evaluate": {
+      "main": [
+        [
+          {
+            "node": "Human Review Boundary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "versionId": "a1e6095d-a0e6-47ca-afe6-06379ee604a4",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "syntheticOnly": true
+  },
+  "tags": []
+}

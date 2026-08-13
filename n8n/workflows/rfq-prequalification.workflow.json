@@ -1,0 +1,102 @@
+{
+  "name": "LAB 06 - RFQ Prequalification",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "196dd20c-1a6d-439f-ab6d-d5321c6dd6c5",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fixtures = [{\"id\":\"complete-rfq\",\"label\":\"Vollständige Anfrage\",\"kind\":\"happy\",\"input\":{\"eventId\":\"RFQ-DEMO-6001\",\"request\":\"Montagezelle für Ventilbaugruppe\",\"quantityPerYear\":180000,\"cycleTimeSeconds\":16,\"interfaces\":[\"Profinet\",\"OPC UA\"],\"targetSop\":\"2027-05-01\",\"requirements\":14,\"contradictions\":[],\"missing\":[],\"evidence\":[{\"source\":\"RFQ_Montagezelle.pdf\",\"page\":4,\"field\":\"Taktzeit\"}]}},{\"id\":\"missing-volume\",\"label\":\"Menge und SOP fehlen\",\"kind\":\"edge\",\"input\":{\"eventId\":\"RFQ-DEMO-6002\",\"request\":\"Prüfstation für Gehäuse\",\"quantityPerYear\":null,\"cycleTimeSeconds\":22,\"interfaces\":[\"CSV\"],\"targetSop\":null,\"requirements\":8,\"contradictions\":[],\"missing\":[\"Jahresmenge\",\"Ziel-SOP\"],\"evidence\":[{\"source\":\"Anfrage_E-Mail\",\"field\":\"Taktzeit\"}]}},{\"id\":\"conflicting-cycle\",\"label\":\"Taktzeit widersprüchlich\",\"kind\":\"error\",\"input\":{\"eventId\":\"RFQ-DEMO-6003\",\"request\":\"Verkettete Prüflinie\",\"quantityPerYear\":240000,\"cycleTimeSeconds\":12,\"interfaces\":[\"Profinet\"],\"targetSop\":\"2027-02-01\",\"requirements\":21,\"contradictions\":[\"E-Mail: 12 s; Lastenheft Seite 9: 15 s\"],\"missing\":[],\"evidence\":[{\"source\":\"E-Mail\",\"field\":\"12 s\"},{\"source\":\"Lastenheft.pdf\",\"page\":9,\"field\":\"15 s\"}]}}];\nreturn fixtures.map((fixture) => ({ json: { workflow: 'rfq-prequal', ...fixture } }));"
+      },
+      "id": "8828dbda-8928-4d6d-a628-d8b48728da47",
+      "name": "Synthetic Fixtures",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => {\n  const fixture = item.json;\n  const state = fixture.kind === 'happy' ? 'READY_FOR_REVIEW' : fixture.kind === 'edge' ? 'REVIEW_REQUIRED' : 'STOPPED_FOR_REVIEW';\n  return { json: {\n    workflow: fixture.workflow,\n    scenario: fixture.id,\n    evidenceType: 'Synthetic Demo',\n    status: state,\n    humanRequired: true,\n    correlationId: fixture.input.eventId,\n    idempotencyKey: fixture.input.eventId,\n    exceptions: fixture.kind === 'happy' ? [] : [{ code: fixture.kind === 'edge' ? 'REVIEW_RULE' : 'STOP_RULE', message: fixture.label }],\n    audit: ['INPUT_RECEIVED', 'NORMALIZED', 'RULES_CHECKED', state],\n    sourceInput: fixture.input\n  } };\n});"
+      },
+      "id": "21b0c18f-20b0-4ffc-a3b0-c4b522b0c322",
+      "name": "Normalize & Evaluate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: {\n  ...item.json,\n  implementationStatus: 'Built and testable',\n  adapterStatus: 'Mocked adapter',\n  humanDecision: 'pending',\n  targetSystem: 'CRM/Angebotsakte bleibt führend',\n  preparedOutput: { target: 'RFQ_DRAFT', sourceEvent: item.json.correlationId },\n  externalWritePerformed: false,\n  terminalMessage: 'Prepared for human review; no external write.'\n} }));"
+      },
+      "id": "2803965d-2703-44ca-a603-9337250391a4",
+      "name": "Human Review Boundary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Synthetic Fixtures",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Synthetic Fixtures": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Evaluate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize & Evaluate": {
+      "main": [
+        [
+          {
+            "node": "Human Review Boundary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "versionId": "79ea6748-7aea-48db-abea-6a6e7cea6c01",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "syntheticOnly": true
+  },
+  "tags": []
+}

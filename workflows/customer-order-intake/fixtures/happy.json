@@ -1,0 +1,47 @@
+{
+  "workflow": "order-intake",
+  "scenario": "clean-order",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "ORD-DEMO-1001",
+    "receivedAt": "2026-08-12T08:14:00Z",
+    "document": "Bestellung_4500815.pdf",
+    "customer": {
+      "name": "Musterwerk Süd GmbH",
+      "number": "K-1042",
+      "address": "Werkstraße 18, 70191 Stuttgart"
+    },
+    "orderNumber": "4500815",
+    "deliveryDate": "2026-09-18",
+    "shipTo": "Tor 3, Werkstraße 18, 70191 Stuttgart",
+    "terms": "30 Tage netto",
+    "items": [
+      {
+        "sku": "HM-AX-240",
+        "description": "Achseinheit 240",
+        "quantity": 2,
+        "unitPrice": 1280,
+        "masterPrice": 1280
+      },
+      {
+        "sku": "HM-SEN-18",
+        "description": "Näherungssensor M18",
+        "quantity": 6,
+        "unitPrice": 84.5,
+        "masterPrice": 84.5
+      }
+    ],
+    "evidence": [
+      {
+        "source": "Bestellung_4500815.pdf",
+        "page": 1,
+        "field": "Bestellnummer, Kunde, Liefertermin"
+      },
+      {
+        "source": "Bestellung_4500815.pdf",
+        "page": 2,
+        "field": "Positionen und Preise"
+      }
+    ]
+  }
+}

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0b1110" />
+    <title>Workflow — Industrial Automation Lab</title>
+    <meta name="description" content="Interaktive synthetische Workflow-Demo mit Ausnahmeweg und menschlicher Freigabe." />
+    <meta name="robots" content="index,follow" />
+    <link rel="stylesheet" href="../../app.css" />
+    <script type="module" src="../../workflow.js"></script>
+  </head>
+  <body data-page="workflow" data-workflow="__WORKFLOW_SLUG__">
+    <a class="skip-link" href="#main">Zum Inhalt</a>
+    <header class="site-header">
+      <a class="brand" href="../../" aria-label="Zur Lab-Startseite"><span class="brand-mark" aria-hidden="true">HM</span><span><strong>Industrial Automation Lab</strong><small>Hugo Menz · Stuttgart</small></span></a>
+      <nav aria-label="Workflow-Navigation"><a href="../../#experimente">Alle Experimente</a><a href="../../#matrix">Bewertung</a><a class="nav-cta" href="https://github.com/hugomenz/automation-portfolio">Repository</a></nav>
+    </header>
+
+    <main id="main">
+      <section class="workflow-hero shell">
+        <div class="workflow-number" id="workflow-number">00</div>
+        <div class="workflow-intro">
+          <p class="kicker" id="workflow-eyebrow">Workflow</p>
+          <h1 id="workflow-title">Workflow wird geladen</h1>
+          <p class="workflow-problem" id="workflow-problem"></p>
+          <div class="badge-row" id="workflow-badges"></div>
+        </div>
+        <aside class="workflow-outcome"><span>Konkrete Verbesserung</span><p id="workflow-improvement"></p><dl><div><dt>Buyer</dt><dd id="workflow-buyer"></dd></div><div><dt>System of Record</dt><dd id="workflow-sor"></dd></div></dl></aside>
+      </section>
+
+      <section class="process-rail shell" aria-label="Prozessschritte" id="process-rail"></section>
+
+      <section class="demo-section shell" aria-labelledby="demo-title">
+        <div class="demo-heading"><div><p class="kicker">Interaktive Synthetic Demo</p><h2 id="demo-title">Was passiert bei einer Ausnahme?</h2></div><p>Wähle einen Testfall. Der Lauf ist deterministisch, verwendet nur synthetische Daten und führt keinen externen Schreibvorgang aus.</p></div>
+        <div class="scenario-tabs" id="scenario-tabs" role="tablist" aria-label="Testfälle"></div>
+        <div class="demo-workbench">
+          <section class="input-panel" aria-labelledby="input-title">
+            <div class="workbench-head"><div><span>01 / EINGANG</span><h3 id="input-title">Testfall</h3></div><span class="connection-state"><i></i> SYNTHETISCH</span></div>
+            <p id="scenario-description" class="scenario-description"></p>
+            <div id="input-summary" class="input-summary"></div>
+            <details class="json-details"><summary>Strukturierte Eingabe ansehen</summary><pre id="input-json"></pre></details>
+            <div class="run-actions"><button class="button button-primary" id="run-button" type="button">Workflow ausführen</button><button class="button button-secondary" id="duplicate-button" type="button">Ereignis wiederholen</button><button class="text-button" id="failure-button" type="button">Adapterfehler simulieren</button></div>
+          </section>
+
+          <section class="result-panel" aria-labelledby="result-title" aria-live="polite">
+            <div class="workbench-head"><div><span>02 / PRÜFUNG</span><h3 id="result-title">Laufergebnis</h3></div><span id="result-state" class="state-chip">Bereit</span></div>
+            <div class="run-meta" id="run-meta"></div>
+            <div id="result-content" class="result-content"><p class="empty-state">Workflow starten, um Prüfungen, Ausnahmen und Auditverlauf zu sehen.</p></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="evidence-section shell" aria-labelledby="evidence-title">
+        <div class="section-heading"><div><p class="kicker">Grenzen & Evidenz</p><h2 id="evidence-title">Vorbereiten, nicht behaupten.</h2></div><p id="workflow-assessment"></p></div>
+        <div class="evidence-grid">
+          <article><span>Automatisiert</span><h3>Struktur + Regeln</h3><p>Felder, Vollständigkeit, Abweichungen, Quellen und ein vorbereiteter Ziel-Payload.</p></article>
+          <article><span>Menschlich</span><h3>Freigabe + Fachurteil</h3><p>Technische Machbarkeit, ambige Teile, sensible Daten und finale Systembuchung.</p></article>
+          <article><span>Nachweis</span><h3>Audit + Replay</h3><p>Run-ID, Idempotenzschlüssel, Regelstatus und terminales Ergebnis bleiben prüfbar.</p></article>
+          <article><span>Grenze</span><h3>Mocked adapter</h3><p>Kein ERP-, CRM-, QMS-, E-Mail- oder Ticket-Write. Keine Kundendaten.</p></article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><div class="shell footer-grid"><div><strong>Hugo Menz</strong><p>Industrial Automation Lab · Stuttgart</p></div><div><span>WAHRHEITSSTATUS</span><p>Synthetic Demo<br />Built and testable<br />Nicht kundenvalidiert</p></div><div><a href="../../">← Zur Lab-Übersicht</a></div></div></footer>
+  </body>
+</html>

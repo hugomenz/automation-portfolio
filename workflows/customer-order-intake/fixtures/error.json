@@ -1,0 +1,35 @@
+{
+  "workflow": "order-intake",
+  "scenario": "unknown-item",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "ORD-DEMO-1003",
+    "receivedAt": "2026-08-12T10:22:00Z",
+    "document": "Bestellung_7719.pdf",
+    "customer": {
+      "name": "Alb Automationssysteme GmbH",
+      "number": "K-1097",
+      "address": "Talweg 7, 72764 Reutlingen"
+    },
+    "orderNumber": "7719",
+    "deliveryDate": null,
+    "shipTo": "Talweg 7, 72764 Reutlingen",
+    "terms": "30 Tage netto",
+    "items": [
+      {
+        "sku": "CUSTOM-LINE-7B",
+        "description": "Sonderhalter laut letzter Anlage",
+        "quantity": 4,
+        "unitPrice": 310,
+        "masterPrice": null
+      }
+    ],
+    "evidence": [
+      {
+        "source": "Bestellung_7719.pdf",
+        "page": 1,
+        "field": "Position 1"
+      }
+    ]
+  }
+}

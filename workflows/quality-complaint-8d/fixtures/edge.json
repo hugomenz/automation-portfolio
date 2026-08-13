@@ -1,0 +1,22 @@
+{
+  "workflow": "quality-8d",
+  "scenario": "missing-lot",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "QLT-DEMO-7002",
+    "complaint": "Kratzer auf Sichtfläche",
+    "product": "Blende B-12",
+    "lot": null,
+    "quantityAffected": 4,
+    "evidenceFiles": [
+      "foto1.jpg"
+    ],
+    "containment": [
+      "Versandstopp für ungeklärte Blenden prüfen"
+    ],
+    "rootCause": null,
+    "missing": [
+      "Charge / Lieferlos"
+    ]
+  }
+}

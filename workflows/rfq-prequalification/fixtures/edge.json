@@ -1,0 +1,27 @@
+{
+  "workflow": "rfq-prequal",
+  "scenario": "missing-volume",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "RFQ-DEMO-6002",
+    "request": "Prüfstation für Gehäuse",
+    "quantityPerYear": null,
+    "cycleTimeSeconds": 22,
+    "interfaces": [
+      "CSV"
+    ],
+    "targetSop": null,
+    "requirements": 8,
+    "contradictions": [],
+    "missing": [
+      "Jahresmenge",
+      "Ziel-SOP"
+    ],
+    "evidence": [
+      {
+        "source": "Anfrage_E-Mail",
+        "field": "Taktzeit"
+      }
+    ]
+  }
+}

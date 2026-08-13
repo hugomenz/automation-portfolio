@@ -1,0 +1,35 @@
+{
+  "workflow": "order-intake",
+  "scenario": "price-deviation",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "ORD-DEMO-1002",
+    "receivedAt": "2026-08-12T09:05:00Z",
+    "document": "PO_900144.xlsx",
+    "customer": {
+      "name": "Neckar Montagebau GmbH",
+      "number": "K-1088",
+      "address": "Industriestraße 4, 71638 Ludwigsburg"
+    },
+    "orderNumber": "900144",
+    "deliveryDate": "2026-09-04",
+    "shipTo": "Industriestraße 4, 71638 Ludwigsburg",
+    "terms": "45 Tage netto",
+    "items": [
+      {
+        "sku": "HM-GRD-500",
+        "description": "Schutzgitter 500",
+        "quantity": 10,
+        "unitPrice": 221,
+        "masterPrice": 240.5
+      }
+    ],
+    "evidence": [
+      {
+        "source": "PO_900144.xlsx",
+        "page": "Tabelle 1",
+        "field": "Position 10"
+      }
+    ]
+  }
+}

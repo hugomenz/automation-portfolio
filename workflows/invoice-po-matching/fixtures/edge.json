@@ -1,0 +1,58 @@
+{
+  "workflow": "invoice-match",
+  "scenario": "quantity-delta",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "INV-DEMO-5002",
+    "invoice": {
+      "number": "RE-2026-0820",
+      "supplier": "Fiktiv Antriebstechnik KG",
+      "supplierId": "L-2077",
+      "po": "PO-78109",
+      "net": 3200,
+      "tax": 608,
+      "gross": 3808,
+      "iban": "DE02100100100000000003",
+      "items": [
+        {
+          "sku": "MOT-075",
+          "quantity": 20,
+          "unitPrice": 160
+        }
+      ]
+    },
+    "purchaseOrder": {
+      "number": "PO-78109",
+      "supplierId": "L-2077",
+      "items": [
+        {
+          "sku": "MOT-075",
+          "quantity": 20,
+          "unitPrice": 160
+        }
+      ]
+    },
+    "goodsReceipt": {
+      "po": "PO-78109",
+      "items": [
+        {
+          "sku": "MOT-075",
+          "quantity": 18
+        }
+      ]
+    },
+    "supplierMaster": {
+      "iban": "DE02100100100000000003"
+    },
+    "evidence": [
+      {
+        "source": "RE-2026-0820.pdf",
+        "field": "Position 1"
+      },
+      {
+        "source": "ERP Wareneingang",
+        "field": "18 Stück"
+      }
+    ]
+  }
+}

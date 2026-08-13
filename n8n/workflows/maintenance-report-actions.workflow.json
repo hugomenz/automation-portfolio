@@ -1,0 +1,102 @@
+{
+  "name": "LAB 09 - Maintenance Report → Actions",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "17a10d61-16a1-4bce-a5a1-0a3b14a108a8",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fixtures = [{\"id\":\"clear-findings\",\"label\":\"Klare Maßnahmen\",\"kind\":\"happy\",\"input\":{\"eventId\":\"MNT-DEMO-9001\",\"report\":\"Wartung_MX-24-0187.pdf\",\"machineNumber\":\"MX-24-0187\",\"findings\":[{\"text\":\"Führungswagen Y zeigt erhöhtes Spiel\",\"severity\":\"mittel\",\"part\":\"HM-LIN-25\",\"owner\":\"Mechanik\",\"deadline\":\"2026-09-05\"},{\"text\":\"Filtermatte Schaltschrank verschmutzt\",\"severity\":\"niedrig\",\"part\":\"HM-FLT-300\",\"owner\":\"Instandhaltung\",\"deadline\":\"2026-08-20\"}]}},{\"id\":\"missing-owner\",\"label\":\"Verantwortung offen\",\"kind\":\"edge\",\"input\":{\"eventId\":\"MNT-DEMO-9002\",\"report\":\"Service_PX8.pdf\",\"machineNumber\":\"PX-8-0091\",\"findings\":[{\"text\":\"Druckregler schwankt außerhalb Sollbereich\",\"severity\":\"hoch\",\"part\":\"HM-REG-08\",\"owner\":null,\"deadline\":\"2026-08-18\"}]}},{\"id\":\"unclear-severity\",\"label\":\"Schweregrad unklar\",\"kind\":\"error\",\"input\":{\"eventId\":\"MNT-DEMO-9003\",\"report\":\"Wartung_AS17.pdf\",\"machineNumber\":\"AS-17-0033\",\"findings\":[{\"text\":\"Riss an Halterung festgestellt\",\"severity\":null,\"part\":null,\"owner\":null,\"deadline\":null}]}}];\nreturn fixtures.map((fixture) => ({ json: { workflow: 'maintenance-actions', ...fixture } }));"
+      },
+      "id": "d9887e11-d888-4c7e-a788-7aebd6887958",
+      "name": "Synthetic Fixtures",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => {\n  const fixture = item.json;\n  const state = fixture.kind === 'happy' ? 'READY_FOR_REVIEW' : fixture.kind === 'edge' ? 'REVIEW_REQUIRED' : 'STOPPED_FOR_REVIEW';\n  return { json: {\n    workflow: fixture.workflow,\n    scenario: fixture.id,\n    evidenceType: 'Synthetic Demo',\n    status: state,\n    humanRequired: true,\n    correlationId: fixture.input.eventId,\n    idempotencyKey: fixture.input.eventId,\n    exceptions: fixture.kind === 'happy' ? [] : [{ code: fixture.kind === 'edge' ? 'REVIEW_RULE' : 'STOP_RULE', message: fixture.label }],\n    audit: ['INPUT_RECEIVED', 'NORMALIZED', 'RULES_CHECKED', state],\n    sourceInput: fixture.input\n  } };\n});"
+      },
+      "id": "7fa39e10-80a3-4fa3-a1a3-a13682a3a2c9",
+      "name": "Normalize & Evaluate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: {\n  ...item.json,\n  implementationStatus: 'Built and testable',\n  adapterStatus: 'Mocked adapter',\n  humanDecision: 'pending',\n  targetSystem: 'CMMS/Ticketsystem bleibt führend',\n  preparedOutput: { target: 'MNT_DRAFT', sourceEvent: item.json.correlationId },\n  externalWritePerformed: false,\n  terminalMessage: 'Prepared for human review; no external write.'\n} }));"
+      },
+      "id": "fd4a8920-fe4a-4ab3-af4a-8c46004a8dd9",
+      "name": "Human Review Boundary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Synthetic Fixtures",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Synthetic Fixtures": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Evaluate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize & Evaluate": {
+      "main": [
+        [
+          {
+            "node": "Human Review Boundary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "versionId": "29765ab5-2876-4922-a776-578f267655fc",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "syntheticOnly": true
+  },
+  "tags": []
+}

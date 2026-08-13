@@ -1,0 +1,32 @@
+{
+  "workflow": "spare-parts",
+  "scenario": "obsolete-part",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "SPR-DEMO-3003",
+    "machineNumber": "AS-17-0033",
+    "query": "HMI Panel 7 Zoll",
+    "photo": null,
+    "candidates": [
+      {
+        "part": "HM-HMI-07A",
+        "label": "HMI 7 Zoll Gen. 1",
+        "confidence": 0.93,
+        "bom": "AS-17 Rev. A / E-02",
+        "successor": "HM-HMI-07C",
+        "successorApproved": false,
+        "stock": 0
+      }
+    ],
+    "evidence": [
+      {
+        "source": "BOM AS-17 Rev. A",
+        "field": "E-02"
+      },
+      {
+        "source": "Nachfolgerliste",
+        "field": "ungeprüfter Kandidat HM-HMI-07C"
+      }
+    ]
+  }
+}

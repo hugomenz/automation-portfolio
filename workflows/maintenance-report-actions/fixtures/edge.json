@@ -1,0 +1,19 @@
+{
+  "workflow": "maintenance-actions",
+  "scenario": "missing-owner",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "MNT-DEMO-9002",
+    "report": "Service_PX8.pdf",
+    "machineNumber": "PX-8-0091",
+    "findings": [
+      {
+        "text": "Druckregler schwankt außerhalb Sollbereich",
+        "severity": "hoch",
+        "part": "HM-REG-08",
+        "owner": null,
+        "deadline": "2026-08-18"
+      }
+    ]
+  }
+}

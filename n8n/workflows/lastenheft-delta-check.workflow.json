@@ -1,0 +1,102 @@
+{
+  "name": "LAB 04 - Lastenheft Delta Check",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "22f38796-23f3-4929-a0f3-847021f38603",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fixtures = [{\"id\":\"bounded-delta\",\"label\":\"Klare Abweichungen\",\"kind\":\"happy\",\"input\":{\"eventId\":\"LST-DEMO-4001\",\"customerSpec\":\"Lastenheft_Musterlinie.pdf\",\"internalStandard\":\"Werksstandard_WS-04.pdf\",\"requirements\":[{\"id\":\"R-12\",\"text\":\"Taktzeit ≤ 18 s\",\"page\":8,\"standard\":\"≤ 20 s\",\"state\":\"delta\"},{\"id\":\"R-27\",\"text\":\"Profinet-Schnittstelle\",\"page\":14,\"standard\":\"Profinet vorgesehen\",\"state\":\"match\"},{\"id\":\"R-41\",\"text\":\"Schaltschrank IP54\",\"page\":22,\"standard\":\"IP54\",\"state\":\"match\"}],\"evidence\":[{\"source\":\"Lastenheft_Musterlinie.pdf\",\"page\":8,\"field\":\"R-12\"}]}},{\"id\":\"missing-acceptance\",\"label\":\"Abnahmekriterium fehlt\",\"kind\":\"edge\",\"input\":{\"eventId\":\"LST-DEMO-4002\",\"customerSpec\":\"Lastenheft_Prüfzelle.pdf\",\"internalStandard\":\"Werksstandard_WS-04.pdf\",\"requirements\":[{\"id\":\"R-08\",\"text\":\"Hohe Prüfgenauigkeit\",\"page\":6,\"standard\":\"Messunsicherheit angeben\",\"state\":\"missing-measure\"},{\"id\":\"R-19\",\"text\":\"CSV-Export\",\"page\":11,\"standard\":\"CSV oder OPC UA\",\"state\":\"match\"}],\"evidence\":[{\"source\":\"Lastenheft_Prüfzelle.pdf\",\"page\":6,\"field\":\"R-08\"}]}},{\"id\":\"contradiction\",\"label\":\"Widersprüchliche Taktzeit\",\"kind\":\"error\",\"input\":{\"eventId\":\"LST-DEMO-4003\",\"customerSpec\":\"Lastenheft_Linie7.pdf\",\"internalStandard\":\"Werksstandard_WS-04.pdf\",\"requirements\":[{\"id\":\"R-03\",\"text\":\"Taktzeit 12 s\",\"page\":3,\"standard\":\"≤ 20 s\",\"state\":\"contradiction\",\"conflictsWith\":\"R-44: Taktzeit 15 s auf Seite 28\"}],\"evidence\":[{\"source\":\"Lastenheft_Linie7.pdf\",\"page\":3,\"field\":\"R-03\"},{\"source\":\"Lastenheft_Linie7.pdf\",\"page\":28,\"field\":\"R-44\"}]}}];\nreturn fixtures.map((fixture) => ({ json: { workflow: 'spec-delta', ...fixture } }));"
+      },
+      "id": "327758ac-3377-4a3f-a477-5bd235775d65",
+      "name": "Synthetic Fixtures",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => {\n  const fixture = item.json;\n  const state = fixture.kind === 'happy' ? 'READY_FOR_REVIEW' : fixture.kind === 'edge' ? 'REVIEW_REQUIRED' : 'STOPPED_FOR_REVIEW';\n  return { json: {\n    workflow: fixture.workflow,\n    scenario: fixture.id,\n    evidenceType: 'Synthetic Demo',\n    status: state,\n    humanRequired: true,\n    correlationId: fixture.input.eventId,\n    idempotencyKey: fixture.input.eventId,\n    exceptions: fixture.kind === 'happy' ? [] : [{ code: fixture.kind === 'edge' ? 'REVIEW_RULE' : 'STOP_RULE', message: fixture.label }],\n    audit: ['INPUT_RECEIVED', 'NORMALIZED', 'RULES_CHECKED', state],\n    sourceInput: fixture.input\n  } };\n});"
+      },
+      "id": "26f7a141-25f7-4fae-a4f7-9e1b23f79c88",
+      "name": "Normalize & Evaluate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: {\n  ...item.json,\n  implementationStatus: 'Built and testable',\n  adapterStatus: 'Mocked adapter',\n  humanDecision: 'pending',\n  targetSystem: 'Freigegebene Anforderungsmatrix',\n  preparedOutput: { target: 'LST_DRAFT', sourceEvent: item.json.correlationId },\n  externalWritePerformed: false,\n  terminalMessage: 'Prepared for human review; no external write.'\n} }));"
+      },
+      "id": "99501deb-9850-4c58-ab50-21119a501f7e",
+      "name": "Human Review Boundary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Synthetic Fixtures",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Synthetic Fixtures": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Evaluate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize & Evaluate": {
+      "main": [
+        [
+          {
+            "node": "Human Review Boundary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "versionId": "ac28e166-ad28-42f9-aa28-de40ab28dfd3",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "syntheticOnly": true
+  },
+  "tags": []
+}

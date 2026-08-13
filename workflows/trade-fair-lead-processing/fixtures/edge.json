@@ -1,0 +1,24 @@
+{
+  "workflow": "trade-fair-lead",
+  "scenario": "possible-duplicate",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "LEAD-DEMO-10002",
+    "badge": {
+      "company": "DemoForm AG",
+      "name": "Kai Muster",
+      "role": "Service Operations",
+      "email": "kai.muster@example.invalid"
+    },
+    "notes": "Ersatzteilprozess besprochen.",
+    "interest": "Spare Parts Inquiry",
+    "consent": {
+      "followUp": true,
+      "source": "Badge-Scan"
+    },
+    "existingContact": {
+      "id": "CRM-4481",
+      "similarity": 0.91
+    }
+  }
+}

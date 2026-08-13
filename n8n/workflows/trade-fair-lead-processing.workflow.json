@@ -1,0 +1,102 @@
+{
+  "name": "LAB 10 - Trade Fair Lead Processing",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "84d4a084-85d4-4217-a6d4-a3aa87d4a53d",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fixtures = [{\"id\":\"qualified-lead\",\"label\":\"Kontakt vollständig\",\"kind\":\"happy\",\"input\":{\"eventId\":\"LEAD-DEMO-10001\",\"badge\":{\"company\":\"Muster Automation GmbH\",\"name\":\"Lena Beispiel\",\"role\":\"Leitung Produktion\",\"email\":\"lena.beispiel@example.invalid\"},\"notes\":\"Interesse an Service-Triage für drei Werke. Rückruf in KW 35 vereinbart.\",\"interest\":\"Machine Service Triage\",\"consent\":{\"followUp\":true,\"source\":\"Gesprächsnotiz\"},\"existingContact\":false}},{\"id\":\"possible-duplicate\",\"label\":\"Mögliche Dublette\",\"kind\":\"edge\",\"input\":{\"eventId\":\"LEAD-DEMO-10002\",\"badge\":{\"company\":\"DemoForm AG\",\"name\":\"Kai Muster\",\"role\":\"Service Operations\",\"email\":\"kai.muster@example.invalid\"},\"notes\":\"Ersatzteilprozess besprochen.\",\"interest\":\"Spare Parts Inquiry\",\"consent\":{\"followUp\":true,\"source\":\"Badge-Scan\"},\"existingContact\":{\"id\":\"CRM-4481\",\"similarity\":0.91}}},{\"id\":\"no-consent\",\"label\":\"Follow-up unklar\",\"kind\":\"error\",\"input\":{\"eventId\":\"LEAD-DEMO-10003\",\"badge\":{\"company\":\"Fiktiv Maschinenbau KG\",\"name\":\"Robin Test\",\"role\":null,\"email\":\"robin.test@example.invalid\"},\"notes\":\"Kurzes Gespräch am Stand.\",\"interest\":null,\"consent\":{\"followUp\":null,\"source\":null},\"existingContact\":false}}];\nreturn fixtures.map((fixture) => ({ json: { workflow: 'trade-fair-lead', ...fixture } }));"
+      },
+      "id": "a5d4f772-a6d4-4905-a3d4-f44ca4d4f5df",
+      "name": "Synthetic Fixtures",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => {\n  const fixture = item.json;\n  const state = fixture.kind === 'happy' ? 'READY_FOR_REVIEW' : fixture.kind === 'edge' ? 'REVIEW_REQUIRED' : 'STOPPED_FOR_REVIEW';\n  return { json: {\n    workflow: fixture.workflow,\n    scenario: fixture.id,\n    evidenceType: 'Synthetic Demo',\n    status: state,\n    humanRequired: true,\n    correlationId: fixture.input.eventId,\n    idempotencyKey: fixture.input.eventId,\n    exceptions: fixture.kind === 'happy' ? [] : [{ code: fixture.kind === 'edge' ? 'REVIEW_RULE' : 'STOP_RULE', message: fixture.label }],\n    audit: ['INPUT_RECEIVED', 'NORMALIZED', 'RULES_CHECKED', state],\n    sourceInput: fixture.input\n  } };\n});"
+      },
+      "id": "fb589997-fa58-4804-ad58-9cbdfc589b2a",
+      "name": "Normalize & Evaluate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: {\n  ...item.json,\n  implementationStatus: 'Built and testable',\n  adapterStatus: 'Mocked adapter',\n  humanDecision: 'pending',\n  targetSystem: 'CRM bleibt führend',\n  preparedOutput: { target: 'LEAD_DRAFT', sourceEvent: item.json.correlationId },\n  externalWritePerformed: false,\n  terminalMessage: 'Prepared for human review; no external write.'\n} }));"
+      },
+      "id": "ef938a95-ee93-4902-ad93-876fec9385dc",
+      "name": "Human Review Boundary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Synthetic Fixtures",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Synthetic Fixtures": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Evaluate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize & Evaluate": {
+      "main": [
+        [
+          {
+            "node": "Human Review Boundary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "versionId": "0e57d660-0f57-47f3-a057-d9861157db19",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "syntheticOnly": true
+  },
+  "tags": []
+}

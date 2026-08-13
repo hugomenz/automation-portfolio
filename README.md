@@ -1,36 +1,78 @@
-# Hugo Menz Automation Portfolio
+# Hugo Menz Industrial Automation Lab
 
-[Portfolio ES](https://hugomenz.github.io/automation-portfolio/?lang=es) · [Portfolio EN](https://hugomenz.github.io/automation-portfolio/?lang=en) · [Portfolio DE](https://hugomenz.github.io/automation-portfolio/?lang=de)
+[Public lab](https://hugomenz.github.io/automation-portfolio/) · [Opportunity matrix](docs/OPPORTUNITY_MATRIX.md) · [n8n proof layer](n8n/README.md) · [German content factory](content/linkedin/README.md)
 
-[N8N Workflows ES](https://hugomenz.github.io/automation-portfolio/workflows/?lang=es) · [N8N Workflows EN](https://hugomenz.github.io/automation-portfolio/workflows/?lang=en) · [Arbeitsweise DE](https://hugomenz.github.io/automation-portfolio/approach/?lang=de)
+![Industrial Automation Lab home](docs/screenshots/lab/home-desktop.png)
 
-[Home screenshot](docs/screenshots/desktop.png) · [workflow page screenshot](docs/screenshots/workflows-en.png)
+Ten functional industrial workflow prototypes for machinery, service, procurement, quality and operations. The lab starts with a person losing time or capacity and ends with a concrete, inspectable improvement. Technology remains implementation infrastructure rather than the commercial promise.
 
-GitHub Pages portfolio with six inspectable German/English automation cases and five established Spanish cases.
+## Truth status
 
-![Portfolio with Menz RFQ Copilot as the principal case](docs/screenshots/desktop.png)
+- Every case is a **Synthetic Demo**.
+- Workflow engines and fixtures are **Built and testable**.
+- External ERP, CRM, QMS, DMS, CMMS and ticket integrations are **Mocked adapter**.
+- None is customer validated, production deployed or backed by measured ROI.
+- Every critical outcome requires a human decision and performs zero external writes.
 
-## Projects
+## The ten workflows
 
-1. Menz RFQ Copilot, technical-request qualification before an offer.
-2. Second Brain, AI-organised notes, RAG questions, Obsidian export and a prompt-injection security lab.
-3. FridgeFlow, Telegram voice input, structured inventory events, Supabase and an administration UI.
-4. Agent Chaos Lab, a webhook and CRUD experiment coordinated through n8n, with Agent Observatory as its runtime view.
-5. Music School Automation, course enquiries and an n8n-to-Telegram handoff, with Twilio documented only as a possible extension.
+| # | Problem | Buyer | Direct demo | Evidence |
+|---:|---|---|---|---|
+| 01 | Customer Order Intake | Vertriebsinnendienst / Operations | [Auftragseingang prüfen](https://hugomenz.github.io/automation-portfolio/lab/customer-order-intake/) | [README](workflows/customer-order-intake/README.md) |
+| 02 | Machine Service Triage | Serviceleitung / After-Sales | [Serviceanfrage vorsortieren](https://hugomenz.github.io/automation-portfolio/lab/machine-service-triage/) | [README](workflows/machine-service-triage/README.md) |
+| 03 | Spare Parts Inquiry | Ersatzteilservice | [Ersatzteilanfrage klären](https://hugomenz.github.io/automation-portfolio/lab/spare-parts-inquiry/) | [README](workflows/spare-parts-inquiry/README.md) |
+| 04 | Lastenheft Delta Check | Engineering / technischer Vertrieb | [Lastenheft-Deltas](https://hugomenz.github.io/automation-portfolio/lab/lastenheft-delta-check/) | [README](workflows/lastenheft-delta-check/README.md) |
+| 05 | Invoice / PO Matching | Kreditorenbuchhaltung / Einkauf | [Rechnung prüfen](https://hugomenz.github.io/automation-portfolio/lab/invoice-po-matching/) | [README](workflows/invoice-po-matching/README.md) |
+| 06 | RFQ Prequalification | Technischer Vertrieb | [Anfrage vorqualifizieren](https://hugomenz.github.io/automation-portfolio/lab/rfq-prequalification/) | [README](workflows/rfq-prequalification/README.md) |
+| 07 | Quality Complaint / 8D | Qualitätsleitung | [8D vorbereiten](https://hugomenz.github.io/automation-portfolio/lab/quality-complaint-8d/) | [README](workflows/quality-complaint-8d/README.md) |
+| 08 | Supplier Document Control | Supplier Quality / Einkauf | [Dokumente überwachen](https://hugomenz.github.io/automation-portfolio/lab/supplier-document-control/) | [README](workflows/supplier-document-control/README.md) |
+| 09 | Maintenance Report → Actions | Instandhaltung / Service Operations | [Maßnahmen vorbereiten](https://hugomenz.github.io/automation-portfolio/lab/maintenance-report-actions/) | [README](workflows/maintenance-report-actions/README.md) |
+| 10 | Trade Fair Lead Processing | Vertrieb / Sales Operations | [Messekontakt nachbereiten](https://hugomenz.github.io/automation-portfolio/lab/trade-fair-lead-processing/) | [README](workflows/trade-fair-lead-processing/README.md) |
 
-Every case explains the complete product, its five-step flow, connected platforms and one concise public-demo scope note. German and English add AuftragKlar as a secondary Order Entry research case after the primary RFQ case; Spanish intentionally keeps the established five-case set. The dedicated `/workflows/` route explains each implementation, and `/approach/` documents the delivery method. Screenshots in `src/assets` were captured from current local builds and n8n where applicable.
+## Three polished demos
 
-## Run
+The implementation hypothesis prioritises Order Intake, Service Triage and Invoice/PO Matching. They combine a clear buyer, frequent work, visible error cost, accessible inputs and a credible human boundary.
+
+| Demo | Strong stop condition | Screenshot | 35-second silent demo |
+|---|---|---|---|
+| Customer Order Intake | unknown article or price deviation | [PNG](docs/screenshots/lab/customer-order-intake-exception.png) | [MP4](content/linkedin/customer-order-intake/assets/demo-30s.mp4) |
+| Machine Service Triage | safety-related message; no remote diagnosis | [PNG](docs/screenshots/lab/machine-service-triage-exception.png) | [MP4](content/linkedin/machine-service-triage/assets/demo-30s.mp4) |
+| Invoice / PO Matching | changed IBAN always stops | [PNG](docs/screenshots/lab/invoice-po-matching-exception.png) | [MP4](content/linkedin/invoice-po-matching/assets/demo-30s.mp4) |
+
+This is not market validation. `Observed interest` and `Paid validation` remain negative in the matrix.
+
+## Reproduce
+
+Requires Node.js 22 or newer.
 
 ```bash
 npm run check
-npx serve src
+python -m http.server 4173 --directory dist
 ```
 
-Translations are maintained independently in `src/i18n/es.json`, `en.json` and `de.json`. The language selector writes `?lang=es`, `?lang=en` or `?lang=de` into every route so the selected page and language can be shared directly.
+Open `http://127.0.0.1:4173/`. Every detail route offers three scenarios plus duplicate replay and a simulated unavailable adapter. Approval changes only the local demo state; it never calls an external service.
 
-## Architecture
+`npm run check` generates and verifies:
 
-The portfolio is a dependency-free multipage static application. `src/app.js` loads one of the three translation JSON files and renders the home cases, workflow explanations or approach sections according to the current route. Each case uses a full-width screenshot followed by two content columns, platform logos, project-specific actions and a zoomable workflow diagram. The home slider changes its project and CTAs, the section navigator follows scroll position, and native dialogs enlarge diagrams without leaving the site. No credential or personal dataset is required at runtime.
+- 10 workflow READMEs;
+- 30 synthetic fixtures;
+- 10 sanitized disabled n8n exports;
+- 10 architecture diagrams;
+- German LinkedIn packs with at least two complete posts per workflow;
+- shared idempotency, bounded retry, audit and human-decision tests;
+- 10 direct static routes, sitemap and metadata;
+- secret and unsupported-claim checks.
 
-`npm run check` verifies German/English parity, the intentional Spanish case boundary, complete flows, platform logos, route/navigation behaviour, responsive CSS, evidence assets and common secret patterns before building `dist/` for GitHub Pages.
+## Repository map
+
+- `src/data/catalog.js` — problem, buyer, opportunity scores and synthetic scenarios.
+- `src/lib/engine.js` — deterministic domain checks and shared run controls.
+- `workflows/` — one README and three fixtures per workflow.
+- `n8n/workflows/` — importable sanitized exports, all `active: false`.
+- `content/linkedin/` — local German posts, visual briefs, storyboards, video scripts and assets; nothing published.
+- `docs/screenshots/lab/` — desktop, mobile and exception evidence.
+- `docs/OPPORTUNITY_MATRIX.md` — ranking with explicit validation gaps.
+
+## n8n boundary
+
+The ten exports were imported into Hugo's n8n Personal project on 2026-08-13 and manually executed with synthetic fixtures. Each run produced three items through `Human Review Boundary`. No credential was attached, no trigger was published and no external write occurred. See [n8n/README.md](n8n/README.md).

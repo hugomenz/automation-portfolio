@@ -1,0 +1,21 @@
+{
+  "workflow": "trade-fair-lead",
+  "scenario": "no-consent",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "LEAD-DEMO-10003",
+    "badge": {
+      "company": "Fiktiv Maschinenbau KG",
+      "name": "Robin Test",
+      "role": null,
+      "email": "robin.test@example.invalid"
+    },
+    "notes": "Kurzes Gespräch am Stand.",
+    "interest": null,
+    "consent": {
+      "followUp": null,
+      "source": null
+    },
+    "existingContact": false
+  }
+}

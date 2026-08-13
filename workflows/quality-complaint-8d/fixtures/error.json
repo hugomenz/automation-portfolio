@@ -1,0 +1,22 @@
+{
+  "workflow": "quality-8d",
+  "scenario": "root-cause-claim",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "QLT-DEMO-7003",
+    "complaint": "Stecker löst sich im Betrieb",
+    "product": "Kabelsatz KS-8",
+    "lot": "L-260801-C",
+    "quantityAffected": 2,
+    "evidenceFiles": [],
+    "containment": [
+      "Betroffene Lieferung identifizieren"
+    ],
+    "rootCause": "Bestimmt Montagefehler beim Lieferanten",
+    "rootCauseEvidence": null,
+    "missing": [
+      "Ausfallteil",
+      "Prüfergebnis"
+    ]
+  }
+}

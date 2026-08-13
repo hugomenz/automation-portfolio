@@ -1,0 +1,102 @@
+{
+  "name": "LAB 07 - Quality Complaint / 8D Preparation",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "32414f96-3341-4129-a041-4c7031414e03",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fixtures = [{\"id\":\"contained-complaint\",\"label\":\"Containment vorbereitet\",\"kind\":\"happy\",\"input\":{\"eventId\":\"QLT-DEMO-7001\",\"complaint\":\"Bohrungsdurchmesser außerhalb Toleranz\",\"product\":\"Trägerplatte TP-44\",\"lot\":\"L-260812-A\",\"quantityAffected\":7,\"evidenceFiles\":[\"messprotokoll.csv\",\"teilfoto.jpg\"],\"containment\":[\"Bestand L-260812-A sperren\",\"100%-Prüfung vorbereiten\"],\"rootCause\":null,\"missing\":[]}},{\"id\":\"missing-lot\",\"label\":\"Charge fehlt\",\"kind\":\"edge\",\"input\":{\"eventId\":\"QLT-DEMO-7002\",\"complaint\":\"Kratzer auf Sichtfläche\",\"product\":\"Blende B-12\",\"lot\":null,\"quantityAffected\":4,\"evidenceFiles\":[\"foto1.jpg\"],\"containment\":[\"Versandstopp für ungeklärte Blenden prüfen\"],\"rootCause\":null,\"missing\":[\"Charge / Lieferlos\"]}},{\"id\":\"root-cause-claim\",\"label\":\"Unbelegte Ursache im Freitext\",\"kind\":\"error\",\"input\":{\"eventId\":\"QLT-DEMO-7003\",\"complaint\":\"Stecker löst sich im Betrieb\",\"product\":\"Kabelsatz KS-8\",\"lot\":\"L-260801-C\",\"quantityAffected\":2,\"evidenceFiles\":[],\"containment\":[\"Betroffene Lieferung identifizieren\"],\"rootCause\":\"Bestimmt Montagefehler beim Lieferanten\",\"rootCauseEvidence\":null,\"missing\":[\"Ausfallteil\",\"Prüfergebnis\"]}}];\nreturn fixtures.map((fixture) => ({ json: { workflow: 'quality-8d', ...fixture } }));"
+      },
+      "id": "49e930ac-4ae9-423f-abe9-33d24ce93565",
+      "name": "Synthetic Fixtures",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => {\n  const fixture = item.json;\n  const state = fixture.kind === 'happy' ? 'READY_FOR_REVIEW' : fixture.kind === 'edge' ? 'REVIEW_REQUIRED' : 'STOPPED_FOR_REVIEW';\n  return { json: {\n    workflow: fixture.workflow,\n    scenario: fixture.id,\n    evidenceType: 'Synthetic Demo',\n    status: state,\n    humanRequired: true,\n    correlationId: fixture.input.eventId,\n    idempotencyKey: fixture.input.eventId,\n    exceptions: fixture.kind === 'happy' ? [] : [{ code: fixture.kind === 'edge' ? 'REVIEW_RULE' : 'STOP_RULE', message: fixture.label }],\n    audit: ['INPUT_RECEIVED', 'NORMALIZED', 'RULES_CHECKED', state],\n    sourceInput: fixture.input\n  } };\n});"
+      },
+      "id": "3e697941-3d69-47ae-ac69-761b3b697488",
+      "name": "Normalize & Evaluate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: {\n  ...item.json,\n  implementationStatus: 'Built and testable',\n  adapterStatus: 'Mocked adapter',\n  humanDecision: 'pending',\n  targetSystem: 'QMS bleibt führend',\n  preparedOutput: { target: 'QLT_DRAFT', sourceEvent: item.json.correlationId },\n  externalWritePerformed: false,\n  terminalMessage: 'Prepared for human review; no external write.'\n} }));"
+      },
+      "id": "60a6a5eb-5fa6-4458-a2a6-a91161a6a77e",
+      "name": "Human Review Boundary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Synthetic Fixtures",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Synthetic Fixtures": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Evaluate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize & Evaluate": {
+      "main": [
+        [
+          {
+            "node": "Human Review Boundary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "versionId": "bb76a966-bc76-4af9-a976-a640ba76a7d3",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "syntheticOnly": true
+  },
+  "tags": []
+}

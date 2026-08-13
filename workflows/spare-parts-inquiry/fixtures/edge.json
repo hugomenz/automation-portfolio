@@ -1,0 +1,33 @@
+{
+  "workflow": "spare-parts",
+  "scenario": "ambiguous-part",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "SPR-DEMO-3002",
+    "machineNumber": "PX-8-0091",
+    "query": "Ventil an der Wartungseinheit",
+    "photo": "valve-closeup.jpg",
+    "candidates": [
+      {
+        "part": "HM-VLV-24",
+        "label": "Magnetventil 24 V",
+        "confidence": 0.71,
+        "bom": "PX-8 Rev. B / P-08",
+        "stock": 4
+      },
+      {
+        "part": "HM-VLV-230",
+        "label": "Magnetventil 230 V",
+        "confidence": 0.68,
+        "bom": "PX-8 Rev. A / P-08",
+        "stock": 1
+      }
+    ],
+    "evidence": [
+      {
+        "source": "Foto",
+        "field": "Bauform; Typenschild nicht lesbar"
+      }
+    ]
+  }
+}

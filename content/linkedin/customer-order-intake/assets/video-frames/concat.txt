@@ -1,0 +1,13 @@
+file 'frame-01-problem.png'
+duration 5
+file 'frame-02-input.png'
+duration 5
+file 'frame-03-processing.png'
+duration 5
+file 'frame-04-exception.png'
+duration 5
+file 'frame-05-review.png'
+duration 5
+file 'frame-06-result.png'
+duration 5
+file 'frame-06-result.png'

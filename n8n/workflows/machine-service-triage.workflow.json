@@ -1,0 +1,102 @@
+{
+  "name": "LAB 02 - Machine Service Triage",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "3d1286e4-3e12-4877-af12-8a0a40128b9d",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const fixtures = [{\"id\":\"known-machine\",\"label\":\"Maschine erkannt\",\"kind\":\"happy\",\"input\":{\"eventId\":\"SRV-DEMO-2001\",\"receivedAt\":\"2026-08-12T06:40:00Z\",\"sender\":\"instandhaltung@musterwerk.example\",\"machineNumber\":\"MX-24-0187\",\"subject\":\"Anlage stoppt beim Referenzieren\",\"errorCodes\":[\"E-217\"],\"symptoms\":\"Achse Y referenziert nicht; Neustart ohne Änderung.\",\"attachments\":[\"panel-e217.jpg\",\"servicebericht-2025-11.pdf\"],\"productionStopped\":true,\"safetyConcern\":false,\"machine\":{\"family\":\"Montagezelle MX-24\",\"site\":\"Werk Stuttgart\",\"warranty\":\"bis 2027-02-28\",\"lastService\":\"2025-11-14\"},\"evidence\":[{\"source\":\"E-Mail\",\"field\":\"Seriennummer und Ausfall\"},{\"source\":\"panel-e217.jpg\",\"field\":\"Fehlercode E-217\"}]}},{\"id\":\"missing-machine\",\"label\":\"Maschine unklar\",\"kind\":\"edge\",\"input\":{\"eventId\":\"SRV-DEMO-2002\",\"receivedAt\":\"2026-08-12T07:20:00Z\",\"sender\":\"technik@alb-demo.example\",\"machineNumber\":null,\"internalLine\":\"Linie 3 / Presse links\",\"subject\":\"Druck fällt sporadisch ab\",\"errorCodes\":[],\"symptoms\":\"Nach ca. 20 Minuten fällt der Druck ab.\",\"attachments\":[\"druckanzeige.jpg\"],\"productionStopped\":false,\"safetyConcern\":false,\"machine\":null,\"evidence\":[{\"source\":\"E-Mail\",\"field\":\"Linie 3\"},{\"source\":\"druckanzeige.jpg\",\"field\":\"sichtbarer Messwert\"}]}},{\"id\":\"safety-stop\",\"label\":\"Sicherheitsrelevanter Hinweis\",\"kind\":\"error\",\"input\":{\"eventId\":\"SRV-DEMO-2003\",\"receivedAt\":\"2026-08-12T07:43:00Z\",\"sender\":\"schichtleitung@demoform.example\",\"machineNumber\":\"MX-22-0091\",\"subject\":\"Schutztürmeldung nach Umbau\",\"errorCodes\":[\"S-044\"],\"symptoms\":\"Meldung nach mechanischem Umbau; Produktion pausiert.\",\"attachments\":[],\"productionStopped\":true,\"safetyConcern\":true,\"machine\":{\"family\":\"Prüfzelle PX-8\",\"site\":\"Werk Heilbronn\",\"warranty\":\"abgelaufen\",\"lastService\":\"2024-04-09\"},\"evidence\":[{\"source\":\"E-Mail\",\"field\":\"Umbau und Schutztürmeldung\"}]}}];\nreturn fixtures.map((fixture) => ({ json: { workflow: 'service-triage', ...fixture } }));"
+      },
+      "id": "9d8ff1d2-9e8f-4365-ab8f-eeac9c8ff03f",
+      "name": "Synthetic Fixtures",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => {\n  const fixture = item.json;\n  const state = fixture.kind === 'happy' ? 'READY_FOR_REVIEW' : fixture.kind === 'edge' ? 'REVIEW_REQUIRED' : 'STOPPED_FOR_REVIEW';\n  return { json: {\n    workflow: fixture.workflow,\n    scenario: fixture.id,\n    evidenceType: 'Synthetic Demo',\n    status: state,\n    humanRequired: true,\n    correlationId: fixture.input.eventId,\n    idempotencyKey: fixture.input.eventId,\n    exceptions: fixture.kind === 'happy' ? [] : [{ code: fixture.kind === 'edge' ? 'REVIEW_RULE' : 'STOP_RULE', message: fixture.label }],\n    audit: ['INPUT_RECEIVED', 'NORMALIZED', 'RULES_CHECKED', state],\n    sourceInput: fixture.input\n  } };\n});"
+      },
+      "id": "c63ac6f7-c53a-4564-a83a-ca1dc73ac88a",
+      "name": "Normalize & Evaluate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: {\n  ...item.json,\n  implementationStatus: 'Built and testable',\n  adapterStatus: 'Mocked adapter',\n  humanDecision: 'pending',\n  targetSystem: 'Service-/Ticketsystem bleibt führend',\n  preparedOutput: { target: 'SRV_DRAFT', sourceEvent: item.json.correlationId },\n  externalWritePerformed: false,\n  terminalMessage: 'Prepared for human review; no external write.'\n} }));"
+      },
+      "id": "7cedf5f5-7bed-4462-aaed-f2cf79edf13c",
+      "name": "Human Review Boundary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        780,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Synthetic Fixtures",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Synthetic Fixtures": {
+      "main": [
+        [
+          {
+            "node": "Normalize & Evaluate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize & Evaluate": {
+      "main": [
+        [
+          {
+            "node": "Human Review Boundary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "versionId": "5490cac0-5590-4c53-a690-cde65790cf79",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "syntheticOnly": true
+  },
+  "tags": []
+}
