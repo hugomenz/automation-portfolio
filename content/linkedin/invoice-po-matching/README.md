@@ -34,6 +34,7 @@ Drei Spalten Rechnung–PO–Wareneingang; IBAN-Zeile rot über die ganze Breite
 - `POST_03_DE.md`: additional technical/operations draft for a polished workflow.
 - `VISUAL_BRIEF_DE.md`: screenshot and composition instructions.
 - `assets/demo-exception.png`: German exception-state capture.
+- `../../../docs/screenshots/n8n/invoice-po-matching-inspectable-executed.png`: supporting evidence from the executed n8n canvas.
 - `CAROUSEL_STORYBOARD_DE.md`: eight-slide carousel structure.
 - `VIDEO_SCRIPT_DE.md`: 30–90 second screen-demo script.
 - `assets/demo-30s.mp4`: 35-second silent browser sequence.

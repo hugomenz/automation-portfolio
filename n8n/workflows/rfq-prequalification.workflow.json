@@ -1,86 +1,1080 @@
 {
-  "name": "LAB 06 - RFQ Prequalification",
+  "name": "LAB 06 - RFQ Prequalification - Inspectable",
   "nodes": [
+    {
+      "parameters": {
+        "content": "# LAB 06: Anfrage vorqualifizieren\n\n**Buyer:** Leitung technischer Vertrieb\n\n**Problem:** Anfragen verteilen technische Anforderungen über E-Mail und Anhänge. Fehlende Angaben und Widersprüche werden oft erst spät sichtbar.\n\n**Result:** Vollständigkeit, Widersprüche, Quellen und Rückfragen werden vorbereitet—ohne Preis oder technische Machbarkeit zu erfinden.\n\nInput → contract → idempotency → context → deterministic rules → exception → human decision → draft.",
+        "width": 840,
+        "height": 300,
+        "color": 2
+      },
+      "id": "29be7600-2abe-4793-abbe-79262cbe7ab9",
+      "name": "Note 01 - Business Flow",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1240,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Contract and evidence\n\n- Six synthetic cases: happy, review, stop, duplicate, dependency failure and invalid payload.\n- Source references stay attached to findings.\n- Missing critical facts are never inferred.\n- Correlation and idempotency keys are created before any adapter boundary.",
+        "width": 840,
+        "height": 300,
+        "color": 4
+      },
+      "id": "1169e0c1-1069-4f2e-af69-dd9b0e69dc08",
+      "name": "Note 02 - Contract & Evidence",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Reliability controls\n\n- Atomic claim is represented by a deterministic test double.\n- Duplicate delivery returns the previous outcome.\n- Only transient failures enter a bounded retry envelope.\n- Retry budget: 3 attempts; no unbounded loop.\n- Invalid data enters a redacted repair queue.",
+        "width": 840,
+        "height": 300,
+        "color": 3
+      },
+      "id": "6c173969-6b17-47d6-aa17-3643691734b0",
+      "name": "Note 03 - Reliability Controls",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        660,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Domain guardrails\n\nContext: CRM + freigegebene Angebotsregeln (mocked adapter).\n\nThe workflow classifies each case as review-ready, review-required or stopped. Domain rules—not an LLM prompt—own the stop decision.",
+        "width": 840,
+        "height": 300,
+        "color": 5
+      },
+      "id": "846a8cc3-836a-4b30-a66a-8fe9856a8e56",
+      "name": "Note 04 - Domain Guardrails",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1640,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Human-controlled decision\n\nOwner: Technischer Vertrieb.\n\nApprove, reject or request information. The approval is version-bound. The external adapter is visible but disabled; every test run reports zero external writes.",
+        "width": 840,
+        "height": 300,
+        "color": 6
+      },
+      "id": "6965e060-6a65-41f3-ab65-e3866c65e519",
+      "name": "Note 05 - Human Boundary",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Test matrix\n\n1. Nominal input reaches review-ready.\n2. Recoverable deviation explains its evidence.\n3. Critical ambiguity stops.\n4. Replay is idempotent.\n5. Dependency outage schedules bounded retry.\n6. Invalid contract is redacted and quarantined.\n\nStatus: Synthetic Demo · Built and testable · not customer validated.",
+        "width": 900,
+        "height": 340,
+        "color": 7
+      },
+      "id": "52202958-5320-4aeb-a420-2c7e55202e11",
+      "name": "Note 06 - Test Matrix",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3640,
+        -720
+      ]
+    },
     {
       "parameters": {},
       "id": "196dd20c-1a6d-439f-ab6d-d5321c6dd6c5",
-      "name": "Manual Trigger",
+      "name": "Manual Test Start",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        0,
+        -1240,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "const fixtures = [{\"id\":\"complete-rfq\",\"label\":\"Vollständige Anfrage\",\"kind\":\"happy\",\"input\":{\"eventId\":\"RFQ-DEMO-6001\",\"request\":\"Montagezelle für Ventilbaugruppe\",\"quantityPerYear\":180000,\"cycleTimeSeconds\":16,\"interfaces\":[\"Profinet\",\"OPC UA\"],\"targetSop\":\"2027-05-01\",\"requirements\":14,\"contradictions\":[],\"missing\":[],\"evidence\":[{\"source\":\"RFQ_Montagezelle.pdf\",\"page\":4,\"field\":\"Taktzeit\"}]}},{\"id\":\"missing-volume\",\"label\":\"Menge und SOP fehlen\",\"kind\":\"edge\",\"input\":{\"eventId\":\"RFQ-DEMO-6002\",\"request\":\"Prüfstation für Gehäuse\",\"quantityPerYear\":null,\"cycleTimeSeconds\":22,\"interfaces\":[\"CSV\"],\"targetSop\":null,\"requirements\":8,\"contradictions\":[],\"missing\":[\"Jahresmenge\",\"Ziel-SOP\"],\"evidence\":[{\"source\":\"Anfrage_E-Mail\",\"field\":\"Taktzeit\"}]}},{\"id\":\"conflicting-cycle\",\"label\":\"Taktzeit widersprüchlich\",\"kind\":\"error\",\"input\":{\"eventId\":\"RFQ-DEMO-6003\",\"request\":\"Verkettete Prüflinie\",\"quantityPerYear\":240000,\"cycleTimeSeconds\":12,\"interfaces\":[\"Profinet\"],\"targetSop\":\"2027-02-01\",\"requirements\":21,\"contradictions\":[\"E-Mail: 12 s; Lastenheft Seite 9: 15 s\"],\"missing\":[],\"evidence\":[{\"source\":\"E-Mail\",\"field\":\"12 s\"},{\"source\":\"Lastenheft.pdf\",\"page\":9,\"field\":\"15 s\"}]}}];\nreturn fixtures.map((fixture) => ({ json: { workflow: 'rfq-prequal', ...fixture } }));"
+        "jsCode": "const fixtures = [{\"id\":\"complete-rfq\",\"label\":\"Vollständige Anfrage\",\"kind\":\"happy\",\"input\":{\"eventId\":\"RFQ-DEMO-6001\",\"request\":\"Montagezelle für Ventilbaugruppe\",\"quantityPerYear\":180000,\"cycleTimeSeconds\":16,\"interfaces\":[\"Profinet\",\"OPC UA\"],\"targetSop\":\"2027-05-01\",\"requirements\":14,\"contradictions\":[],\"missing\":[],\"evidence\":[{\"source\":\"RFQ_Montagezelle.pdf\",\"page\":4,\"field\":\"Taktzeit\"}]}},{\"id\":\"missing-volume\",\"label\":\"Menge und SOP fehlen\",\"kind\":\"edge\",\"input\":{\"eventId\":\"RFQ-DEMO-6002\",\"request\":\"Prüfstation für Gehäuse\",\"quantityPerYear\":null,\"cycleTimeSeconds\":22,\"interfaces\":[\"CSV\"],\"targetSop\":null,\"requirements\":8,\"contradictions\":[],\"missing\":[\"Jahresmenge\",\"Ziel-SOP\"],\"evidence\":[{\"source\":\"Anfrage_E-Mail\",\"field\":\"Taktzeit\"}]}},{\"id\":\"conflicting-cycle\",\"label\":\"Taktzeit widersprüchlich\",\"kind\":\"error\",\"input\":{\"eventId\":\"RFQ-DEMO-6003\",\"request\":\"Verkettete Prüflinie\",\"quantityPerYear\":240000,\"cycleTimeSeconds\":12,\"interfaces\":[\"Profinet\"],\"targetSop\":\"2027-02-01\",\"requirements\":21,\"contradictions\":[\"E-Mail: 12 s; Lastenheft Seite 9: 15 s\"],\"missing\":[],\"evidence\":[{\"source\":\"E-Mail\",\"field\":\"12 s\"},{\"source\":\"Lastenheft.pdf\",\"page\":9,\"field\":\"15 s\"}]}},{\"id\":\"complete-rfq-replay\",\"label\":\"Doppelte Zustellung\",\"kind\":\"duplicate\",\"input\":{\"eventId\":\"RFQ-DEMO-6001\",\"request\":\"Montagezelle für Ventilbaugruppe\",\"quantityPerYear\":180000,\"cycleTimeSeconds\":16,\"interfaces\":[\"Profinet\",\"OPC UA\"],\"targetSop\":\"2027-05-01\",\"requirements\":14,\"contradictions\":[],\"missing\":[],\"evidence\":[{\"source\":\"RFQ_Montagezelle.pdf\",\"page\":4,\"field\":\"Taktzeit\"}]}},{\"id\":\"complete-rfq-dependency\",\"label\":\"Temporärer Adapterfehler\",\"kind\":\"dependency\",\"input\":{\"eventId\":\"RFQ-DEMO-6001-DEP\",\"request\":\"Montagezelle für Ventilbaugruppe\",\"quantityPerYear\":180000,\"cycleTimeSeconds\":16,\"interfaces\":[\"Profinet\",\"OPC UA\"],\"targetSop\":\"2027-05-01\",\"requirements\":14,\"contradictions\":[],\"missing\":[],\"evidence\":[{\"source\":\"RFQ_Montagezelle.pdf\",\"page\":4,\"field\":\"Taktzeit\"}],\"adapterAvailable\":false,\"retryAttempt\":1}},{\"id\":\"complete-rfq-invalid\",\"label\":\"Ungültiger Eingangsvertrag\",\"kind\":\"invalid\",\"input\":{\"eventId\":null,\"request\":\"Montagezelle für Ventilbaugruppe\",\"quantityPerYear\":180000,\"cycleTimeSeconds\":16,\"interfaces\":[\"Profinet\",\"OPC UA\"],\"targetSop\":\"2027-05-01\",\"requirements\":14,\"contradictions\":[],\"missing\":[],\"evidence\":[{\"source\":\"RFQ_Montagezelle.pdf\",\"page\":4,\"field\":\"Taktzeit\"}]}}];\nreturn fixtures.map((fixture) => ({ json: { workflowId: 'rfq-prequal', evidenceType: 'Synthetic Demo', ...fixture } }));"
       },
-      "id": "8828dbda-8928-4d6d-a628-d8b48728da47",
-      "name": "Synthetic Fixtures",
+      "id": "9f443f11-9e44-4d7e-ad44-3beb9c443a58",
+      "name": "Load 6 Synthetic Test Cases",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        260,
+        -1020,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "return items.map((item) => {\n  const fixture = item.json;\n  const state = fixture.kind === 'happy' ? 'READY_FOR_REVIEW' : fixture.kind === 'edge' ? 'REVIEW_REQUIRED' : 'STOPPED_FOR_REVIEW';\n  return { json: {\n    workflow: fixture.workflow,\n    scenario: fixture.id,\n    evidenceType: 'Synthetic Demo',\n    status: state,\n    humanRequired: true,\n    correlationId: fixture.input.eventId,\n    idempotencyKey: fixture.input.eventId,\n    exceptions: fixture.kind === 'happy' ? [] : [{ code: fixture.kind === 'edge' ? 'REVIEW_RULE' : 'STOP_RULE', message: fixture.label }],\n    audit: ['INPUT_RECEIVED', 'NORMALIZED', 'RULES_CHECKED', state],\n    sourceInput: fixture.input\n  } };\n});"
+        "jsCode": "return items.map((item, index) => ({ json: {\n  workflowId: item.json.workflowId,\n  workflowTitle: \"RFQ Prequalification\",\n  implementationStatus: 'Built and testable',\n  adapterStatus: 'Mocked adapter',\n  evidenceType: item.json.evidenceType,\n  scenario: item.json.id,\n  scenarioLabel: item.json.label,\n  fixtureKind: item.json.kind,\n  sourceType: \"RFQ-E-Mail + technische Dokumente\",\n  sourceInput: item.json.input,\n  correlationId: item.json.input?.eventId ?? `INVALID-RFQ-${String(index + 1).padStart(2, '0')}`,\n  idempotencyKey: item.json.input?.eventId ?? null,\n  retry: { attempt: Number(item.json.input?.retryAttempt ?? 0), maxAttempts: 3, policy: 'transient_only' },\n  adapter: { name: \"CRM + freigegebene Angebotsregeln\", mode: 'mock', available: item.json.kind !== 'dependency', writesPerformed: 0 },\n  processing: [],\n  audit: [{ state: 'INPUT_RECEIVED', detail: item.json.id, at: '2026-08-13T12:00:00.000Z' }]\n} }));"
       },
-      "id": "21b0c18f-20b0-4ffc-a3b0-c4b522b0c322",
-      "name": "Normalize & Evaluate",
+      "id": "9acdef47-99cd-4db4-accd-f26d9bcdf0da",
+      "name": "Normalize Intake Envelope",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        520,
+        -800,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "return items.map((item) => ({ json: {\n  ...item.json,\n  implementationStatus: 'Built and testable',\n  adapterStatus: 'Mocked adapter',\n  humanDecision: 'pending',\n  targetSystem: 'CRM/Angebotsakte bleibt führend',\n  preparedOutput: { target: 'RFQ_DRAFT', sourceEvent: item.json.correlationId },\n  externalWritePerformed: false,\n  terminalMessage: 'Prepared for human review; no external write.'\n} }));"
+        "jsCode": "return items.map((item) => {\n  const missing = [];\n  if (!item.json.sourceInput || typeof item.json.sourceInput !== 'object') missing.push('sourceInput');\n  if (!item.json.sourceInput?.eventId) missing.push('eventId');\n  return { json: { ...item.json, validation: { valid: missing.length === 0, missing, schema: 'RFQ_INTAKE_V1' }, audit: [...item.json.audit, { state: 'CONTRACT_VALIDATED', detail: missing.length ? missing.join(',') : 'valid', at: '2026-08-13T12:00:10.000Z' }] } };\n});"
+      },
+      "id": "04e370aa-05e3-423d-a2e3-6d8403e36f17",
+      "name": "Validate Required Contract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -580,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{ $json.validation.valid ? 0 : 1 }}"
+      },
+      "id": "8b56da16-8c56-4ba9-a956-d6f08a56d883",
+      "name": "Route Contract Status",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -360,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, status: 'INVALID_INPUT', errorClass: 'business_validation', retryable: false, exceptions: [{ code: 'INVALID_CONTRACT', severity: 'stop', message: `Missing: ${item.json.validation.missing.join(', ')}` }], externalWritePerformed: false } }));"
+      },
+      "id": "0b4f6274-0c4f-4407-ad4f-659a0e4f672d",
+      "name": "Classify Validation Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, sourceInput: { redacted: true, sourceType: item.json.sourceType }, redaction: { applied: true, retained: ['correlationId', 'scenario', 'errorClass'] } } }));"
+      },
+      "id": "61d4905b-60d4-4ec8-a3d4-938162d491ee",
+      "name": "Redact Invalid Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        140,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, audit: [...item.json.audit, { state: 'MANUAL_DATA_REPAIR', detail: 'invalid_contract', at: '2026-08-13T12:00:20.000Z' }] } }));"
+      },
+      "id": "5dd2e12d-5cd2-4f9a-abd2-de075ad2dc74",
+      "name": "Audit Validation Failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        380,
+        500
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "49a1f746-4aa1-48d9-a7a1-f42048a1f5b3",
+      "name": "Terminal - Manual Data Repair",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        620,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const claimed = new Set();\nreturn items.map((item) => {\n  const key = item.json.idempotencyKey;\n  const duplicate = item.json.fixtureKind === 'duplicate' || claimed.has(key);\n  if (!duplicate) claimed.add(key);\n  return { json: { ...item.json, idempotency: { key, claimed: !duplicate, duplicate, store: 'atomic_test_double' }, audit: [...item.json.audit, { state: duplicate ? 'DUPLICATE_DETECTED' : 'IDEMPOTENCY_CLAIMED', detail: key, at: '2026-08-13T12:00:30.000Z' }] } };\n});"
+      },
+      "id": "4810efce-4910-4161-a610-eca84710ee3b",
+      "name": "Claim Idempotency Key [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{ $json.idempotency.duplicate ? 1 : 0 }}"
+      },
+      "id": "cafffb0b-c9ff-4978-acff-fe31cbfffc9e",
+      "name": "Route Replay Status",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        140,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, status: 'DUPLICATE_REPLAY', previousOutcome: { status: 'READY_FOR_REVIEW', reference: item.json.idempotencyKey }, externalWritePerformed: false } }));"
+      },
+      "id": "3c5c3404-3d5c-4597-ae5c-372a3f5c38bd",
+      "name": "Load Previous Outcome [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        380,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, audit: [...item.json.audit, { state: 'REPLAY_SAFE_RETURN', detail: 'no_second_processing', at: '2026-08-13T12:00:40.000Z' }] } }));"
+      },
+      "id": "8584993f-8484-47ac-a784-9c6586849ad2",
+      "name": "Audit Duplicate Delivery",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        620,
+        280
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "8c3577bc-8d35-494f-ae35-7ae28f357c75",
+      "name": "Terminal - Replay Safe",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        860,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, contextLookup: { source: \"CRM + freigegebene Angebotsregeln\", status: item.json.adapter.available ? 'available' : 'unavailable', synthetic: true }, audit: [...item.json.audit, { state: 'CONTEXT_LOOKUP', detail: item.json.adapter.available ? 'ok' : '503_test_double', at: '2026-08-13T12:00:50.000Z' }] } }));"
+      },
+      "id": "11b4d57b-10b4-43e8-a3b4-d8a112b4d70e",
+      "name": "Load CRM + freigegebene Angebotsregeln [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        380,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{ $json.adapter.available ? 0 : 1 }}"
+      },
+      "id": "d1d125e9-d0d1-4456-afd1-22c3ced12130",
+      "name": "Route Dependency Health",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        620,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, status: 'DEPENDENCY_UNAVAILABLE', errorClass: 'external_transient', retryable: true, retry: { ...item.json.retry, attempt: item.json.retry.attempt || 1 }, externalWritePerformed: false } }));"
+      },
+      "id": "26f51ef8-27f5-408b-a8f5-221e29f523b1",
+      "name": "Classify Transient Dependency Failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{ $json.retry.retryable === false || $json.retry.attempt >= $json.retry.maxAttempts ? 1 : 0 }}"
+      },
+      "id": "9dee374e-9eee-48e1-abee-34289cee35bb",
+      "name": "Route Retry Budget",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1100,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, retry: { ...item.json.retry, nextAttempt: item.json.retry.attempt + 1, backoffSeconds: Math.min(60, 2 ** item.json.retry.attempt) + 1, jitterPolicy: 'deterministic_test_value' } } }));"
+      },
+      "id": "0bb207c8-0cb2-495b-adb2-0aee0eb20c81",
+      "name": "Plan Backoff + Jitter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, retryEnvelope: { correlationId: item.json.correlationId, idempotencyKey: item.json.idempotencyKey, nextAttempt: item.json.retry.nextAttempt, payloadRedacted: true }, audit: [...item.json.audit, { state: 'RETRY_SCHEDULED', detail: `attempt_${item.json.retry.nextAttempt}`, at: '2026-08-13T12:01:00.000Z' }] } }));"
+      },
+      "id": "ca9ddb75-c99d-49e2-a89d-d84fc79dd6bc",
+      "name": "Persist Retry Envelope [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        420
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "427b8057-417b-4ec4-a47b-837d437b81ea",
+      "name": "Terminal - Bounded Retry Queue",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1820,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, status: 'TERMINAL_DEPENDENCY_FAILURE', incident: { severity: 'high', correlationId: item.json.correlationId, errorClass: item.json.errorClass, payloadIncluded: false }, externalWritePerformed: false } }));"
+      },
+      "id": "05bcd942-06bc-4ad5-a3bc-d61c04bcd7af",
+      "name": "Build Redacted Technical Incident",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        620
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "d8b077b3-d7b0-4620-aab0-7ad9d9b07946",
+      "name": "Terminal - Operator Action",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, processing: [...(item.json.processing ?? []), { order: 1, step: \"RFQ und Anlagen strukturieren\", status: 'completed', sourceBound: true }], audit: [...item.json.audit, { state: 'DOMAIN_STAGE_1', detail: \"RFQ und Anlagen strukturieren\", at: '2026-08-13T12:00:00.000Z' }] } }));"
+      },
+      "id": "60840f5e-6184-40f1-ae84-0c385f840dcb",
+      "name": "RFQ und Anlagen strukturieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, processing: [...(item.json.processing ?? []), { order: 2, step: \"Anforderungen mit Quellen verknüpfen\", status: 'completed', sourceBound: true }], audit: [...item.json.audit, { state: 'DOMAIN_STAGE_2', detail: \"Anforderungen mit Quellen verknüpfen\", at: '2026-08-13T12:01:00.000Z' }] } }));"
+      },
+      "id": "9c22cdaf-9b22-4c1c-ae22-d0d59d22cf42",
+      "name": "Anforderungen mit Quellen verknüpfen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, processing: [...(item.json.processing ?? []), { order: 3, step: \"Vollständigkeit gegen Prüfkatalog testen\", status: 'completed', sourceBound: true }], audit: [...item.json.audit, { state: 'DOMAIN_STAGE_3', detail: \"Vollständigkeit gegen Prüfkatalog testen\", at: '2026-08-13T12:02:00.000Z' }] } }));"
+      },
+      "id": "2580e6c0-2680-4853-a780-e9e62880eb79",
+      "name": "Vollständigkeit gegen Prüfkatalog testen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, processing: [...(item.json.processing ?? []), { order: 4, step: \"Widersprüche und Rückfragen ableiten\", status: 'completed', sourceBound: true }], audit: [...item.json.audit, { state: 'DOMAIN_STAGE_4', detail: \"Widersprüche und Rückfragen ableiten\", at: '2026-08-13T12:03:00.000Z' }] } }));"
+      },
+      "id": "8b9e32e9-8a9e-4156-a99e-2fc3889e2e30",
+      "name": "Widersprüche und Rückfragen ableiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => {\n  const input = item.json.sourceInput ?? {};\n  const issues = [];\n  const signals = [];\n  const issue = (code, severity, message, evidence = []) => ({ code, severity, message, evidence });\n  \nif ((input.contradictions ?? []).length) issues.push(issue('RFQ_CONTRADICTION', 'stop', 'Widersprüchliche technische Angaben müssen durch den Kunden geklärt werden.', input.contradictions));\nif ((input.missing ?? []).length) issues.push(issue('RFQ_INFORMATION_MISSING', 'review', 'Kritische Angaben fehlen; Rückfragen werden vorbereitet.', input.missing));\nif (!input.request) issues.push(issue('SCOPE_MISSING', 'stop', 'Anfragegegenstand fehlt.'));\n  const status = issues.some((entry) => entry.severity === 'stop')\n    ? 'STOPPED_FOR_REVIEW'\n    : issues.some((entry) => entry.severity === 'review')\n      ? 'REVIEW_REQUIRED'\n      : 'READY_FOR_REVIEW';\n  return { json: {\n    ...item.json,\n    decision: { status, derivedBy: 'deterministic_guardrails', humanRequired: true },\n    exceptions: issues,\n    signals,\n    audit: [...item.json.audit, { state: 'GUARDRAILS_EVALUATED', detail: status, at: '2026-08-13T12:05:00.000Z' }]\n  } };\n});"
+      },
+      "id": "58e9f38e-59e9-4521-a6e9-f06857e9f1fb",
+      "name": "Evaluate Deterministic Guardrails",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1820,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 3,
+        "output": "={{ ({ READY_FOR_REVIEW: 0, REVIEW_REQUIRED: 1, STOPPED_FOR_REVIEW: 2 })[$json.decision.status] ?? 2 }}"
+      },
+      "id": "c3700d96-c470-4f29-a170-0a70c2700c03",
+      "name": "Route Business Outcome",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2060,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, route: 'ready', reviewMessage: 'Prüfung vollständig; fachliche Freigabe bleibt erforderlich.' } }));"
+      },
+      "id": "d0090def-cf09-4c5c-a209-1115d1090f82",
+      "name": "Prepare Review-Ready Candidate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2300,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, route: 'review', reviewMessage: 'Abweichung mit Quelle und empfohlener Rückfrage vorbereitet.' } }));"
+      },
+      "id": "24d856c1-23d8-452e-a2d8-539b21d85208",
+      "name": "Explain Review Exceptions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, route: 'stopped', reviewMessage: 'Kritischer Stop: keine automatische Fortsetzung.' } }));"
+      },
+      "id": "b2864418-b386-45ab-a486-473eb58648d1",
+      "name": "Quarantine Critical Case",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2300,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, humanDecision: { state: 'pending', owner: \"Technischer Vertrieb\", allowed: ['approve', 'reject', 'request_information'], approvalVersion: `${item.json.correlationId}:v1` }, externalWritePerformed: false, audit: [...item.json.audit, { state: 'HUMAN_REVIEW_PENDING', detail: item.json.decision.status, at: '2026-08-13T12:06:00.000Z' }] } }));"
       },
       "id": "2803965d-2703-44ca-a603-9337250391a4",
-      "name": "Human Review Boundary",
+      "name": "Human Decision Required",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        780,
+        2560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, preparedOutput: { target: \"RFQ Review Package\", mode: 'draft_only', sourceEvent: item.json.correlationId, status: item.json.decision.status, exceptionCodes: item.json.exceptions.map((entry) => entry.code), approvalVersion: item.json.humanDecision.approvalVersion }, adapter: { ...item.json.adapter, writesPerformed: 0 } } }));"
+      },
+      "id": "7f92755f-7e92-43cc-a192-7885809276f2",
+      "name": "Build RFQ Review Package Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2800,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 3,
+        "output": "={{ ({ pending: 0, approved: 1, rejected: 2 })[$json.humanDecision.state] ?? 0 }}"
+      },
+      "id": "ddb23d6d-dcb2-4bda-abb2-3a47dab238b4",
+      "name": "Route Human Decision",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        3040,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, terminalState: 'PENDING_HUMAN_REVIEW', queue: { owner: item.json.humanDecision.owner, synthetic: true }, externalWritePerformed: false } }));"
+      },
+      "id": "2b45d7e9-2a45-4656-a945-d4c32845d330",
+      "name": "Queue for Owner Review [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3280,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://example.invalid/test-adapter",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Idempotency-Key",
+              "value": "={{ $json.idempotencyKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.preparedOutput) }}",
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "id": "a02e8a1a-a12e-4bad-ae2e-86f49f2e8887",
+      "name": "[DISABLED] RFQ Review Package Test Adapter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3280,
+        0
+      ],
+      "disabled": true,
+      "onError": "stopWorkflow",
+      "notes": "Intentionally disabled. Assign a test credential and test endpoint only in a future approved integration goal."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, terminalState: 'REJECTED_BY_HUMAN', preparedOutput: null, externalWritePerformed: false } }));"
+      },
+      "id": "441665fe-4516-4791-a216-62d84316646b",
+      "name": "Close Rejected Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3280,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, externalWritePerformed: false, adapter: { ...item.json.adapter, writesPerformed: 0 }, audit: [...item.json.audit, { state: item.json.terminalState ?? 'ADAPTER_DRY_RUN', detail: 'zero_external_writes', at: '2026-08-13T12:07:00.000Z' }] } }));"
+      },
+      "id": "eb62b242-ec62-43d5-a962-af1cea62b0af",
+      "name": "Append Final Audit Event [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3540,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "2f25aab7-2e25-4924-a125-addd3025ac4a",
+      "name": "Terminal - Inspectable Review Package",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3800,
         0
       ]
     }
   ],
   "pinData": {},
   "connections": {
-    "Manual Trigger": {
+    "Manual Test Start": {
       "main": [
         [
           {
-            "node": "Synthetic Fixtures",
+            "node": "Load 6 Synthetic Test Cases",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Synthetic Fixtures": {
+    "Load 6 Synthetic Test Cases": {
       "main": [
         [
           {
-            "node": "Normalize & Evaluate",
+            "node": "Normalize Intake Envelope",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Normalize & Evaluate": {
+    "Normalize Intake Envelope": {
       "main": [
         [
           {
-            "node": "Human Review Boundary",
+            "node": "Validate Required Contract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Required Contract": {
+      "main": [
+        [
+          {
+            "node": "Route Contract Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Contract Status": {
+      "main": [
+        [
+          {
+            "node": "Claim Idempotency Key [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Classify Validation Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Validation Error": {
+      "main": [
+        [
+          {
+            "node": "Redact Invalid Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redact Invalid Payload": {
+      "main": [
+        [
+          {
+            "node": "Audit Validation Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit Validation Failure": {
+      "main": [
+        [
+          {
+            "node": "Terminal - Manual Data Repair",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim Idempotency Key [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Route Replay Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Replay Status": {
+      "main": [
+        [
+          {
+            "node": "Load CRM + freigegebene Angebotsregeln [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Load Previous Outcome [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Previous Outcome [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Audit Duplicate Delivery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit Duplicate Delivery": {
+      "main": [
+        [
+          {
+            "node": "Terminal - Replay Safe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load CRM + freigegebene Angebotsregeln [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Route Dependency Health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Dependency Health": {
+      "main": [
+        [
+          {
+            "node": "RFQ und Anlagen strukturieren",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Classify Transient Dependency Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Transient Dependency Failure": {
+      "main": [
+        [
+          {
+            "node": "Route Retry Budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Retry Budget": {
+      "main": [
+        [
+          {
+            "node": "Plan Backoff + Jitter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Redacted Technical Incident",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plan Backoff + Jitter": {
+      "main": [
+        [
+          {
+            "node": "Persist Retry Envelope [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Persist Retry Envelope [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Terminal - Bounded Retry Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Redacted Technical Incident": {
+      "main": [
+        [
+          {
+            "node": "Terminal - Operator Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RFQ und Anlagen strukturieren": {
+      "main": [
+        [
+          {
+            "node": "Anforderungen mit Quellen verknüpfen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anforderungen mit Quellen verknüpfen": {
+      "main": [
+        [
+          {
+            "node": "Vollständigkeit gegen Prüfkatalog testen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vollständigkeit gegen Prüfkatalog testen": {
+      "main": [
+        [
+          {
+            "node": "Widersprüche und Rückfragen ableiten",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Widersprüche und Rückfragen ableiten": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Deterministic Guardrails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Deterministic Guardrails": {
+      "main": [
+        [
+          {
+            "node": "Route Business Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Business Outcome": {
+      "main": [
+        [
+          {
+            "node": "Prepare Review-Ready Candidate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Explain Review Exceptions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Quarantine Critical Case",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Review-Ready Candidate": {
+      "main": [
+        [
+          {
+            "node": "Human Decision Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Explain Review Exceptions": {
+      "main": [
+        [
+          {
+            "node": "Human Decision Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quarantine Critical Case": {
+      "main": [
+        [
+          {
+            "node": "Human Decision Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human Decision Required": {
+      "main": [
+        [
+          {
+            "node": "Build RFQ Review Package Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build RFQ Review Package Draft": {
+      "main": [
+        [
+          {
+            "node": "Route Human Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Human Decision": {
+      "main": [
+        [
+          {
+            "node": "Queue for Owner Review [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "[DISABLED] RFQ Review Package Test Adapter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Close Rejected Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Queue for Owner Review [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Append Final Audit Event [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[DISABLED] RFQ Review Package Test Adapter": {
+      "main": [
+        [
+          {
+            "node": "Append Final Audit Event [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Close Rejected Draft": {
+      "main": [
+        [
+          {
+            "node": "Append Final Audit Event [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Final Audit Event [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Terminal - Inspectable Review Package",
             "type": "main",
             "index": 0
           }
@@ -91,12 +1085,15 @@
   "active": false,
   "settings": {
     "executionOrder": "v1",
-    "saveManualExecutions": true
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "executionTimeout": 300
   },
-  "versionId": "79ea6748-7aea-48db-abea-6a6e7cea6c01",
+  "versionId": "5fde6527-5ede-4394-a1de-684d60de66ba",
   "meta": {
     "templateCredsSetupCompleted": false,
-    "syntheticOnly": true
+    "syntheticOnly": true,
+    "portfolioProof": "inspectable-v2"
   },
   "tags": []
 }

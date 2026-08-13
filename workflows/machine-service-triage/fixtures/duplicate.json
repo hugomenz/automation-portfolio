@@ -1,0 +1,38 @@
+{
+  "workflow": "service-triage",
+  "scenario": "known-machine-replay",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "SRV-DEMO-2001",
+    "receivedAt": "2026-08-12T06:40:00Z",
+    "sender": "instandhaltung@musterwerk.example",
+    "machineNumber": "MX-24-0187",
+    "subject": "Anlage stoppt beim Referenzieren",
+    "errorCodes": [
+      "E-217"
+    ],
+    "symptoms": "Achse Y referenziert nicht; Neustart ohne Änderung.",
+    "attachments": [
+      "panel-e217.jpg",
+      "servicebericht-2025-11.pdf"
+    ],
+    "productionStopped": true,
+    "safetyConcern": false,
+    "machine": {
+      "family": "Montagezelle MX-24",
+      "site": "Werk Stuttgart",
+      "warranty": "bis 2027-02-28",
+      "lastService": "2025-11-14"
+    },
+    "evidence": [
+      {
+        "source": "E-Mail",
+        "field": "Seriennummer und Ausfall"
+      },
+      {
+        "source": "panel-e217.jpg",
+        "field": "Fehlercode E-217"
+      }
+    ]
+  }
+}

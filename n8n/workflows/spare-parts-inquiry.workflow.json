@@ -1,86 +1,1080 @@
 {
-  "name": "LAB 03 - Spare Parts Inquiry",
+  "name": "LAB 03 - Spare Parts Inquiry - Inspectable",
   "nodes": [
+    {
+      "parameters": {
+        "content": "# LAB 03: Ersatzteilanfrage klären\n\n**Buyer:** Leitung Ersatzteilservice\n\n**Problem:** Kunden fragen mit Freitext, Foto oder Maschinenreferenz nach einem Ersatzteil. Varianten, Nachfolger und unvollständige BOM-Daten machen eine automatische Auswahl riskant.\n\n**Result:** Kandidaten, BOM-Quelle, Nachfolger und synthetische Verfügbarkeit werden vorbereitet; bei Mehrdeutigkeit stoppt der Prozess.\n\nInput → contract → idempotency → context → deterministic rules → exception → human decision → draft.",
+        "width": 840,
+        "height": 300,
+        "color": 2
+      },
+      "id": "b0c1efd4-b1c1-4167-a2c1-f2fab3c1f48d",
+      "name": "Note 01 - Business Flow",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1240,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Contract and evidence\n\n- Six synthetic cases: happy, review, stop, duplicate, dependency failure and invalid payload.\n- Source references stay attached to findings.\n- Missing critical facts are never inferred.\n- Correlation and idempotency keys are created before any adapter boundary.",
+        "width": 840,
+        "height": 300,
+        "color": 4
+      },
+      "id": "2a30bea5-2930-4d12-a830-bb7f2730b9ec",
+      "name": "Note 02 - Contract & Evidence",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Reliability controls\n\n- Atomic claim is represented by a deterministic test double.\n- Duplicate delivery returns the previous outcome.\n- Only transient failures enter a bounded retry envelope.\n- Retry budget: 3 attempts; no unbounded loop.\n- Invalid data enters a redacted repair queue.",
+        "width": 840,
+        "height": 300,
+        "color": 3
+      },
+      "id": "d4565035-d356-4ea2-a256-4d0fd1564b7c",
+      "name": "Note 03 - Reliability Controls",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        660,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Domain guardrails\n\nContext: BOM + Nachfolger + Bestand (mocked adapter).\n\nThe workflow classifies each case as review-ready, review-required or stopped. Domain rules—not an LLM prompt—own the stop decision.",
+        "width": 840,
+        "height": 300,
+        "color": 5
+      },
+      "id": "885468f7-8754-4764-aa54-6c1d89546a8a",
+      "name": "Note 04 - Domain Guardrails",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1640,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Human-controlled decision\n\nOwner: Ersatzteilservice.\n\nApprove, reject or request information. The approval is version-bound. The external adapter is visible but disabled; every test run reports zero external writes.",
+        "width": 840,
+        "height": 300,
+        "color": 6
+      },
+      "id": "e63d3404-e73d-4597-a83d-372ae93d38bd",
+      "name": "Note 05 - Human Boundary",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Test matrix\n\n1. Nominal input reaches review-ready.\n2. Recoverable deviation explains its evidence.\n3. Critical ambiguity stops.\n4. Replay is idempotent.\n5. Dependency outage schedules bounded retry.\n6. Invalid contract is redacted and quarantined.\n\nStatus: Synthetic Demo · Built and testable · not customer validated.",
+        "width": 900,
+        "height": 340,
+        "color": 7
+      },
+      "id": "f3fc340c-f4fc-459f-a5fc-3732f6fc38c5",
+      "name": "Note 06 - Test Matrix",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3640,
+        -720
+      ]
+    },
     {
       "parameters": {},
       "id": "7c848068-7d84-41fb-ae84-838e7f848521",
-      "name": "Manual Trigger",
+      "name": "Manual Test Start",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        0,
+        -1240,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "const fixtures = [{\"id\":\"unique-part\",\"label\":\"Eindeutiger Treffer\",\"kind\":\"happy\",\"input\":{\"eventId\":\"SPR-DEMO-3001\",\"machineNumber\":\"MX-24-0187\",\"query\":\"Sensor an Position B-17\",\"photo\":\"sensor-b17.jpg\",\"candidates\":[{\"part\":\"HM-SEN-18\",\"label\":\"Näherungssensor M18\",\"confidence\":0.97,\"bom\":\"MX-24 Rev. C / B-17\",\"successor\":null,\"stock\":12}],\"evidence\":[{\"source\":\"BOM MX-24 Rev. C\",\"field\":\"Position B-17\"}]}},{\"id\":\"ambiguous-part\",\"label\":\"Zwei mögliche Varianten\",\"kind\":\"edge\",\"input\":{\"eventId\":\"SPR-DEMO-3002\",\"machineNumber\":\"PX-8-0091\",\"query\":\"Ventil an der Wartungseinheit\",\"photo\":\"valve-closeup.jpg\",\"candidates\":[{\"part\":\"HM-VLV-24\",\"label\":\"Magnetventil 24 V\",\"confidence\":0.71,\"bom\":\"PX-8 Rev. B / P-08\",\"stock\":4},{\"part\":\"HM-VLV-230\",\"label\":\"Magnetventil 230 V\",\"confidence\":0.68,\"bom\":\"PX-8 Rev. A / P-08\",\"stock\":1}],\"evidence\":[{\"source\":\"Foto\",\"field\":\"Bauform; Typenschild nicht lesbar\"}]}},{\"id\":\"obsolete-part\",\"label\":\"Abgekündigtes Teil\",\"kind\":\"error\",\"input\":{\"eventId\":\"SPR-DEMO-3003\",\"machineNumber\":\"AS-17-0033\",\"query\":\"HMI Panel 7 Zoll\",\"photo\":null,\"candidates\":[{\"part\":\"HM-HMI-07A\",\"label\":\"HMI 7 Zoll Gen. 1\",\"confidence\":0.93,\"bom\":\"AS-17 Rev. A / E-02\",\"successor\":\"HM-HMI-07C\",\"successorApproved\":false,\"stock\":0}],\"evidence\":[{\"source\":\"BOM AS-17 Rev. A\",\"field\":\"E-02\"},{\"source\":\"Nachfolgerliste\",\"field\":\"ungeprüfter Kandidat HM-HMI-07C\"}]}}];\nreturn fixtures.map((fixture) => ({ json: { workflow: 'spare-parts', ...fixture } }));"
+        "jsCode": "const fixtures = [{\"id\":\"unique-part\",\"label\":\"Eindeutiger Treffer\",\"kind\":\"happy\",\"input\":{\"eventId\":\"SPR-DEMO-3001\",\"machineNumber\":\"MX-24-0187\",\"query\":\"Sensor an Position B-17\",\"photo\":\"sensor-b17.jpg\",\"candidates\":[{\"part\":\"HM-SEN-18\",\"label\":\"Näherungssensor M18\",\"confidence\":0.97,\"bom\":\"MX-24 Rev. C / B-17\",\"successor\":null,\"stock\":12}],\"evidence\":[{\"source\":\"BOM MX-24 Rev. C\",\"field\":\"Position B-17\"}]}},{\"id\":\"ambiguous-part\",\"label\":\"Zwei mögliche Varianten\",\"kind\":\"edge\",\"input\":{\"eventId\":\"SPR-DEMO-3002\",\"machineNumber\":\"PX-8-0091\",\"query\":\"Ventil an der Wartungseinheit\",\"photo\":\"valve-closeup.jpg\",\"candidates\":[{\"part\":\"HM-VLV-24\",\"label\":\"Magnetventil 24 V\",\"confidence\":0.71,\"bom\":\"PX-8 Rev. B / P-08\",\"stock\":4},{\"part\":\"HM-VLV-230\",\"label\":\"Magnetventil 230 V\",\"confidence\":0.68,\"bom\":\"PX-8 Rev. A / P-08\",\"stock\":1}],\"evidence\":[{\"source\":\"Foto\",\"field\":\"Bauform; Typenschild nicht lesbar\"}]}},{\"id\":\"obsolete-part\",\"label\":\"Abgekündigtes Teil\",\"kind\":\"error\",\"input\":{\"eventId\":\"SPR-DEMO-3003\",\"machineNumber\":\"AS-17-0033\",\"query\":\"HMI Panel 7 Zoll\",\"photo\":null,\"candidates\":[{\"part\":\"HM-HMI-07A\",\"label\":\"HMI 7 Zoll Gen. 1\",\"confidence\":0.93,\"bom\":\"AS-17 Rev. A / E-02\",\"successor\":\"HM-HMI-07C\",\"successorApproved\":false,\"stock\":0}],\"evidence\":[{\"source\":\"BOM AS-17 Rev. A\",\"field\":\"E-02\"},{\"source\":\"Nachfolgerliste\",\"field\":\"ungeprüfter Kandidat HM-HMI-07C\"}]}},{\"id\":\"unique-part-replay\",\"label\":\"Doppelte Zustellung\",\"kind\":\"duplicate\",\"input\":{\"eventId\":\"SPR-DEMO-3001\",\"machineNumber\":\"MX-24-0187\",\"query\":\"Sensor an Position B-17\",\"photo\":\"sensor-b17.jpg\",\"candidates\":[{\"part\":\"HM-SEN-18\",\"label\":\"Näherungssensor M18\",\"confidence\":0.97,\"bom\":\"MX-24 Rev. C / B-17\",\"successor\":null,\"stock\":12}],\"evidence\":[{\"source\":\"BOM MX-24 Rev. C\",\"field\":\"Position B-17\"}]}},{\"id\":\"unique-part-dependency\",\"label\":\"Temporärer Adapterfehler\",\"kind\":\"dependency\",\"input\":{\"eventId\":\"SPR-DEMO-3001-DEP\",\"machineNumber\":\"MX-24-0187\",\"query\":\"Sensor an Position B-17\",\"photo\":\"sensor-b17.jpg\",\"candidates\":[{\"part\":\"HM-SEN-18\",\"label\":\"Näherungssensor M18\",\"confidence\":0.97,\"bom\":\"MX-24 Rev. C / B-17\",\"successor\":null,\"stock\":12}],\"evidence\":[{\"source\":\"BOM MX-24 Rev. C\",\"field\":\"Position B-17\"}],\"adapterAvailable\":false,\"retryAttempt\":1}},{\"id\":\"unique-part-invalid\",\"label\":\"Ungültiger Eingangsvertrag\",\"kind\":\"invalid\",\"input\":{\"eventId\":null,\"machineNumber\":\"MX-24-0187\",\"query\":\"Sensor an Position B-17\",\"photo\":\"sensor-b17.jpg\",\"candidates\":[{\"part\":\"HM-SEN-18\",\"label\":\"Näherungssensor M18\",\"confidence\":0.97,\"bom\":\"MX-24 Rev. C / B-17\",\"successor\":null,\"stock\":12}],\"evidence\":[{\"source\":\"BOM MX-24 Rev. C\",\"field\":\"Position B-17\"}]}}];\nreturn fixtures.map((fixture) => ({ json: { workflowId: 'spare-parts', evidenceType: 'Synthetic Demo', ...fixture } }));"
       },
-      "id": "30829e0e-3182-4fa1-ae82-9ae82f829c7b",
-      "name": "Synthetic Fixtures",
+      "id": "00cfad15-ffcf-4b82-aecf-a9effdcfa85c",
+      "name": "Load 6 Synthetic Test Cases",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        260,
+        -1020,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "return items.map((item) => {\n  const fixture = item.json;\n  const state = fixture.kind === 'happy' ? 'READY_FOR_REVIEW' : fixture.kind === 'edge' ? 'REVIEW_REQUIRED' : 'STOPPED_FOR_REVIEW';\n  return { json: {\n    workflow: fixture.workflow,\n    scenario: fixture.id,\n    evidenceType: 'Synthetic Demo',\n    status: state,\n    humanRequired: true,\n    correlationId: fixture.input.eventId,\n    idempotencyKey: fixture.input.eventId,\n    exceptions: fixture.kind === 'happy' ? [] : [{ code: fixture.kind === 'edge' ? 'REVIEW_RULE' : 'STOP_RULE', message: fixture.label }],\n    audit: ['INPUT_RECEIVED', 'NORMALIZED', 'RULES_CHECKED', state],\n    sourceInput: fixture.input\n  } };\n});"
+        "jsCode": "return items.map((item, index) => ({ json: {\n  workflowId: item.json.workflowId,\n  workflowTitle: \"Spare Parts Inquiry\",\n  implementationStatus: 'Built and testable',\n  adapterStatus: 'Mocked adapter',\n  evidenceType: item.json.evidenceType,\n  scenario: item.json.id,\n  scenarioLabel: item.json.label,\n  fixtureKind: item.json.kind,\n  sourceType: \"Freitext + Foto + Maschinennummer\",\n  sourceInput: item.json.input,\n  correlationId: item.json.input?.eventId ?? `INVALID-SPR-${String(index + 1).padStart(2, '0')}`,\n  idempotencyKey: item.json.input?.eventId ?? null,\n  retry: { attempt: Number(item.json.input?.retryAttempt ?? 0), maxAttempts: 3, policy: 'transient_only' },\n  adapter: { name: \"BOM + Nachfolger + Bestand\", mode: 'mock', available: item.json.kind !== 'dependency', writesPerformed: 0 },\n  processing: [],\n  audit: [{ state: 'INPUT_RECEIVED', detail: item.json.id, at: '2026-08-13T12:00:00.000Z' }]\n} }));"
       },
-      "id": "117e3983-107e-47f0-a37e-3ca9127e3b16",
-      "name": "Normalize & Evaluate",
+      "id": "b13ec65b-b03e-44c8-a33e-c981b23ec7ee",
+      "name": "Normalize Intake Envelope",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        520,
+        -800,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "return items.map((item) => ({ json: {\n  ...item.json,\n  implementationStatus: 'Built and testable',\n  adapterStatus: 'Mocked adapter',\n  humanDecision: 'pending',\n  targetSystem: 'BOM und ERP bleiben führend',\n  preparedOutput: { target: 'SPR_DRAFT', sourceEvent: item.json.correlationId },\n  externalWritePerformed: false,\n  terminalMessage: 'Prepared for human review; no external write.'\n} }));"
+        "jsCode": "return items.map((item) => {\n  const missing = [];\n  if (!item.json.sourceInput || typeof item.json.sourceInput !== 'object') missing.push('sourceInput');\n  if (!item.json.sourceInput?.eventId) missing.push('eventId');\n  return { json: { ...item.json, validation: { valid: missing.length === 0, missing, schema: 'SPR_INTAKE_V1' }, audit: [...item.json.audit, { state: 'CONTRACT_VALIDATED', detail: missing.length ? missing.join(',') : 'valid', at: '2026-08-13T12:00:10.000Z' }] } };\n});"
+      },
+      "id": "e759e3e6-e859-4579-a559-e0c0e659e253",
+      "name": "Validate Required Contract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -580,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{ $json.validation.valid ? 0 : 1 }}"
+      },
+      "id": "65858202-6685-4395-a385-7edc6485806f",
+      "name": "Route Contract Status",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -360,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, status: 'INVALID_INPUT', errorClass: 'business_validation', retryable: false, exceptions: [{ code: 'INVALID_CONTRACT', severity: 'stop', message: `Missing: ${item.json.validation.missing.join(', ')}` }], externalWritePerformed: false } }));"
+      },
+      "id": "deba7770-dfba-4903-a0ba-7a96e1ba7c29",
+      "name": "Classify Validation Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, sourceInput: { redacted: true, sourceType: item.json.sourceType }, redaction: { applied: true, retained: ['correlationId', 'scenario', 'errorClass'] } } }));"
+      },
+      "id": "f67164ff-f571-436c-a871-6825f7716692",
+      "name": "Redact Invalid Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        140,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, audit: [...item.json.audit, { state: 'MANUAL_DATA_REPAIR', detail: 'invalid_contract', at: '2026-08-13T12:00:20.000Z' }] } }));"
+      },
+      "id": "2aceeb41-29ce-49ae-a8ce-e81b27cee688",
+      "name": "Audit Validation Failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        380,
+        500
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "23958eda-2495-406d-a195-8bb422958d47",
+      "name": "Terminal - Manual Data Repair",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        620,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const claimed = new Set();\nreturn items.map((item) => {\n  const key = item.json.idempotencyKey;\n  const duplicate = item.json.fixtureKind === 'duplicate' || claimed.has(key);\n  if (!duplicate) claimed.add(key);\n  return { json: { ...item.json, idempotency: { key, claimed: !duplicate, duplicate, store: 'atomic_test_double' }, audit: [...item.json.audit, { state: duplicate ? 'DUPLICATE_DETECTED' : 'IDEMPOTENCY_CLAIMED', detail: key, at: '2026-08-13T12:00:30.000Z' }] } };\n});"
+      },
+      "id": "ce81536a-cf81-44fd-ac81-5044cd8151d7",
+      "name": "Claim Idempotency Key [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{ $json.idempotency.duplicate ? 1 : 0 }}"
+      },
+      "id": "878b1c87-868b-4af4-a98b-1fad888b1e1a",
+      "name": "Route Replay Status",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        140,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, status: 'DUPLICATE_REPLAY', previousOutcome: { status: 'READY_FOR_REVIEW', reference: item.json.idempotencyKey }, externalWritePerformed: false } }));"
+      },
+      "id": "f217c6e0-f317-4873-a417-ca06f517cb99",
+      "name": "Load Previous Outcome [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        380,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, audit: [...item.json.audit, { state: 'REPLAY_SAFE_RETURN', detail: 'no_second_processing', at: '2026-08-13T12:00:40.000Z' }] } }));"
+      },
+      "id": "14bfd123-13bf-4f90-a6bf-d44915bfd2b6",
+      "name": "Audit Duplicate Delivery",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        620,
+        280
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "527c8148-537c-42db-a47c-846e557c8601",
+      "name": "Terminal - Replay Safe",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        860,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, contextLookup: { source: \"BOM + Nachfolger + Bestand\", status: item.json.adapter.available ? 'available' : 'unavailable', synthetic: true }, audit: [...item.json.audit, { state: 'CONTEXT_LOOKUP', detail: item.json.adapter.available ? 'ok' : '503_test_double', at: '2026-08-13T12:00:50.000Z' }] } }));"
+      },
+      "id": "46d573df-45d5-424c-a8d5-770547d57572",
+      "name": "Load BOM + Nachfolger + Bestand [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        380,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{ $json.adapter.available ? 0 : 1 }}"
+      },
+      "id": "8a75b12d-8975-4f9a-a875-ae078775ac74",
+      "name": "Route Dependency Health",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        620,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, status: 'DEPENDENCY_UNAVAILABLE', errorClass: 'external_transient', retryable: true, retry: { ...item.json.retry, attempt: item.json.retry.attempt || 1 }, externalWritePerformed: false } }));"
+      },
+      "id": "d0e7c424-d1e7-45b7-a2e7-c74ad3e7c8dd",
+      "name": "Classify Transient Dependency Failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{ $json.retry.retryable === false || $json.retry.attempt >= $json.retry.maxAttempts ? 1 : 0 }}"
+      },
+      "id": "42bbf9e2-43bb-4b75-a0bb-f6bc41bbf84f",
+      "name": "Route Retry Budget",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1100,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, retry: { ...item.json.retry, nextAttempt: item.json.retry.attempt + 1, backoffSeconds: Math.min(60, 2 ** item.json.retry.attempt) + 1, jitterPolicy: 'deterministic_test_value' } } }));"
+      },
+      "id": "c1182bec-c218-4d7f-a318-2f12c41830a5",
+      "name": "Plan Backoff + Jitter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, retryEnvelope: { correlationId: item.json.correlationId, idempotencyKey: item.json.idempotencyKey, nextAttempt: item.json.retry.nextAttempt, payloadRedacted: true }, audit: [...item.json.audit, { state: 'RETRY_SCHEDULED', detail: `attempt_${item.json.retry.nextAttempt}`, at: '2026-08-13T12:01:00.000Z' }] } }));"
+      },
+      "id": "24f72af9-23f7-4966-a2f7-27d321f72640",
+      "name": "Persist Retry Envelope [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        420
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "437b8b5b-427b-49c8-a57b-8e81447b8cee",
+      "name": "Terminal - Bounded Retry Queue",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1820,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, status: 'TERMINAL_DEPENDENCY_FAILURE', incident: { severity: 'high', correlationId: item.json.correlationId, errorClass: item.json.errorClass, payloadIncluded: false }, externalWritePerformed: false } }));"
+      },
+      "id": "5b382cbe-5c38-4e51-a938-29985a382b2b",
+      "name": "Build Redacted Technical Incident",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        620
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "b749a4bf-b649-432c-a949-a7e5b849a652",
+      "name": "Terminal - Operator Action",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, processing: [...(item.json.processing ?? []), { order: 1, step: \"Anfrage und Bildhinweise strukturieren\", status: 'completed', sourceBound: true }], audit: [...item.json.audit, { state: 'DOMAIN_STAGE_1', detail: \"Anfrage und Bildhinweise strukturieren\", at: '2026-08-13T12:00:00.000Z' }] } }));"
+      },
+      "id": "3fb5383a-40b5-49cd-adb5-35143eb536a7",
+      "name": "Anfrage und Bildhinweise strukturieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, processing: [...(item.json.processing ?? []), { order: 2, step: \"Maschine und BOM-Version auflösen [MOCK]\", status: 'completed', sourceBound: true }], audit: [...item.json.audit, { state: 'DOMAIN_STAGE_2', detail: \"Maschine und BOM-Version auflösen [MOCK]\", at: '2026-08-13T12:01:00.000Z' }] } }));"
+      },
+      "id": "7c912b0b-7b91-4978-ae91-2e317d912c9e",
+      "name": "Maschine und BOM-Version auflösen [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, processing: [...(item.json.processing ?? []), { order: 3, step: \"Kandidaten und Nachfolger vergleichen [MOCK]\", status: 'completed', sourceBound: true }], audit: [...item.json.audit, { state: 'DOMAIN_STAGE_3', detail: \"Kandidaten und Nachfolger vergleichen [MOCK]\", at: '2026-08-13T12:02:00.000Z' }] } }));"
+      },
+      "id": "86171d0c-8717-4e9f-a817-2032891721c5",
+      "name": "Kandidaten und Nachfolger vergleichen [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, processing: [...(item.json.processing ?? []), { order: 4, step: \"Confidence und Freigabestatus prüfen\", status: 'completed', sourceBound: true }], audit: [...item.json.audit, { state: 'DOMAIN_STAGE_4', detail: \"Confidence und Freigabestatus prüfen\", at: '2026-08-13T12:03:00.000Z' }] } }));"
+      },
+      "id": "e1b60dbd-e0b6-4c2a-afb6-0a97deb60904",
+      "name": "Confidence und Freigabestatus prüfen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => {\n  const input = item.json.sourceInput ?? {};\n  const issues = [];\n  const signals = [];\n  const issue = (code, severity, message, evidence = []) => ({ code, severity, message, evidence });\n  \nconst candidates = Array.isArray(input.candidates) ? input.candidates : [];\nif (candidates.length === 0) issues.push(issue('NO_PART_CANDIDATE', 'stop', 'Kein belastbarer Ersatzteilkandidat vorhanden.'));\nif (candidates.some((part) => part.successor && part.successorApproved !== true)) issues.push(issue('SUCCESSOR_NOT_APPROVED', 'stop', 'Ein möglicher Nachfolger ist technisch nicht freigegeben.', candidates.map((part) => part.successor).filter(Boolean)));\nif (candidates.length > 1 || candidates.some((part) => Number(part.confidence) < 0.9)) issues.push(issue('AMBIGUOUS_PART', 'review', 'Mehrdeutige Variante: Typenschild oder elektrische Ausführung muss bestätigt werden.', candidates.map((part) => part.part)));\nif (candidates.some((part) => Number(part.stock) === 0)) signals.push('synthetic_stock_zero');\n  const status = issues.some((entry) => entry.severity === 'stop')\n    ? 'STOPPED_FOR_REVIEW'\n    : issues.some((entry) => entry.severity === 'review')\n      ? 'REVIEW_REQUIRED'\n      : 'READY_FOR_REVIEW';\n  return { json: {\n    ...item.json,\n    decision: { status, derivedBy: 'deterministic_guardrails', humanRequired: true },\n    exceptions: issues,\n    signals,\n    audit: [...item.json.audit, { state: 'GUARDRAILS_EVALUATED', detail: status, at: '2026-08-13T12:05:00.000Z' }]\n  } };\n});"
+      },
+      "id": "b4e3f592-b5e3-4725-a2e3-f26cb3e3f3ff",
+      "name": "Evaluate Deterministic Guardrails",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1820,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 3,
+        "output": "={{ ({ READY_FOR_REVIEW: 0, REVIEW_REQUIRED: 1, STOPPED_FOR_REVIEW: 2 })[$json.decision.status] ?? 2 }}"
+      },
+      "id": "4949f59a-4a49-472d-a749-f2744849f407",
+      "name": "Route Business Outcome",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2060,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, route: 'ready', reviewMessage: 'Prüfung vollständig; fachliche Freigabe bleibt erforderlich.' } }));"
+      },
+      "id": "236c795b-226c-47c8-a56c-7c81246c7aee",
+      "name": "Prepare Review-Ready Candidate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2300,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, route: 'review', reviewMessage: 'Abweichung mit Quelle und empfohlener Rückfrage vorbereitet.' } }));"
+      },
+      "id": "298bd0ed-288b-4f5a-a78b-cdc7268bcc34",
+      "name": "Explain Review Exceptions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, route: 'stopped', reviewMessage: 'Kritischer Stop: keine automatische Fortsetzung.' } }));"
+      },
+      "id": "f14d4dc4-f24d-4f57-a34d-50eaf44d527d",
+      "name": "Quarantine Critical Case",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2300,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, humanDecision: { state: 'pending', owner: \"Ersatzteilservice\", allowed: ['approve', 'reject', 'request_information'], approvalVersion: `${item.json.correlationId}:v1` }, externalWritePerformed: false, audit: [...item.json.audit, { state: 'HUMAN_REVIEW_PENDING', detail: item.json.decision.status, at: '2026-08-13T12:06:00.000Z' }] } }));"
       },
       "id": "0710d2c1-0610-412e-a510-cf9b0410ce08",
-      "name": "Human Review Boundary",
+      "name": "Human Decision Required",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        780,
+        2560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, preparedOutput: { target: \"Ersatzteil-Anfrage\", mode: 'draft_only', sourceEvent: item.json.correlationId, status: item.json.decision.status, exceptionCodes: item.json.exceptions.map((entry) => entry.code), approvalVersion: item.json.humanDecision.approvalVersion }, adapter: { ...item.json.adapter, writesPerformed: 0 } } }));"
+      },
+      "id": "90809ce3-8f80-4b50-a280-a00991809e76",
+      "name": "Build Ersatzteil-Anfrage Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2800,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 3,
+        "output": "={{ ({ pending: 0, approved: 1, rejected: 2 })[$json.humanDecision.state] ?? 0 }}"
+      },
+      "id": "fe9bf139-fd9b-4fa6-ac9b-ee13fb9bec80",
+      "name": "Route Human Decision",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        3040,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, terminalState: 'PENDING_HUMAN_REVIEW', queue: { owner: item.json.humanDecision.owner, synthetic: true }, externalWritePerformed: false } }));"
+      },
+      "id": "a2c0e1dd-a1c0-404a-a0c0-deb79fc0dd24",
+      "name": "Queue for Owner Review [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3280,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://example.invalid/test-adapter",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Idempotency-Key",
+              "value": "={{ $json.idempotencyKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.preparedOutput) }}",
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "id": "4d17d5fe-4e17-4791-ab17-d2d84c17d46b",
+      "name": "[DISABLED] Ersatzteil-Anfrage Test Adapter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3280,
+        0
+      ],
+      "disabled": true,
+      "onError": "stopWorkflow",
+      "notes": "Intentionally disabled. Assign a test credential and test endpoint only in a future approved integration goal."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, terminalState: 'REJECTED_BY_HUMAN', preparedOutput: null, externalWritePerformed: false } }));"
+      },
+      "id": "c2036b2a-c303-4cbd-a003-6804c1036997",
+      "name": "Close Rejected Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3280,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, externalWritePerformed: false, adapter: { ...item.json.adapter, writesPerformed: 0 }, audit: [...item.json.audit, { state: item.json.terminalState ?? 'ADAPTER_DRY_RUN', detail: 'zero_external_writes', at: '2026-08-13T12:07:00.000Z' }] } }));"
+      },
+      "id": "fcc23e46-fdc2-4fd9-aac2-3b20fbc23cb3",
+      "name": "Append Final Audit Event [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3540,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "0b3037d3-0a30-4640-ad30-3af90c303966",
+      "name": "Terminal - Inspectable Review Package",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3800,
         0
       ]
     }
   ],
   "pinData": {},
   "connections": {
-    "Manual Trigger": {
+    "Manual Test Start": {
       "main": [
         [
           {
-            "node": "Synthetic Fixtures",
+            "node": "Load 6 Synthetic Test Cases",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Synthetic Fixtures": {
+    "Load 6 Synthetic Test Cases": {
       "main": [
         [
           {
-            "node": "Normalize & Evaluate",
+            "node": "Normalize Intake Envelope",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Normalize & Evaluate": {
+    "Normalize Intake Envelope": {
       "main": [
         [
           {
-            "node": "Human Review Boundary",
+            "node": "Validate Required Contract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Required Contract": {
+      "main": [
+        [
+          {
+            "node": "Route Contract Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Contract Status": {
+      "main": [
+        [
+          {
+            "node": "Claim Idempotency Key [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Classify Validation Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Validation Error": {
+      "main": [
+        [
+          {
+            "node": "Redact Invalid Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redact Invalid Payload": {
+      "main": [
+        [
+          {
+            "node": "Audit Validation Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit Validation Failure": {
+      "main": [
+        [
+          {
+            "node": "Terminal - Manual Data Repair",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim Idempotency Key [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Route Replay Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Replay Status": {
+      "main": [
+        [
+          {
+            "node": "Load BOM + Nachfolger + Bestand [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Load Previous Outcome [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Previous Outcome [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Audit Duplicate Delivery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit Duplicate Delivery": {
+      "main": [
+        [
+          {
+            "node": "Terminal - Replay Safe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load BOM + Nachfolger + Bestand [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Route Dependency Health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Dependency Health": {
+      "main": [
+        [
+          {
+            "node": "Anfrage und Bildhinweise strukturieren",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Classify Transient Dependency Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Transient Dependency Failure": {
+      "main": [
+        [
+          {
+            "node": "Route Retry Budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Retry Budget": {
+      "main": [
+        [
+          {
+            "node": "Plan Backoff + Jitter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Redacted Technical Incident",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plan Backoff + Jitter": {
+      "main": [
+        [
+          {
+            "node": "Persist Retry Envelope [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Persist Retry Envelope [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Terminal - Bounded Retry Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Redacted Technical Incident": {
+      "main": [
+        [
+          {
+            "node": "Terminal - Operator Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anfrage und Bildhinweise strukturieren": {
+      "main": [
+        [
+          {
+            "node": "Maschine und BOM-Version auflösen [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Maschine und BOM-Version auflösen [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Kandidaten und Nachfolger vergleichen [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kandidaten und Nachfolger vergleichen [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Confidence und Freigabestatus prüfen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confidence und Freigabestatus prüfen": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Deterministic Guardrails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Deterministic Guardrails": {
+      "main": [
+        [
+          {
+            "node": "Route Business Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Business Outcome": {
+      "main": [
+        [
+          {
+            "node": "Prepare Review-Ready Candidate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Explain Review Exceptions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Quarantine Critical Case",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Review-Ready Candidate": {
+      "main": [
+        [
+          {
+            "node": "Human Decision Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Explain Review Exceptions": {
+      "main": [
+        [
+          {
+            "node": "Human Decision Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quarantine Critical Case": {
+      "main": [
+        [
+          {
+            "node": "Human Decision Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human Decision Required": {
+      "main": [
+        [
+          {
+            "node": "Build Ersatzteil-Anfrage Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Ersatzteil-Anfrage Draft": {
+      "main": [
+        [
+          {
+            "node": "Route Human Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Human Decision": {
+      "main": [
+        [
+          {
+            "node": "Queue for Owner Review [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "[DISABLED] Ersatzteil-Anfrage Test Adapter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Close Rejected Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Queue for Owner Review [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Append Final Audit Event [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[DISABLED] Ersatzteil-Anfrage Test Adapter": {
+      "main": [
+        [
+          {
+            "node": "Append Final Audit Event [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Close Rejected Draft": {
+      "main": [
+        [
+          {
+            "node": "Append Final Audit Event [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Final Audit Event [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Terminal - Inspectable Review Package",
             "type": "main",
             "index": 0
           }
@@ -91,12 +1085,15 @@
   "active": false,
   "settings": {
     "executionOrder": "v1",
-    "saveManualExecutions": true
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "executionTimeout": 300
   },
-  "versionId": "ffd44224-00d4-43b7-a1d4-454a02d446dd",
+  "versionId": "2921e5f3-2821-4460-ab21-e9192a21e786",
   "meta": {
     "templateCredsSetupCompleted": false,
-    "syntheticOnly": true
+    "syntheticOnly": true,
+    "portfolioProof": "inspectable-v2"
   },
   "tags": []
 }

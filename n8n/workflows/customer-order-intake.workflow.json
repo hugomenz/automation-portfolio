@@ -1,86 +1,1080 @@
 {
-  "name": "LAB 01 - Customer Order Intake",
+  "name": "LAB 01 - Customer Order Intake - Inspectable",
   "nodes": [
+    {
+      "parameters": {
+        "content": "# LAB 01: Auftragseingang prüfen\n\n**Buyer:** Leitung Vertriebsinnendienst / Operations\n\n**Problem:** Bestellungen kommen per E-Mail, PDF oder Excel. Artikel, Preis, Menge, Termin und Lieferadresse werden manuell gegen Stammdaten geprüft und ins ERP übertragen.\n\n**Result:** Weniger Copy/Paste, früh sichtbare Abweichungen und ein nachvollziehbarer ERP-Entwurf statt einer blinden Buchung.\n\nInput → contract → idempotency → context → deterministic rules → exception → human decision → draft.",
+        "width": 840,
+        "height": 300,
+        "color": 2
+      },
+      "id": "6206aa59-6106-48c6-a006-a7335f06a5a0",
+      "name": "Note 01 - Business Flow",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1240,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Contract and evidence\n\n- Six synthetic cases: happy, review, stop, duplicate, dependency failure and invalid payload.\n- Source references stay attached to findings.\n- Missing critical facts are never inferred.\n- Correlation and idempotency keys are created before any adapter boundary.",
+        "width": 840,
+        "height": 300,
+        "color": 4
+      },
+      "id": "efaac180-f0aa-4313-a1aa-c4a6f2aac639",
+      "name": "Note 02 - Contract & Evidence",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Reliability controls\n\n- Atomic claim is represented by a deterministic test double.\n- Duplicate delivery returns the previous outcome.\n- Only transient failures enter a bounded retry envelope.\n- Retry budget: 3 attempts; no unbounded loop.\n- Invalid data enters a redacted repair queue.",
+        "width": 840,
+        "height": 300,
+        "color": 3
+      },
+      "id": "c1ddc36a-c2dd-44fd-afdd-c044c0ddc1d7",
+      "name": "Note 03 - Reliability Controls",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        660,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Domain guardrails\n\nContext: ERP Kunden- und Artikelstamm (mocked adapter).\n\nThe workflow classifies each case as review-ready, review-required or stopped. Domain rules—not an LLM prompt—own the stop decision.",
+        "width": 840,
+        "height": 300,
+        "color": 5
+      },
+      "id": "f3d9de1e-f4d9-4fb1-a1d9-daf8f2d9dc8b",
+      "name": "Note 04 - Domain Guardrails",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1640,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Human-controlled decision\n\nOwner: Auftragssachbearbeitung.\n\nApprove, reject or request information. The approval is version-bound. The external adapter is visible but disabled; every test run reports zero external writes.",
+        "width": 840,
+        "height": 300,
+        "color": 6
+      },
+      "id": "784ab003-774a-4e70-aa4a-b329794ab196",
+      "name": "Note 05 - Human Boundary",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        -720
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Test matrix\n\n1. Nominal input reaches review-ready.\n2. Recoverable deviation explains its evidence.\n3. Critical ambiguity stops.\n4. Replay is idempotent.\n5. Dependency outage schedules bounded retry.\n6. Invalid contract is redacted and quarantined.\n\nStatus: Synthetic Demo · Built and testable · not customer validated.",
+        "width": 900,
+        "height": 340,
+        "color": 7
+      },
+      "id": "1e482d4f-1d48-4bbc-a048-30751f482ee2",
+      "name": "Note 06 - Test Matrix",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3640,
+        -720
+      ]
+    },
     {
       "parameters": {},
       "id": "f1c26de9-f0c2-4c56-afc2-6ac3eec26930",
-      "name": "Manual Trigger",
+      "name": "Manual Test Start",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        0,
+        -1240,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "const fixtures = [{\"id\":\"clean-order\",\"label\":\"Passender Auftrag\",\"kind\":\"happy\",\"input\":{\"eventId\":\"ORD-DEMO-1001\",\"receivedAt\":\"2026-08-12T08:14:00Z\",\"document\":\"Bestellung_4500815.pdf\",\"customer\":{\"name\":\"Musterwerk Süd GmbH\",\"number\":\"K-1042\",\"address\":\"Werkstraße 18, 70191 Stuttgart\"},\"orderNumber\":\"4500815\",\"deliveryDate\":\"2026-09-18\",\"shipTo\":\"Tor 3, Werkstraße 18, 70191 Stuttgart\",\"terms\":\"30 Tage netto\",\"items\":[{\"sku\":\"HM-AX-240\",\"description\":\"Achseinheit 240\",\"quantity\":2,\"unitPrice\":1280,\"masterPrice\":1280},{\"sku\":\"HM-SEN-18\",\"description\":\"Näherungssensor M18\",\"quantity\":6,\"unitPrice\":84.5,\"masterPrice\":84.5}],\"evidence\":[{\"source\":\"Bestellung_4500815.pdf\",\"page\":1,\"field\":\"Bestellnummer, Kunde, Liefertermin\"},{\"source\":\"Bestellung_4500815.pdf\",\"page\":2,\"field\":\"Positionen und Preise\"}]}},{\"id\":\"price-deviation\",\"label\":\"Preisabweichung\",\"kind\":\"edge\",\"input\":{\"eventId\":\"ORD-DEMO-1002\",\"receivedAt\":\"2026-08-12T09:05:00Z\",\"document\":\"PO_900144.xlsx\",\"customer\":{\"name\":\"Neckar Montagebau GmbH\",\"number\":\"K-1088\",\"address\":\"Industriestraße 4, 71638 Ludwigsburg\"},\"orderNumber\":\"900144\",\"deliveryDate\":\"2026-09-04\",\"shipTo\":\"Industriestraße 4, 71638 Ludwigsburg\",\"terms\":\"45 Tage netto\",\"items\":[{\"sku\":\"HM-GRD-500\",\"description\":\"Schutzgitter 500\",\"quantity\":10,\"unitPrice\":221,\"masterPrice\":240.5}],\"evidence\":[{\"source\":\"PO_900144.xlsx\",\"page\":\"Tabelle 1\",\"field\":\"Position 10\"}]}},{\"id\":\"unknown-item\",\"label\":\"Unbekannter Artikel\",\"kind\":\"error\",\"input\":{\"eventId\":\"ORD-DEMO-1003\",\"receivedAt\":\"2026-08-12T10:22:00Z\",\"document\":\"Bestellung_7719.pdf\",\"customer\":{\"name\":\"Alb Automationssysteme GmbH\",\"number\":\"K-1097\",\"address\":\"Talweg 7, 72764 Reutlingen\"},\"orderNumber\":\"7719\",\"deliveryDate\":null,\"shipTo\":\"Talweg 7, 72764 Reutlingen\",\"terms\":\"30 Tage netto\",\"items\":[{\"sku\":\"CUSTOM-LINE-7B\",\"description\":\"Sonderhalter laut letzter Anlage\",\"quantity\":4,\"unitPrice\":310,\"masterPrice\":null}],\"evidence\":[{\"source\":\"Bestellung_7719.pdf\",\"page\":1,\"field\":\"Position 1\"}]}}];\nreturn fixtures.map((fixture) => ({ json: { workflow: 'order-intake', ...fixture } }));"
+        "jsCode": "const fixtures = [{\"id\":\"clean-order\",\"label\":\"Passender Auftrag\",\"kind\":\"happy\",\"input\":{\"eventId\":\"ORD-DEMO-1001\",\"receivedAt\":\"2026-08-12T08:14:00Z\",\"document\":\"Bestellung_4500815.pdf\",\"customer\":{\"name\":\"Musterwerk Süd GmbH\",\"number\":\"K-1042\",\"address\":\"Werkstraße 18, 70191 Stuttgart\"},\"orderNumber\":\"4500815\",\"deliveryDate\":\"2026-09-18\",\"shipTo\":\"Tor 3, Werkstraße 18, 70191 Stuttgart\",\"terms\":\"30 Tage netto\",\"items\":[{\"sku\":\"HM-AX-240\",\"description\":\"Achseinheit 240\",\"quantity\":2,\"unitPrice\":1280,\"masterPrice\":1280},{\"sku\":\"HM-SEN-18\",\"description\":\"Näherungssensor M18\",\"quantity\":6,\"unitPrice\":84.5,\"masterPrice\":84.5}],\"evidence\":[{\"source\":\"Bestellung_4500815.pdf\",\"page\":1,\"field\":\"Bestellnummer, Kunde, Liefertermin\"},{\"source\":\"Bestellung_4500815.pdf\",\"page\":2,\"field\":\"Positionen und Preise\"}]}},{\"id\":\"price-deviation\",\"label\":\"Preisabweichung\",\"kind\":\"edge\",\"input\":{\"eventId\":\"ORD-DEMO-1002\",\"receivedAt\":\"2026-08-12T09:05:00Z\",\"document\":\"PO_900144.xlsx\",\"customer\":{\"name\":\"Neckar Montagebau GmbH\",\"number\":\"K-1088\",\"address\":\"Industriestraße 4, 71638 Ludwigsburg\"},\"orderNumber\":\"900144\",\"deliveryDate\":\"2026-09-04\",\"shipTo\":\"Industriestraße 4, 71638 Ludwigsburg\",\"terms\":\"45 Tage netto\",\"items\":[{\"sku\":\"HM-GRD-500\",\"description\":\"Schutzgitter 500\",\"quantity\":10,\"unitPrice\":221,\"masterPrice\":240.5}],\"evidence\":[{\"source\":\"PO_900144.xlsx\",\"page\":\"Tabelle 1\",\"field\":\"Position 10\"}]}},{\"id\":\"unknown-item\",\"label\":\"Unbekannter Artikel\",\"kind\":\"error\",\"input\":{\"eventId\":\"ORD-DEMO-1003\",\"receivedAt\":\"2026-08-12T10:22:00Z\",\"document\":\"Bestellung_7719.pdf\",\"customer\":{\"name\":\"Alb Automationssysteme GmbH\",\"number\":\"K-1097\",\"address\":\"Talweg 7, 72764 Reutlingen\"},\"orderNumber\":\"7719\",\"deliveryDate\":null,\"shipTo\":\"Talweg 7, 72764 Reutlingen\",\"terms\":\"30 Tage netto\",\"items\":[{\"sku\":\"CUSTOM-LINE-7B\",\"description\":\"Sonderhalter laut letzter Anlage\",\"quantity\":4,\"unitPrice\":310,\"masterPrice\":null}],\"evidence\":[{\"source\":\"Bestellung_7719.pdf\",\"page\":1,\"field\":\"Position 1\"}]}},{\"id\":\"clean-order-replay\",\"label\":\"Doppelte Zustellung\",\"kind\":\"duplicate\",\"input\":{\"eventId\":\"ORD-DEMO-1001\",\"receivedAt\":\"2026-08-12T08:14:00Z\",\"document\":\"Bestellung_4500815.pdf\",\"customer\":{\"name\":\"Musterwerk Süd GmbH\",\"number\":\"K-1042\",\"address\":\"Werkstraße 18, 70191 Stuttgart\"},\"orderNumber\":\"4500815\",\"deliveryDate\":\"2026-09-18\",\"shipTo\":\"Tor 3, Werkstraße 18, 70191 Stuttgart\",\"terms\":\"30 Tage netto\",\"items\":[{\"sku\":\"HM-AX-240\",\"description\":\"Achseinheit 240\",\"quantity\":2,\"unitPrice\":1280,\"masterPrice\":1280},{\"sku\":\"HM-SEN-18\",\"description\":\"Näherungssensor M18\",\"quantity\":6,\"unitPrice\":84.5,\"masterPrice\":84.5}],\"evidence\":[{\"source\":\"Bestellung_4500815.pdf\",\"page\":1,\"field\":\"Bestellnummer, Kunde, Liefertermin\"},{\"source\":\"Bestellung_4500815.pdf\",\"page\":2,\"field\":\"Positionen und Preise\"}]}},{\"id\":\"clean-order-dependency\",\"label\":\"Temporärer Adapterfehler\",\"kind\":\"dependency\",\"input\":{\"eventId\":\"ORD-DEMO-1001-DEP\",\"receivedAt\":\"2026-08-12T08:14:00Z\",\"document\":\"Bestellung_4500815.pdf\",\"customer\":{\"name\":\"Musterwerk Süd GmbH\",\"number\":\"K-1042\",\"address\":\"Werkstraße 18, 70191 Stuttgart\"},\"orderNumber\":\"4500815\",\"deliveryDate\":\"2026-09-18\",\"shipTo\":\"Tor 3, Werkstraße 18, 70191 Stuttgart\",\"terms\":\"30 Tage netto\",\"items\":[{\"sku\":\"HM-AX-240\",\"description\":\"Achseinheit 240\",\"quantity\":2,\"unitPrice\":1280,\"masterPrice\":1280},{\"sku\":\"HM-SEN-18\",\"description\":\"Näherungssensor M18\",\"quantity\":6,\"unitPrice\":84.5,\"masterPrice\":84.5}],\"evidence\":[{\"source\":\"Bestellung_4500815.pdf\",\"page\":1,\"field\":\"Bestellnummer, Kunde, Liefertermin\"},{\"source\":\"Bestellung_4500815.pdf\",\"page\":2,\"field\":\"Positionen und Preise\"}],\"adapterAvailable\":false,\"retryAttempt\":1}},{\"id\":\"clean-order-invalid\",\"label\":\"Ungültiger Eingangsvertrag\",\"kind\":\"invalid\",\"input\":{\"eventId\":null,\"receivedAt\":\"2026-08-12T08:14:00Z\",\"document\":\"Bestellung_4500815.pdf\",\"customer\":{\"name\":\"Musterwerk Süd GmbH\",\"number\":\"K-1042\",\"address\":\"Werkstraße 18, 70191 Stuttgart\"},\"orderNumber\":\"4500815\",\"deliveryDate\":\"2026-09-18\",\"shipTo\":\"Tor 3, Werkstraße 18, 70191 Stuttgart\",\"terms\":\"30 Tage netto\",\"items\":[{\"sku\":\"HM-AX-240\",\"description\":\"Achseinheit 240\",\"quantity\":2,\"unitPrice\":1280,\"masterPrice\":1280},{\"sku\":\"HM-SEN-18\",\"description\":\"Näherungssensor M18\",\"quantity\":6,\"unitPrice\":84.5,\"masterPrice\":84.5}],\"evidence\":[{\"source\":\"Bestellung_4500815.pdf\",\"page\":1,\"field\":\"Bestellnummer, Kunde, Liefertermin\"},{\"source\":\"Bestellung_4500815.pdf\",\"page\":2,\"field\":\"Positionen und Preise\"}]}}];\nreturn fixtures.map((fixture) => ({ json: { workflowId: 'order-intake', evidenceType: 'Synthetic Demo', ...fixture } }));"
       },
-      "id": "a38308d9-a283-4746-a183-05b3a0830420",
-      "name": "Synthetic Fixtures",
+      "id": "df575834-e057-49c7-a157-5b5ae2575ced",
+      "name": "Load 6 Synthetic Test Cases",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        260,
+        -1020,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "return items.map((item) => {\n  const fixture = item.json;\n  const state = fixture.kind === 'happy' ? 'READY_FOR_REVIEW' : fixture.kind === 'edge' ? 'REVIEW_REQUIRED' : 'STOPPED_FOR_REVIEW';\n  return { json: {\n    workflow: fixture.workflow,\n    scenario: fixture.id,\n    evidenceType: 'Synthetic Demo',\n    status: state,\n    humanRequired: true,\n    correlationId: fixture.input.eventId,\n    idempotencyKey: fixture.input.eventId,\n    exceptions: fixture.kind === 'happy' ? [] : [{ code: fixture.kind === 'edge' ? 'REVIEW_RULE' : 'STOP_RULE', message: fixture.label }],\n    audit: ['INPUT_RECEIVED', 'NORMALIZED', 'RULES_CHECKED', state],\n    sourceInput: fixture.input\n  } };\n});"
+        "jsCode": "return items.map((item, index) => ({ json: {\n  workflowId: item.json.workflowId,\n  workflowTitle: \"Customer Order Intake\",\n  implementationStatus: 'Built and testable',\n  adapterStatus: 'Mocked adapter',\n  evidenceType: item.json.evidenceType,\n  scenario: item.json.id,\n  scenarioLabel: item.json.label,\n  fixtureKind: item.json.kind,\n  sourceType: \"E-Mail + PDF / Excel Bestellung\",\n  sourceInput: item.json.input,\n  correlationId: item.json.input?.eventId ?? `INVALID-ORD-${String(index + 1).padStart(2, '0')}`,\n  idempotencyKey: item.json.input?.eventId ?? null,\n  retry: { attempt: Number(item.json.input?.retryAttempt ?? 0), maxAttempts: 3, policy: 'transient_only' },\n  adapter: { name: \"ERP Kunden- und Artikelstamm\", mode: 'mock', available: item.json.kind !== 'dependency', writesPerformed: 0 },\n  processing: [],\n  audit: [{ state: 'INPUT_RECEIVED', detail: item.json.id, at: '2026-08-13T12:00:00.000Z' }]\n} }));"
       },
-      "id": "42ddfd88-43dd-4f1b-a4de-00ae45de0241",
-      "name": "Normalize & Evaluate",
+      "id": "79c29c3e-7ac2-4dd1-a7c2-991878c29aab",
+      "name": "Normalize Intake Envelope",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        520,
+        -800,
         0
       ]
     },
     {
       "parameters": {
-        "jsCode": "return items.map((item) => ({ json: {\n  ...item.json,\n  implementationStatus: 'Built and testable',\n  adapterStatus: 'Mocked adapter',\n  humanDecision: 'pending',\n  targetSystem: 'ERP bleibt führend',\n  preparedOutput: { target: 'ORD_DRAFT', sourceEvent: item.json.correlationId },\n  externalWritePerformed: false,\n  terminalMessage: 'Prepared for human review; no external write.'\n} }));"
+        "jsCode": "return items.map((item) => {\n  const missing = [];\n  if (!item.json.sourceInput || typeof item.json.sourceInput !== 'object') missing.push('sourceInput');\n  if (!item.json.sourceInput?.eventId) missing.push('eventId');\n  return { json: { ...item.json, validation: { valid: missing.length === 0, missing, schema: 'ORD_INTAKE_V1' }, audit: [...item.json.audit, { state: 'CONTRACT_VALIDATED', detail: missing.length ? missing.join(',') : 'valid', at: '2026-08-13T12:00:10.000Z' }] } };\n});"
+      },
+      "id": "6f3f8e41-6e3f-4cae-ad3f-8b1b6c3f8988",
+      "name": "Validate Required Contract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -580,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{ $json.validation.valid ? 0 : 1 }}"
+      },
+      "id": "d68d1c0d-d58d-4a7a-a48d-18e7d38d1754",
+      "name": "Route Contract Status",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -360,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, status: 'INVALID_INPUT', errorClass: 'business_validation', retryable: false, exceptions: [{ code: 'INVALID_CONTRACT', severity: 'stop', message: `Missing: ${item.json.validation.missing.join(', ')}` }], externalWritePerformed: false } }));"
+      },
+      "id": "de5d580d-dd5d-467a-ac5d-54e7db5d5354",
+      "name": "Classify Validation Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, sourceInput: { redacted: true, sourceType: item.json.sourceType }, redaction: { applied: true, retained: ['correlationId', 'scenario', 'errorClass'] } } }));"
+      },
+      "id": "49827aa4-4a82-4c37-ab82-7dca4c827f5d",
+      "name": "Redact Invalid Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        140,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, audit: [...item.json.audit, { state: 'MANUAL_DATA_REPAIR', detail: 'invalid_contract', at: '2026-08-13T12:00:20.000Z' }] } }));"
+      },
+      "id": "9ccfe602-9dcf-4795-aacf-e2dc9bcfe46f",
+      "name": "Audit Validation Failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        380,
+        500
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ba3afcad-b93a-4b1a-a83a-f987b73af7f4",
+      "name": "Terminal - Manual Data Repair",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        620,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const claimed = new Set();\nreturn items.map((item) => {\n  const key = item.json.idempotencyKey;\n  const duplicate = item.json.fixtureKind === 'duplicate' || claimed.has(key);\n  if (!duplicate) claimed.add(key);\n  return { json: { ...item.json, idempotency: { key, claimed: !duplicate, duplicate, store: 'atomic_test_double' }, audit: [...item.json.audit, { state: duplicate ? 'DUPLICATE_DETECTED' : 'IDEMPOTENCY_CLAIMED', detail: key, at: '2026-08-13T12:00:30.000Z' }] } };\n});"
+      },
+      "id": "e3e00837-e2e0-46a4-a5e0-0b5de4e009ca",
+      "name": "Claim Idempotency Key [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{ $json.idempotency.duplicate ? 1 : 0 }}"
+      },
+      "id": "4eda8ff4-4fda-4187-a0da-931a51da94ad",
+      "name": "Route Replay Status",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        140,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, status: 'DUPLICATE_REPLAY', previousOutcome: { status: 'READY_FOR_REVIEW', reference: item.json.idempotencyKey }, externalWritePerformed: false } }));"
+      },
+      "id": "69e27f7f-68e2-4dec-abe2-82a56ae28112",
+      "name": "Load Previous Outcome [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        380,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, audit: [...item.json.audit, { state: 'REPLAY_SAFE_RETURN', detail: 'no_second_processing', at: '2026-08-13T12:00:40.000Z' }] } }));"
+      },
+      "id": "4d5fc122-4e5f-42b5-ab5f-bdfc4c5fbf8f",
+      "name": "Audit Duplicate Delivery",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        620,
+        280
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "97c93d59-96c9-4bc6-a5c9-3a3394c938a0",
+      "name": "Terminal - Replay Safe",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        860,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, contextLookup: { source: \"ERP Kunden- und Artikelstamm\", status: item.json.adapter.available ? 'available' : 'unavailable', synthetic: true }, audit: [...item.json.audit, { state: 'CONTEXT_LOOKUP', detail: item.json.adapter.available ? 'ok' : '503_test_double', at: '2026-08-13T12:00:50.000Z' }] } }));"
+      },
+      "id": "380303fe-3903-4591-a603-00d83703026b",
+      "name": "Load ERP Kunden- und Artikelstamm [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        380,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{ $json.adapter.available ? 0 : 1 }}"
+      },
+      "id": "ca47d102-cb47-4295-a847-cddcc947cf6f",
+      "name": "Route Dependency Health",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        620,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, status: 'DEPENDENCY_UNAVAILABLE', errorClass: 'external_transient', retryable: true, retry: { ...item.json.retry, attempt: item.json.retry.attempt || 1 }, externalWritePerformed: false } }));"
+      },
+      "id": "86ab8ab9-85ab-4926-a4ab-879383ab8600",
+      "name": "Classify Transient Dependency Failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{ $json.retry.retryable === false || $json.retry.attempt >= $json.retry.maxAttempts ? 1 : 0 }}"
+      },
+      "id": "6e0000ef-6cff-4f5c-a000-04156f000282",
+      "name": "Route Retry Budget",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1100,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, retry: { ...item.json.retry, nextAttempt: item.json.retry.attempt + 1, backoffSeconds: Math.min(60, 2 ** item.json.retry.attempt) + 1, jitterPolicy: 'deterministic_test_value' } } }));"
+      },
+      "id": "826be1a5-816b-4012-a06b-de7f7f6bdcec",
+      "name": "Plan Backoff + Jitter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, retryEnvelope: { correlationId: item.json.correlationId, idempotencyKey: item.json.idempotencyKey, nextAttempt: item.json.retry.nextAttempt, payloadRedacted: true }, audit: [...item.json.audit, { state: 'RETRY_SCHEDULED', detail: `attempt_${item.json.retry.nextAttempt}`, at: '2026-08-13T12:01:00.000Z' }] } }));"
+      },
+      "id": "f42abe22-f52a-4fb5-a22a-bafcf32abc8f",
+      "name": "Persist Retry Envelope [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        420
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "38b7aaac-39b7-4c3f-aab7-add23bb7af65",
+      "name": "Terminal - Bounded Retry Queue",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1820,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, status: 'TERMINAL_DEPENDENCY_FAILURE', incident: { severity: 'high', correlationId: item.json.correlationId, errorClass: item.json.errorClass, payloadIncluded: false }, externalWritePerformed: false } }));"
+      },
+      "id": "49b9002d-48b8-4e9a-a7b8-fd0746b8fb74",
+      "name": "Build Redacted Technical Incident",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        620
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "4fb0a636-50b0-47c9-adb0-a3104eb0a4a3",
+      "name": "Terminal - Operator Action",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        620
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, processing: [...(item.json.processing ?? []), { order: 1, step: \"Bestellkopf extrahieren\", status: 'completed', sourceBound: true }], audit: [...item.json.audit, { state: 'DOMAIN_STAGE_1', detail: \"Bestellkopf extrahieren\", at: '2026-08-13T12:00:00.000Z' }] } }));"
+      },
+      "id": "39cd4ec5-38cd-4d32-a7cd-4b9f36cd4a0c",
+      "name": "Bestellkopf extrahieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, processing: [...(item.json.processing ?? []), { order: 2, step: \"Kundenstamm auflösen [MOCK]\", status: 'completed', sourceBound: true }], audit: [...item.json.audit, { state: 'DOMAIN_STAGE_2', detail: \"Kundenstamm auflösen [MOCK]\", at: '2026-08-13T12:01:00.000Z' }] } }));"
+      },
+      "id": "997aa7a0-9a7a-4933-ab7a-aac69c7aac59",
+      "name": "Kundenstamm auflösen [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, processing: [...(item.json.processing ?? []), { order: 3, step: \"Artikelstamm auflösen [MOCK]\", status: 'completed', sourceBound: true }], audit: [...item.json.audit, { state: 'DOMAIN_STAGE_3', detail: \"Artikelstamm auflösen [MOCK]\", at: '2026-08-13T12:02:00.000Z' }] } }));"
+      },
+      "id": "901bc50f-8f1b-437c-a21b-c835911bc6a2",
+      "name": "Artikelstamm auflösen [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1340,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, processing: [...(item.json.processing ?? []), { order: 4, step: \"Preis, Menge und Lieferkonditionen prüfen\", status: 'completed', sourceBound: true }], audit: [...item.json.audit, { state: 'DOMAIN_STAGE_4', detail: \"Preis, Menge und Lieferkonditionen prüfen\", at: '2026-08-13T12:03:00.000Z' }] } }));"
+      },
+      "id": "17cd42c2-18cd-4455-a5cd-3f9c16cd412f",
+      "name": "Preis, Menge und Lieferkonditionen prüfen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1580,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => {\n  const input = item.json.sourceInput ?? {};\n  const issues = [];\n  const signals = [];\n  const issue = (code, severity, message, evidence = []) => ({ code, severity, message, evidence });\n  \nconst lines = Array.isArray(input.items) ? input.items : [];\nconst unknown = lines.filter((line) => !Number.isFinite(line.masterPrice));\nconst priceDeltas = lines.filter((line) => Number.isFinite(line.masterPrice) && Math.abs(line.unitPrice - line.masterPrice) / line.masterPrice > 0.02);\nif (unknown.length) issues.push(issue('UNKNOWN_ARTICLE', 'stop', 'Mindestens eine Position ist keinem freigegebenen Artikel zugeordnet.', unknown.map((line) => line.sku)));\nif (!input.deliveryDate) issues.push(issue('DELIVERY_DATE_MISSING', 'stop', 'Der bestätigungsfähige Liefertermin fehlt.', [input.document]));\nif (priceDeltas.length) issues.push(issue('PRICE_DEVIATION', 'review', 'Preisabweichung über 2 % muss kaufmännisch freigegeben werden.', priceDeltas.map((line) => line.sku)));\nif (!input.customer?.number) issues.push(issue('CUSTOMER_UNRESOLVED', 'review', 'Der Kunde konnte nicht eindeutig gegen den Stamm aufgelöst werden.'));\n  const status = issues.some((entry) => entry.severity === 'stop')\n    ? 'STOPPED_FOR_REVIEW'\n    : issues.some((entry) => entry.severity === 'review')\n      ? 'REVIEW_REQUIRED'\n      : 'READY_FOR_REVIEW';\n  return { json: {\n    ...item.json,\n    decision: { status, derivedBy: 'deterministic_guardrails', humanRequired: true },\n    exceptions: issues,\n    signals,\n    audit: [...item.json.audit, { state: 'GUARDRAILS_EVALUATED', detail: status, at: '2026-08-13T12:05:00.000Z' }]\n  } };\n});"
+      },
+      "id": "4879e1a1-4779-400e-a679-de7b4579dce8",
+      "name": "Evaluate Deterministic Guardrails",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1820,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 3,
+        "output": "={{ ({ READY_FOR_REVIEW: 0, REVIEW_REQUIRED: 1, STOPPED_FOR_REVIEW: 2 })[$json.decision.status] ?? 2 }}"
+      },
+      "id": "c839d19d-c739-400a-a639-ce77c539cce4",
+      "name": "Route Business Outcome",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2060,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, route: 'ready', reviewMessage: 'Prüfung vollständig; fachliche Freigabe bleibt erforderlich.' } }));"
+      },
+      "id": "2a963b1e-2b96-4cb1-a896-37f82996398b",
+      "name": "Prepare Review-Ready Candidate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2300,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, route: 'review', reviewMessage: 'Abweichung mit Quelle und empfohlener Rückfrage vorbereitet.' } }));"
+      },
+      "id": "25b24a90-26b2-4c23-a7b2-4db628b24f49",
+      "name": "Explain Review Exceptions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2300,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, route: 'stopped', reviewMessage: 'Kritischer Stop: keine automatische Fortsetzung.' } }));"
+      },
+      "id": "921d8e3b-911d-4ca8-a41d-9161931d8fce",
+      "name": "Quarantine Critical Case",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2300,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, humanDecision: { state: 'pending', owner: \"Auftragssachbearbeitung\", allowed: ['approve', 'reject', 'request_information'], approvalVersion: `${item.json.correlationId}:v1` }, externalWritePerformed: false, audit: [...item.json.audit, { state: 'HUMAN_REVIEW_PENDING', detail: item.json.decision.status, at: '2026-08-13T12:06:00.000Z' }] } }));"
       },
       "id": "b6faaf28-b7fa-40bb-a8fa-b24eb9fab3e1",
-      "name": "Human Review Boundary",
+      "name": "Human Decision Required",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        780,
+        2560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, preparedOutput: { target: \"ERP Auftrag\", mode: 'draft_only', sourceEvent: item.json.correlationId, status: item.json.decision.status, exceptionCodes: item.json.exceptions.map((entry) => entry.code), approvalVersion: item.json.humanDecision.approvalVersion }, adapter: { ...item.json.adapter, writesPerformed: 0 } } }));"
+      },
+      "id": "1240ec3e-1340-4dd1-a040-e9181140eaab",
+      "name": "Build ERP Auftrag Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2800,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 3,
+        "output": "={{ ({ pending: 0, approved: 1, rejected: 2 })[$json.humanDecision.state] ?? 0 }}"
+      },
+      "id": "636dc56c-646d-46ff-a56d-c892666dca25",
+      "name": "Route Human Decision",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        3040,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, terminalState: 'PENDING_HUMAN_REVIEW', queue: { owner: item.json.humanDecision.owner, synthetic: true }, externalWritePerformed: false } }));"
+      },
+      "id": "ece10998-ede1-4b2b-aee1-0cbeefe10e51",
+      "name": "Queue for Owner Review [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3280,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://example.invalid/test-adapter",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Idempotency-Key",
+              "value": "={{ $json.idempotencyKey }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify($json.preparedOutput) }}",
+        "options": {
+          "timeout": 5000
+        }
+      },
+      "id": "c41feff5-c31f-4e62-a21f-eccfc11feb3c",
+      "name": "[DISABLED] ERP Auftrag Test Adapter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3280,
+        0
+      ],
+      "disabled": true,
+      "onError": "stopWorkflow",
+      "notes": "Intentionally disabled. Assign a test credential and test endpoint only in a future approved integration goal."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, terminalState: 'REJECTED_BY_HUMAN', preparedOutput: null, externalWritePerformed: false } }));"
+      },
+      "id": "f139b3dd-f039-424a-af39-b0b7ee39af24",
+      "name": "Close Rejected Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3280,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item) => ({ json: { ...item.json, externalWritePerformed: false, adapter: { ...item.json.adapter, writesPerformed: 0 }, audit: [...item.json.audit, { state: item.json.terminalState ?? 'ADAPTER_DRY_RUN', detail: 'zero_external_writes', at: '2026-08-13T12:07:00.000Z' }] } }));"
+      },
+      "id": "b78b8133-b68b-4fa0-a98b-8459b88b82c6",
+      "name": "Append Final Audit Event [MOCK]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3540,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ec5ce97a-ed5c-4b0d-aa5c-e654eb5ce7e7",
+      "name": "Terminal - Inspectable Review Package",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3800,
         0
       ]
     }
   ],
   "pinData": {},
   "connections": {
-    "Manual Trigger": {
+    "Manual Test Start": {
       "main": [
         [
           {
-            "node": "Synthetic Fixtures",
+            "node": "Load 6 Synthetic Test Cases",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Synthetic Fixtures": {
+    "Load 6 Synthetic Test Cases": {
       "main": [
         [
           {
-            "node": "Normalize & Evaluate",
+            "node": "Normalize Intake Envelope",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Normalize & Evaluate": {
+    "Normalize Intake Envelope": {
       "main": [
         [
           {
-            "node": "Human Review Boundary",
+            "node": "Validate Required Contract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Required Contract": {
+      "main": [
+        [
+          {
+            "node": "Route Contract Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Contract Status": {
+      "main": [
+        [
+          {
+            "node": "Claim Idempotency Key [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Classify Validation Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Validation Error": {
+      "main": [
+        [
+          {
+            "node": "Redact Invalid Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redact Invalid Payload": {
+      "main": [
+        [
+          {
+            "node": "Audit Validation Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit Validation Failure": {
+      "main": [
+        [
+          {
+            "node": "Terminal - Manual Data Repair",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim Idempotency Key [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Route Replay Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Replay Status": {
+      "main": [
+        [
+          {
+            "node": "Load ERP Kunden- und Artikelstamm [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Load Previous Outcome [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Previous Outcome [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Audit Duplicate Delivery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit Duplicate Delivery": {
+      "main": [
+        [
+          {
+            "node": "Terminal - Replay Safe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load ERP Kunden- und Artikelstamm [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Route Dependency Health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Dependency Health": {
+      "main": [
+        [
+          {
+            "node": "Bestellkopf extrahieren",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Classify Transient Dependency Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify Transient Dependency Failure": {
+      "main": [
+        [
+          {
+            "node": "Route Retry Budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Retry Budget": {
+      "main": [
+        [
+          {
+            "node": "Plan Backoff + Jitter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Redacted Technical Incident",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plan Backoff + Jitter": {
+      "main": [
+        [
+          {
+            "node": "Persist Retry Envelope [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Persist Retry Envelope [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Terminal - Bounded Retry Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Redacted Technical Incident": {
+      "main": [
+        [
+          {
+            "node": "Terminal - Operator Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bestellkopf extrahieren": {
+      "main": [
+        [
+          {
+            "node": "Kundenstamm auflösen [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Kundenstamm auflösen [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Artikelstamm auflösen [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Artikelstamm auflösen [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Preis, Menge und Lieferkonditionen prüfen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preis, Menge und Lieferkonditionen prüfen": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Deterministic Guardrails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Deterministic Guardrails": {
+      "main": [
+        [
+          {
+            "node": "Route Business Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Business Outcome": {
+      "main": [
+        [
+          {
+            "node": "Prepare Review-Ready Candidate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Explain Review Exceptions",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Quarantine Critical Case",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Review-Ready Candidate": {
+      "main": [
+        [
+          {
+            "node": "Human Decision Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Explain Review Exceptions": {
+      "main": [
+        [
+          {
+            "node": "Human Decision Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quarantine Critical Case": {
+      "main": [
+        [
+          {
+            "node": "Human Decision Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human Decision Required": {
+      "main": [
+        [
+          {
+            "node": "Build ERP Auftrag Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build ERP Auftrag Draft": {
+      "main": [
+        [
+          {
+            "node": "Route Human Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Human Decision": {
+      "main": [
+        [
+          {
+            "node": "Queue for Owner Review [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "[DISABLED] ERP Auftrag Test Adapter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Close Rejected Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Queue for Owner Review [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Append Final Audit Event [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[DISABLED] ERP Auftrag Test Adapter": {
+      "main": [
+        [
+          {
+            "node": "Append Final Audit Event [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Close Rejected Draft": {
+      "main": [
+        [
+          {
+            "node": "Append Final Audit Event [MOCK]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Final Audit Event [MOCK]": {
+      "main": [
+        [
+          {
+            "node": "Terminal - Inspectable Review Package",
             "type": "main",
             "index": 0
           }
@@ -91,12 +1085,15 @@
   "active": false,
   "settings": {
     "executionOrder": "v1",
-    "saveManualExecutions": true
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "executionTimeout": 300
   },
-  "versionId": "a1e6095d-a0e6-47ca-afe6-06379ee604a4",
+  "versionId": "bb3a1040-bc3a-41d3-ad3a-1366be3a14f9",
   "meta": {
     "templateCredsSetupCompleted": false,
-    "syntheticOnly": true
+    "syntheticOnly": true,
+    "portfolioProof": "inspectable-v2"
   },
   "tags": []
 }

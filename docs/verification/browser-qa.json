@@ -1,6 +1,15 @@
 {
-  "date": "2026-08-13",
+  "date": "2026-08-14",
   "pass": true,
+  "n8nEvidenceRegression": {
+    "detailTemplate": true,
+    "workflowScreenshots": 10,
+    "polishedDetailScreenshots": 3,
+    "orderIntakeImagesLoaded": 2,
+    "desktopHorizontalOverflow": false,
+    "interactiveExceptionState": "PRÜFUNG ERFORDERLICH",
+    "externalWrites": 0
+  },
   "results": [
     {
       "viewport": "desktop",

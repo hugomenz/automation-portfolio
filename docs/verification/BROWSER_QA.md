@@ -1,6 +1,6 @@
 # Browser QA — Industrial Automation Lab
 
-Date: 2026-08-13
+Date: 2026-08-14
 
 Result: **PASS**
 
@@ -15,6 +15,7 @@ Result: **PASS**
 - No console error occurred.
 - No horizontal overflow remained.
 - The third scenario on every workflow produced `Zur manuellen Prüfung` and displayed `WRITES 0`.
+- Regression check after the n8n evidence upgrade confirmed all 10 workflow screenshots exist in the production build, all three polished detail images load, and the public detail template exposes the 40-node proof section without horizontal overflow.
 
 Machine-readable evidence: [`browser-qa.json`](browser-qa.json).
 
@@ -25,6 +26,8 @@ Machine-readable evidence: [`browser-qa.json`](browser-qa.json).
 - Approval changed only the local draft state and explicitly reported no external write.
 - Replaying the same event returned `Duplikat erkannt` with no second processing.
 - Mobile full-page visual inspection confirmed readable hierarchy and usable navigation.
+- The upgraded Order Intake detail rendered two completed n8n images, the heading `Die Ausnahmewege sind Teil des Systems.`, and the evidence labels `40 OPERATIVE NODES` and `0 EXTERNAL WRITES`.
+- Re-running the price-deviation case after adding the visual proof still returned `PRÜFUNG ERFORDERLICH`, 82 % confidence and `WRITES 0`.
 
 ## Defect found and fixed
 

@@ -12,6 +12,8 @@ try {
 
 await mkdir('dist', { recursive: true });
 await cp('src', 'dist', { recursive: true });
+await mkdir('dist/evidence/n8n', { recursive: true });
+await cp('docs/screenshots/n8n', 'dist/evidence/n8n', { recursive: true });
 const template = await readFile('src/workflow.html', 'utf8');
 
 for (const workflow of workflows) {

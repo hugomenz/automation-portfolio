@@ -52,6 +52,28 @@
         </div>
       </section>
 
+      <section class="automation-proof shell" aria-labelledby="automation-proof-title">
+        <div class="section-heading proof-heading">
+          <div><p class="kicker">Ausgeführter n8n-Proof</p><h2 id="automation-proof-title">Die Ausnahmewege sind Teil des Systems.</h2></div>
+          <p>Kein dekoratives Flowchart: Der exportierte Workflow wurde im Testprojekt importiert und mit sechs synthetischen Routen ausgeführt.</p>
+        </div>
+        <figure class="canvas-proof-frame">
+          <div class="canvas-proof-bar"><span>UNPUBLISHED TEST WORKFLOW</span><span>40 OPERATIVE NODES</span><span>0 EXTERNAL WRITES</span></div>
+          <img id="n8n-canvas-image" src="" alt="" loading="lazy" />
+          <figcaption><strong id="n8n-proof-caption">Ausgeführter Workflow</strong><span>Contract · Idempotenz · Retry · Stop · Human Review · Audit</span></figcaption>
+        </figure>
+        <div class="proof-control-grid" aria-label="Sichtbare Workflow-Kontrollen">
+          <article><span>01</span><h3>Input & Vertrag</h3><p>Normalisierung, Pflichtfelder und ein eigener Reparaturweg für ungültige Daten.</p></article>
+          <article><span>02</span><h3>Replay & Abhängigkeit</h3><p>Idempotenz, vorheriges Ergebnis, transiente Fehler und begrenzter Retry.</p></article>
+          <article><span>03</span><h3>Fachliche Regeln</h3><p>Domänenspezifische Prüfungen routen in Ready, Review oder kritischen Stop.</p></article>
+          <article><span>04</span><h3>Mensch & Adapter</h3><p>Versionierte Freigabe; der sichtbare Zieladapter bleibt im Proof deaktiviert.</p></article>
+        </div>
+        <figure class="canvas-detail-frame" id="n8n-detail-frame" hidden>
+          <img id="n8n-detail-image" src="" alt="" loading="lazy" />
+          <figcaption>Detailansicht der ausgeführten Fehler-, Retry- und Review-Routen.</figcaption>
+        </figure>
+      </section>
+
       <section class="evidence-section shell" aria-labelledby="evidence-title">
         <div class="section-heading"><div><p class="kicker">Grenzen & Evidenz</p><h2 id="evidence-title">Vorbereiten, nicht behaupten.</h2></div><p id="workflow-assessment"></p></div>
         <div class="evidence-grid">

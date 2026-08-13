@@ -36,6 +36,17 @@ function renderStatic() {
   document.querySelector('#workflow-buyer').textContent = workflow.buyer;
   document.querySelector('#workflow-sor').textContent = workflow.systemOfRecord;
   document.querySelector('#workflow-assessment').textContent = workflow.assessment;
+  const n8nImage = document.querySelector('#n8n-canvas-image');
+  n8nImage.src = `../../evidence/n8n/${workflow.slug}-inspectable-executed.png`;
+  n8nImage.alt = `Ausgeführter n8n-Workflow für ${workflow.title} mit sichtbaren Ausnahme- und Freigaberouten`;
+  document.querySelector('#n8n-proof-caption').textContent = `${workflow.title} — ausgeführter Synthetic Demo Workflow`;
+  if (workflow.polished) {
+    const detailFrame = document.querySelector('#n8n-detail-frame');
+    const detailImage = document.querySelector('#n8n-detail-image');
+    detailFrame.hidden = false;
+    detailImage.src = `../../evidence/n8n/${workflow.slug}-error-handling-detail.png`;
+    detailImage.alt = `Detailansicht der Fehlerbehandlung für ${workflow.title}`;
+  }
   document.querySelector('#workflow-badges').innerHTML = `<span>${workflow.evidenceType}</span><span>${workflow.status}</span><span>${workflow.adapterStatus}</span><span>${workflow.customerValidation}</span>`;
   document.querySelector('#process-rail').innerHTML = stages.map((stage, index) => `<div><span>0${index + 1}</span><strong>${stage}</strong></div>`).join('');
   document.querySelector('#scenario-tabs').innerHTML = workflow.scenarios.map((scenario, index) => `<button type="button" role="tab" aria-selected="${index === 0}" data-scenario="${scenario.id}"><span>${scenario.kind === 'happy' ? 'Happy Path' : scenario.kind === 'edge' ? 'Abweichung' : 'Stop Condition'}</span><strong>${scenario.label}</strong></button>`).join('');

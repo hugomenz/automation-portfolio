@@ -33,11 +33,11 @@ Ten functional industrial workflow prototypes for machinery, service, procuremen
 
 The implementation hypothesis prioritises Order Intake, Service Triage and Invoice/PO Matching. They combine a clear buyer, frequent work, visible error cost, accessible inputs and a credible human boundary.
 
-| Demo | Strong stop condition | Screenshot | 35-second silent demo |
-|---|---|---|---|
-| Customer Order Intake | unknown article or price deviation | [PNG](docs/screenshots/lab/customer-order-intake-exception.png) | [MP4](content/linkedin/customer-order-intake/assets/demo-30s.mp4) |
-| Machine Service Triage | safety-related message; no remote diagnosis | [PNG](docs/screenshots/lab/machine-service-triage-exception.png) | [MP4](content/linkedin/machine-service-triage/assets/demo-30s.mp4) |
-| Invoice / PO Matching | changed IBAN always stops | [PNG](docs/screenshots/lab/invoice-po-matching-exception.png) | [MP4](content/linkedin/invoice-po-matching/assets/demo-30s.mp4) |
+| Demo | Strong stop condition | Product UI | Executed n8n canvas | 35-second demo |
+|---|---|---|---|---|
+| Customer Order Intake | unknown article or price deviation | [PNG](docs/screenshots/lab/customer-order-intake-exception.png) | [PNG](docs/screenshots/n8n/customer-order-intake-inspectable-executed.png) | [MP4](content/linkedin/customer-order-intake/assets/demo-30s.mp4) |
+| Machine Service Triage | safety-related message; no remote diagnosis | [PNG](docs/screenshots/lab/machine-service-triage-exception.png) | [PNG](docs/screenshots/n8n/machine-service-triage-inspectable-executed.png) | [MP4](content/linkedin/machine-service-triage/assets/demo-30s.mp4) |
+| Invoice / PO Matching | changed IBAN always stops | [PNG](docs/screenshots/lab/invoice-po-matching-exception.png) | [PNG](docs/screenshots/n8n/invoice-po-matching-inspectable-executed.png) | [MP4](content/linkedin/invoice-po-matching/assets/demo-30s.mp4) |
 
 This is not market validation. `Observed interest` and `Paid validation` remain negative in the matrix.
 
@@ -55,7 +55,7 @@ Open `http://127.0.0.1:4173/`. Every detail route offers three scenarios plus du
 `npm run check` generates and verifies:
 
 - 10 workflow READMEs;
-- 30 synthetic fixtures;
+- 60 synthetic fixtures;
 - 10 sanitized disabled n8n exports;
 - 10 architecture diagrams;
 - German LinkedIn packs with at least two complete posts per workflow;
@@ -68,11 +68,11 @@ Open `http://127.0.0.1:4173/`. Every detail route offers three scenarios plus du
 - `src/data/catalog.js` — problem, buyer, opportunity scores and synthetic scenarios.
 - `src/lib/engine.js` — deterministic domain checks and shared run controls.
 - `workflows/` — one README and three fixtures per workflow.
-- `n8n/workflows/` — importable sanitized exports, all `active: false`.
+- `n8n/workflows/` — importable sanitized exports, each with 40 operational nodes, six test routes and `active: false`.
 - `content/linkedin/` — local German posts, visual briefs, storyboards, video scripts and assets; nothing published.
 - `docs/screenshots/lab/` — desktop, mobile and exception evidence.
 - `docs/OPPORTUNITY_MATRIX.md` — ranking with explicit validation gaps.
 
 ## n8n boundary
 
-The ten exports were imported into Hugo's n8n Personal project on 2026-08-13 and manually executed with synthetic fixtures. Each run produced three items through `Human Review Boundary`. No credential was attached, no trigger was published and no external write occurred. See [n8n/README.md](n8n/README.md).
+The ten detailed exports were imported into Hugo's n8n Personal test project and manually executed with six synthetic routes each on 2026-08-14. Contract rejection, duplicate replay, bounded retry, business stop and human review are separate visible branches. No credential was attached, no trigger was published and no external write occurred. See [n8n/README.md](n8n/README.md).

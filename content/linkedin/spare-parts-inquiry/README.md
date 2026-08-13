@@ -33,6 +33,7 @@ Zwei gleich plausible Teile nebeneinander, Confidence-Werte, BOM-Revision und gr
 - `POST_01_DE.md` and `POST_02_DE.md`: complete German drafts.
 - `VISUAL_BRIEF_DE.md`: screenshot and composition instructions.
 - `assets/demo-exception.png`: German exception-state capture.
+- `../../../docs/screenshots/n8n/spare-parts-inquiry-inspectable-executed.png`: supporting evidence from the executed n8n canvas.
 
 ## Safety
 

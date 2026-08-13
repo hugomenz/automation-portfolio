@@ -1,0 +1,26 @@
+{
+  "workflow": "rfq-prequal",
+  "scenario": "complete-rfq-invalid",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": null,
+    "request": "Montagezelle für Ventilbaugruppe",
+    "quantityPerYear": 180000,
+    "cycleTimeSeconds": 16,
+    "interfaces": [
+      "Profinet",
+      "OPC UA"
+    ],
+    "targetSop": "2027-05-01",
+    "requirements": 14,
+    "contradictions": [],
+    "missing": [],
+    "evidence": [
+      {
+        "source": "RFQ_Montagezelle.pdf",
+        "page": 4,
+        "field": "Taktzeit"
+      }
+    ]
+  }
+}
