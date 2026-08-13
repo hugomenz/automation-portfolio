@@ -1,70 +1,115 @@
 <!doctype html>
-<html lang="es">
+<html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Cinco casos verificables de automatización, aplicaciones y workflows." />
-    <title>Hugo Menz · Sistemas que funcionan</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0b1110" />
+    <title>Industrial Automation Lab — Hugo Menz</title>
+    <meta name="description" content="Zehn getestete Prozessprototypen für Maschinenbau, Service, Einkauf und Operations—mit synthetischen Daten, Ausnahmen und menschlicher Freigabe." />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://hugomenz.github.io/automation-portfolio/" />
     <link rel="stylesheet" href="./app.css" />
+    <script type="module" src="./app.js"></script>
   </head>
   <body data-page="home">
-    <header class="topbar">
-      <a data-route="home" class="brand">HUGO MENZ <span>AUTOMATION</span></a>
-      <nav aria-label="Navegación principal">
-        <a data-route="home" data-i18n="nav.work" aria-current="page">Casos</a>
-        <a data-route="workflows" data-i18n="nav.workflows">N8N Workflows</a>
-        <a data-route="approach" data-i18n="nav.approach">Cómo trabajo</a>
+    <a class="skip-link" href="#main">Zum Inhalt</a>
+    <header class="site-header">
+      <a class="brand" href="./" aria-label="Industrial Automation Lab Startseite">
+        <span class="brand-mark" aria-hidden="true">HM</span>
+        <span><strong>Industrial Automation Lab</strong><small>Hugo Menz · Stuttgart</small></span>
+      </a>
+      <nav aria-label="Hauptnavigation">
+        <a href="#experimente">Experimente</a>
+        <a href="#matrix">Bewertung</a>
+        <a href="#prinzip">Prinzip</a>
+        <a class="nav-cta" href="https://github.com/hugomenz/automation-portfolio">Repository</a>
       </nav>
-      <label class="language"><span data-i18n="nav.language">Idioma</span><select id="language-selector" aria-label="Language"><option value="es">ES</option><option value="en">EN</option><option value="de">DE</option></select></label>
     </header>
 
-    <main id="top">
-      <section class="hero" aria-labelledby="hero-title">
+    <main id="main">
+      <section class="hero shell" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow" data-i18n="hero.kicker">PORTFOLIO · CINCO CASOS</p>
-          <h1 id="hero-title" data-i18n="hero.title">Sistemas que se pueden abrir, probar e inspeccionar.</h1>
-          <p data-i18n="hero.lead">Cinco casos reales de automatización, aplicaciones y workflows. Sin resultados inventados y con el estado técnico visible.</p>
-          <div class="hero-actions"><a id="hero-open" class="primary"></a><a id="hero-view"></a></div>
-        </div>
-
-        <div class="hero-showcase" aria-live="polite">
-          <a id="hero-frame" class="hero-frame">
-            <span id="hero-frame-index" class="frame-index"></span>
-            <img id="hero-image" alt="" />
-            <b id="hero-project-name"></b>
-          </a>
-          <div class="slider-controls">
-            <button id="hero-prev" class="slider-arrow" type="button" aria-label="Anterior">←</button>
-            <div id="hero-dots" class="slider-dots" aria-label="Casos del portfolio"></div>
-            <button id="hero-next" class="slider-arrow" type="button" aria-label="Siguiente">→</button>
+          <p class="kicker"><span class="live-dot"></span> Laborstand · August 2026</p>
+          <h1 id="hero-title">Weniger Reibung in industriellen Abläufen.</h1>
+          <p class="hero-lede">Zehn funktionale Prozessprototypen für Maschinenbau und Sondermaschinenbau. Nicht als „AI-Agenten“ verkauft, sondern als prüfbare Vorbereitung: Eingang strukturieren, Abweichungen erkennen, Menschen entscheiden lassen.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#top-demos">Drei Demos prüfen</a>
+            <a class="button button-secondary" href="#matrix">Priorisierung ansehen</a>
           </div>
+        </div>
+        <aside class="control-panel" aria-label="Laborstatus">
+          <div class="panel-head"><span>LAB / CONTROL</span><span>DE-STG</span></div>
+          <div class="signal-grid">
+            <div><strong>10</strong><span>Workflows<br />Built and testable</span></div>
+            <div><strong>3</strong><span>interaktive<br />Demos</span></div>
+            <div><strong>0</strong><span>Customer<br />Validated</span></div>
+            <div><strong>0</strong><span>externe<br />Writes</span></div>
+          </div>
+          <p class="panel-note"><span aria-hidden="true">↳</span> Alle Daten sind synthetisch. ERP, CRM, QMS und Ticketsysteme bleiben führend.</p>
+        </aside>
+      </section>
+
+      <section class="problem-strip" aria-label="Verbesserungsziele">
+        <div class="shell strip-track">
+          <span>Weniger Copy/Paste</span><span>Frühere Ausnahmen</span><span>Kürzere Reaktionszeit</span><span>Nachvollziehbare Entscheidungen</span><span>Keine stille Automatisierung</span>
         </div>
       </section>
 
-      <nav class="index-strip" id="work" aria-label="Cinco casos"></nav>
-      <div id="projects" class="projects" aria-live="polite"></div>
+      <section id="top-demos" class="section shell">
+        <div class="section-heading">
+          <div><p class="kicker">01 / Ausgewählte Beweise</p><h2>Drei Prozesse, die man in 90 Sekunden versteht.</h2></div>
+          <p>Ausgewählt nach Frequenz, Fehlerkosten, Datenzugang und Klarheit des Buyers. Das ist eine Implementierungshypothese—noch kein Marktbeweis.</p>
+        </div>
+        <div id="featured-list" class="featured-list"></div>
+      </section>
+
+      <section id="experimente" class="section section-ink">
+        <div class="shell">
+          <div class="section-heading light">
+            <div><p class="kicker">02 / Das Labor</p><h2>Zehn Abläufe. Immer mit Ausnahmeweg.</h2></div>
+            <p>Jeder Fall folgt demselben prüfbaren Vertrag: Problem → Eingang → Prüfung → Ausnahme → menschliche Entscheidung → vorbereiteter Output.</p>
+          </div>
+          <div id="workflow-index" class="workflow-index"></div>
+        </div>
+      </section>
+
+      <section id="matrix" class="section shell">
+        <div class="section-heading">
+          <div><p class="kicker">03 / Opportunity Matrix</p><h2>Nicht alles, was baubar ist, ist zuerst verkaufbar.</h2></div>
+          <p>Skala 1–5. Hohe Integrations- und Risikowerte bedeuten hier: leicht beherrschbar. Beobachtetes Interesse und bezahlte Validierung bleiben bei null.</p>
+        </div>
+        <div class="matrix-summary" id="matrix-summary"></div>
+        <div class="table-wrap" tabindex="0" aria-label="Opportunity Matrix horizontal scrollbar">
+          <table class="matrix-table">
+            <thead><tr><th>Prozess</th><th>Buyer</th><th>Frequenz</th><th>Impact</th><th>Daten</th><th>Machbar</th><th>Erklärbar</th><th>Verkauf</th><th>Gesamt</th><th>Interesse</th><th>Paid</th></tr></thead>
+            <tbody id="matrix-body"></tbody>
+          </table>
+        </div>
+        <p class="matrix-note">Gesamt enthält außerdem Wiederholung, Integrationsbeherrschbarkeit, Risiko und externe Nachfrage-Signale. Die vollständige Begründung liegt im Repository.</p>
+      </section>
+
+      <section id="prinzip" class="section shell principle-section">
+        <div class="principle-card">
+          <p class="kicker">04 / Leitplanke</p>
+          <blockquote>„Dieser Workflow hat nicht weitergemacht. Und genau das war das richtige Ergebnis.“</blockquote>
+          <p>Unbekannter Artikel, unklare Maschine, widersprüchliche Taktzeit oder geänderte IBAN: Ein glaubwürdiges System macht Unsicherheit sichtbar und stoppt, bevor ein Fehler im führenden System landet.</p>
+        </div>
+        <div class="principle-steps" aria-label="Sicherheitsprinzipien">
+          <div><span>01</span><strong>Quelle zeigen</strong><p>Feld, Datei, Seite oder Stammdatensatz bleiben sichtbar.</p></div>
+          <div><span>02</span><strong>Unsicherheit benennen</strong><p>Confidence ist Hinweis, keine technische Wahrheit.</p></div>
+          <div><span>03</span><strong>Entscheidung trennen</strong><p>Das System bereitet vor. Der verantwortliche Mensch gibt frei.</p></div>
+          <div><span>04</span><strong>Write begrenzen</strong><p>Diese Demos schreiben in kein reales ERP, CRM oder QMS.</p></div>
+        </div>
+      </section>
     </main>
 
-    <div id="section-navigation"></div>
-
-    <dialog id="workflow-dialog" class="workflow-dialog" aria-labelledby="workflow-dialog-title">
-      <div class="dialog-bar">
-        <div><p class="eyebrow" data-i18n="workflow.label">Flujo del proyecto</p><h2 id="workflow-dialog-title"></h2></div>
-        <button class="dialog-close" type="button" data-dialog-close aria-label="Cerrar">×</button>
+    <footer class="site-footer">
+      <div class="shell footer-grid">
+        <div><strong>Hugo Menz</strong><p>Industrial automation experience × software systems.<br />Stuttgart, Deutschland.</p></div>
+        <div><span>STATUS</span><p>Synthetic Demo<br />Built and testable<br />Nicht kundenvalidiert</p></div>
+        <div><span>KONTAKT / EVIDENZ</span><a href="https://github.com/hugomenz">GitHub</a><a href="https://www.hugomenz.de/">hugomenz.de</a><a href="https://www.linkedin.com/in/hugomartin-menz">LinkedIn</a></div>
       </div>
-      <div class="dialog-canvas"><img id="workflow-dialog-image" alt="" /></div>
-      <div class="dialog-footer"><p id="workflow-dialog-copy"></p><a id="workflow-dialog-link" class="primary"></a></div>
-    </dialog>
-
-    <footer>
-      <span>Hugo Menz · Stuttgart</span>
-      <a href="https://hugomenz.de">hugomenz.de</a>
-      <a href="https://github.com/hugomenz">GitHub</a>
-      <a href="https://www.linkedin.com/in/hugomartin-menz/">LinkedIn</a>
     </footer>
-    <script type="module" src="./app.js"></script>
   </body>
 </html>

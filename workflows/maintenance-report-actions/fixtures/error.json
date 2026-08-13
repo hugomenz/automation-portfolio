@@ -1,0 +1,19 @@
+{
+  "workflow": "maintenance-actions",
+  "scenario": "unclear-severity",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "MNT-DEMO-9003",
+    "report": "Wartung_AS17.pdf",
+    "machineNumber": "AS-17-0033",
+    "findings": [
+      {
+        "text": "Riss an Halterung festgestellt",
+        "severity": null,
+        "part": null,
+        "owner": null,
+        "deadline": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "workflow": "spare-parts",
+  "scenario": "unique-part-dependency",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "SPR-DEMO-3001-DEP",
+    "machineNumber": "MX-24-0187",
+    "query": "Sensor an Position B-17",
+    "photo": "sensor-b17.jpg",
+    "candidates": [
+      {
+        "part": "HM-SEN-18",
+        "label": "Näherungssensor M18",
+        "confidence": 0.97,
+        "bom": "MX-24 Rev. C / B-17",
+        "successor": null,
+        "stock": 12
+      }
+    ],
+    "evidence": [
+      {
+        "source": "BOM MX-24 Rev. C",
+        "field": "Position B-17"
+      }
+    ],
+    "adapterAvailable": false,
+    "retryAttempt": 1
+  }
+}

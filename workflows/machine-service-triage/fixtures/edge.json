@@ -1,0 +1,31 @@
+{
+  "workflow": "service-triage",
+  "scenario": "missing-machine",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "SRV-DEMO-2002",
+    "receivedAt": "2026-08-12T07:20:00Z",
+    "sender": "technik@alb-demo.example",
+    "machineNumber": null,
+    "internalLine": "Linie 3 / Presse links",
+    "subject": "Druck fällt sporadisch ab",
+    "errorCodes": [],
+    "symptoms": "Nach ca. 20 Minuten fällt der Druck ab.",
+    "attachments": [
+      "druckanzeige.jpg"
+    ],
+    "productionStopped": false,
+    "safetyConcern": false,
+    "machine": null,
+    "evidence": [
+      {
+        "source": "E-Mail",
+        "field": "Linie 3"
+      },
+      {
+        "source": "druckanzeige.jpg",
+        "field": "sichtbarer Messwert"
+      }
+    ]
+  }
+}

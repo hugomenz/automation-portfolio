@@ -1,0 +1,26 @@
+{
+  "workflow": "maintenance-actions",
+  "scenario": "clear-findings-replay",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "MNT-DEMO-9001",
+    "report": "Wartung_MX-24-0187.pdf",
+    "machineNumber": "MX-24-0187",
+    "findings": [
+      {
+        "text": "Führungswagen Y zeigt erhöhtes Spiel",
+        "severity": "mittel",
+        "part": "HM-LIN-25",
+        "owner": "Mechanik",
+        "deadline": "2026-09-05"
+      },
+      {
+        "text": "Filtermatte Schaltschrank verschmutzt",
+        "severity": "niedrig",
+        "part": "HM-FLT-300",
+        "owner": "Instandhaltung",
+        "deadline": "2026-08-20"
+      }
+    ]
+  }
+}

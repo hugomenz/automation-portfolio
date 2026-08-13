@@ -1,0 +1,31 @@
+{
+  "workflow": "rfq-prequal",
+  "scenario": "conflicting-cycle",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "RFQ-DEMO-6003",
+    "request": "Verkettete Prüflinie",
+    "quantityPerYear": 240000,
+    "cycleTimeSeconds": 12,
+    "interfaces": [
+      "Profinet"
+    ],
+    "targetSop": "2027-02-01",
+    "requirements": 21,
+    "contradictions": [
+      "E-Mail: 12 s; Lastenheft Seite 9: 15 s"
+    ],
+    "missing": [],
+    "evidence": [
+      {
+        "source": "E-Mail",
+        "field": "12 s"
+      },
+      {
+        "source": "Lastenheft.pdf",
+        "page": 9,
+        "field": "15 s"
+      }
+    ]
+  }
+}

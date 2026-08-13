@@ -1,57 +1,141 @@
-import { readFile, stat } from 'node:fs/promises';
+import { access, readFile, stat } from 'node:fs/promises';
+import { polishedWorkflows, stages, totalScore, workflows } from '../src/data/catalog.js';
+import { applyHumanDecision, runStates, runWorkflow, simulateUnavailableDependency } from '../src/lib/engine.js';
+import { linkedinContent } from '../content/linkedin/content-data.mjs';
 
-const languages = ['es', 'en', 'de'];
-const translations = Object.fromEntries(
-  await Promise.all(languages.map(async (language) => [language, JSON.parse(await readFile(`src/i18n/${language}.json`, 'utf8'))])),
-);
+const checks = [];
+const check = (name, condition) => checks.push([name, Boolean(condition)]);
 
-function keys(value, prefix = '') {
-  return Object.entries(value).flatMap(([key, child]) => {
-    const path = prefix ? `${prefix}.${key}` : key;
-    return child && typeof child === 'object' && !Array.isArray(child) ? keys(child, path) : [path];
-  }).sort();
+function runCodeNode(node, items) {
+  return Function('items', `'use strict';\n${node.parameters.jsCode}`)(structuredClone(items));
 }
 
-const germanEnglishKeys = JSON.stringify(keys(translations.de));
-const imagePaths = ['rfq.png', 'order-entry.jpg', 'rag-security.png', 'fridgeflow.png', 'agent-observatory.png', 'music-school.png'];
-const workflowPaths = ['rfq-workflow.png', 'order-entry-workflow.svg', 'rag-workflow.png', 'fridge-workflow.png', 'agent-workflow.png', 'music-workflow.png'];
-const n8nPaths = ['n8n-rfq.jpg', 'n8n-rag.jpg', 'n8n-fridge.jpg', 'n8n-agent.jpg'];
-const [home, workflows, approach, script, css] = await Promise.all([
-  readFile('src/index.html', 'utf8'),
-  readFile('src/workflows/index.html', 'utf8'),
-  readFile('src/approach/index.html', 'utf8'),
-  readFile('src/app.js', 'utf8'),
-  readFile('src/app.css', 'utf8'),
+function routeSwitchNode(node, items) {
+  const expression = node.parameters.output.replace(/^=\{\{\s*/, '').replace(/\s*\}\}$/, '');
+  const outputs = Array.from({ length: node.parameters.numberOutputs }, () => []);
+  for (const item of items) {
+    const output = Function('$json', `'use strict'; return (${expression});`)(item.json);
+    if (!Number.isInteger(output) || output < 0 || output >= outputs.length) throw new Error(`${node.name}: invalid output ${output}`);
+    outputs[output].push(item);
+  }
+  return outputs;
+}
+
+function executeN8nExport(workflow) {
+  const nodes = new Map(workflow.nodes.map((node) => [node.name, node]));
+  const terminalItems = new Map();
+  const walk = (nodeName, inputItems) => {
+    if (!inputItems.length) return;
+    const node = nodes.get(nodeName);
+    if (!node) throw new Error(`Missing node ${nodeName}`);
+    let outputs;
+    if (node.type === 'n8n-nodes-base.code') outputs = [runCodeNode(node, inputItems)];
+    else if (node.type === 'n8n-nodes-base.switch') outputs = routeSwitchNode(node, inputItems);
+    else outputs = [structuredClone(inputItems)];
+    const links = workflow.connections[nodeName]?.main ?? [];
+    if (!links.some((branch) => branch?.length)) {
+      terminalItems.set(nodeName, [...(terminalItems.get(nodeName) ?? []), ...outputs.flat()]);
+      return;
+    }
+    outputs.forEach((items, outputIndex) => {
+      for (const link of links[outputIndex] ?? []) walk(link.node, items);
+    });
+  };
+  walk('Manual Test Start', [{ json: {} }]);
+  return terminalItems;
+}
+
+check('exactly ten workflow definitions', workflows.length === 10);
+check('exactly three polished workflows', polishedWorkflows.length === 3);
+check('six-stage explainable process', JSON.stringify(stages) === JSON.stringify(['Problem', 'Eingang', 'Prüfung', 'Ausnahme', 'Mensch', 'Ergebnis']));
+check('unique IDs and slugs', new Set(workflows.map(({ id }) => id)).size === 10 && new Set(workflows.map(({ slug }) => slug)).size === 10);
+check('approved public status taxonomy', workflows.every((workflow) => ['Built and testable', 'Test-account integration', 'Mocked adapter', 'Architecture only', 'Planned'].includes(workflow.status) && workflow.adapterStatus === 'Mocked adapter'));
+check('no claimed customer validation', workflows.every((workflow) => workflow.customerValidation === 'Nicht validiert'));
+check('LinkedIn content exists for all workflows', Object.keys(linkedinContent).length === 10 && workflows.every((workflow) => linkedinContent[workflow.slug]));
+
+for (const workflow of workflows) {
+  check(`${workflow.id}: three synthetic scenarios`, workflow.scenarios.length >= 3 && new Set(workflow.scenarios.map(({ kind }) => kind)).size === 3);
+  check(`${workflow.id}: complete commercial frame`, Boolean(workflow.problem && workflow.buyer && workflow.improvement && workflow.systemOfRecord && workflow.marketSignal && workflow.assessment));
+  check(`${workflow.id}: ten opportunity scores`, Object.keys(workflow.scores).length === 10 && Object.values(workflow.scores).every((score) => score >= 1 && score <= 5) && totalScore(workflow) <= 50);
+  const content = linkedinContent[workflow.slug];
+  check(`${workflow.id}: complete local content pack`, content.posts.length >= 2 && content.angles.length >= 3 && content.hooks.length >= 3 && content.ctas.length >= 3 && content.visual);
+  check(`${workflow.id}: polished content is richer`, !workflow.polished || (content.posts.length >= 3 && content.carousel.length >= 8 && content.video.length >= 5));
+
+  const seen = new Set();
+  const runs = workflow.scenarios.map((scenario) => runWorkflow(workflow.id, scenario.input, { seen }));
+  check(`${workflow.id}: every scenario has structured output`, runs.every((run) => run.runId && run.idempotencyKey && run.audit.length >= 4 && run.result && run.adapter.writesPerformed === 0));
+  check(`${workflow.id}: happy path reaches review-ready`, runs.find((_, index) => workflow.scenarios[index].kind === 'happy')?.state.code === runStates.ready.code || workflow.id === 'spec-delta');
+  check(`${workflow.id}: stop condition exists`, runs.some((run) => run.state.code === runStates.stopped.code));
+  check(`${workflow.id}: all critical outcomes remain human controlled`, runs.filter((run) => ![runStates.duplicate.code, runStates.retry.code].includes(run.state.code)).every((run) => run.humanRequired));
+
+  const fresh = runWorkflow(workflow.id, workflow.scenarios[0].input, { seen: new Set() });
+  const approved = applyHumanDecision(fresh, 'approve', 'synthetic test approval');
+  check(`${workflow.id}: approval prepares but never writes`, approved.state.code === runStates.approved.code && approved.result.externalWritePerformed === false && approved.adapter.writesPerformed === 0);
+
+  const replaySeen = new Set();
+  runWorkflow(workflow.id, workflow.scenarios[0].input, { seen: replaySeen });
+  const replay = runWorkflow(workflow.id, workflow.scenarios[0].input, { seen: replaySeen });
+  check(`${workflow.id}: replay is idempotent`, replay.state.code === runStates.duplicate.code && replay.adapter.writesPerformed === 0);
+
+  const retry = simulateUnavailableDependency(workflow.id, workflow.scenarios[0].input);
+  check(`${workflow.id}: unavailable dependency schedules bounded retry`, retry.state.code === runStates.retry.code && retry.result.retry.maxAttempts === 3 && retry.adapter.writesPerformed === 0);
+}
+
+const [home, detail, script, workflowScript, css, readme] = await Promise.all([
+  readFile('src/index.html', 'utf8'), readFile('src/workflow.html', 'utf8'), readFile('src/app.js', 'utf8'), readFile('src/workflow.js', 'utf8'), readFile('src/app.css', 'utf8'), readFile('README.md', 'utf8'),
 ]);
-const publicSource = home + workflows + approach + script + css + JSON.stringify(translations);
-const checks = [
-  ['German and English translation keys match', JSON.stringify(keys(translations.en)) === germanEnglishKeys],
-  ['six German and English projects', ['de', 'en'].every((language) => Object.keys(translations[language].projects).length === 6)],
-  ['six German and English workflow cases', ['de', 'en'].every((language) => Object.keys(translations[language].workflowPage.cases).length === 6)],
-  ['Spanish intentionally remains at five cases', Object.keys(translations.es.projects).length === 5 && Object.keys(translations.es.workflowPage.cases).length === 5 && !translations.es.projects.order],
-  ['three independent pages', home.includes('data-page="home"') && workflows.includes('data-page="workflows"') && approach.includes('data-page="approach"')],
-  ['language selector on every page', [home, workflows, approach].every((html) => html.includes('id="language-selector"'))],
-  ['shareable language URL', script.includes("searchParams.set('lang', language)") && script.includes('languageFromUrl()')],
-  ['route links preserve language', script.includes('routeUrl') && script.includes("route === 'home'")],
-  ['hero project slider', home.includes('id="hero-dots"') && script.includes('updateHeroSlide')],
-  ['language-specific project order', script.includes('messages.projects.order') && script.includes("['rfq', 'order', 'rag', 'fridge', 'agent', 'music']")],
-  ['scroll-aware section navigation', script.includes('IntersectionObserver') && script.includes('section-index')],
-  ['native workflow zoom dialog', home.includes('<dialog') && workflows.includes('<dialog') && script.includes('showModal()')],
-  ['no public Figma navigation', !/figma\.com/i.test(home + workflows + approach + script)],
-  ['LinkedIn footer on every page', [home, workflows, approach].every((html) => html.includes('linkedin.com/in/hugomartin-menz'))],
-  ['workflow explanations', languages.every((language) => Object.values(translations[language].workflowPage.cases).every((item) => item.why && item.purpose && item.how && item.set.length))],
-  ['project flows and scope', languages.every((language) => Object.values(translations[language].projects).every((item) => item.flow.length >= 5 && item.scope && item.visualLabel))],
-  ['order entry remains secondary and bounded', ['de', 'en'].every((language) => /secondary|sekundär/i.test(translations[language].projects.order.role) && /No ERP|Keine ERP/i.test(translations[language].projects.order.scope))],
-  ['platform logos', script.includes('platformMeta') && script.includes('cdn.simpleicons.org') && script.includes('renderPlatforms')],
-  ['no repeated status grid', !script.includes('truth-table') && !home.includes('status.working') && languages.every((language) => !translations[language].status)],
-  ['agent is the full experiment', languages.every((language) => translations[language].projects.agent.name === 'Agent Chaos Lab' && /Observatory/.test(translations[language].projects.agent.how))],
-  ['Twilio is scoped as an extension', languages.every((language) => /Twilio/.test(translations[language].projects.music.extension))],
-  ['desktop and mobile navigation', css.includes('.section-index') && css.includes('.section-jump') && css.includes('@media (max-width: 780px)')],
-  ['no invented metrics', !/\b\d+%|\bsaved\s+\d+|\b\d+\s+(customers?|clients?)\b/i.test(JSON.stringify(translations))],
-  ['no secrets', !/sk-or-v1-|sb_secret_|BEGIN PRIVATE KEY/.test(publicSource)],
-];
-for (const image of imagePaths) checks.push([`real screenshot ${image}`, (await stat(`src/assets/${image}`)).size > 20_000]);
-for (const image of workflowPaths) checks.push([`workflow diagram ${image}`, (await stat(`src/assets/${image}`)).size > (image.endsWith('.svg') ? 3_000 : 20_000)]);
-for (const image of n8nPaths) checks.push([`real n8n editor ${image}`, (await stat(`src/assets/${image}`)).size > 40_000]);
+const publicSource = [home, detail, script, workflowScript, css, readme, JSON.stringify(workflows)].join('\n');
+check('German initial document language', home.includes('<html lang="de">') && detail.includes('<html lang="de">'));
+check('accessible landmarks and skip links', [home, detail].every((html) => html.includes('<main id="main">') && html.includes('skip-link')));
+check('all important items avoid carousel navigation', !/carousel|slider/i.test(home + script));
+check('mobile and reduced motion CSS', css.includes('@media (max-width: 780px)') && css.includes('prefers-reduced-motion'));
+check('human decision interaction present', workflowScript.includes('applyHumanDecision') && detail.includes('menschlicher Freigabe'));
+check('duplicate and dependency failure controls present', detail.includes('duplicate-button') && detail.includes('failure-button'));
+check('executed n8n evidence is visible on every detail page', detail.includes('n8n-canvas-image') && workflowScript.includes('inspectable-executed.png') && detail.includes('40 OPERATIVE NODES'));
+check('truth status visible on home and detail', home.includes('Customer') && home.includes('Validated') && detail.includes('Built and testable'));
+check('no common secret patterns', !/(gsk_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9_-]{20,}|sb_secret_|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|ghp_[A-Za-z0-9]{20,})/.test(publicSource));
+check('no invented commercial metrics', !/\b\d+\s*(customers?|Kunden|clients?)\b|\b\d+%\s*(saved|gespart|weniger)/i.test(publicSource));
+
+for (const workflow of workflows) {
+  await access(`workflows/${workflow.slug}/README.md`);
+  await access(`workflows/${workflow.slug}/fixtures/happy.json`);
+  await access(`workflows/${workflow.slug}/fixtures/edge.json`);
+  await access(`workflows/${workflow.slug}/fixtures/error.json`);
+  await access(`workflows/${workflow.slug}/fixtures/duplicate.json`);
+  await access(`workflows/${workflow.slug}/fixtures/dependency.json`);
+  await access(`workflows/${workflow.slug}/fixtures/invalid.json`);
+  await access(`workflows/${workflow.slug}/N8N_RUNBOOK.md`);
+  const exportSource = await readFile(`n8n/workflows/${workflow.slug}.workflow.json`, 'utf8');
+  const exportJson = JSON.parse(exportSource);
+  const operationalNodes = exportJson.nodes.filter((node) => node.type !== 'n8n-nodes-base.stickyNote');
+  const nodeNames = new Set(exportJson.nodes.map((node) => node.name));
+  const connectionTargets = Object.values(exportJson.connections).flatMap(({ main }) => main.flat().map(({ node }) => node));
+  check(`${workflow.id}: detailed disabled n8n export`, exportJson.active === false && operationalNodes.length >= 35 && exportJson.nodes.filter((node) => node.type === 'n8n-nodes-base.switch').length >= 6);
+  check(`${workflow.id}: sanitized adapter boundary`, exportJson.nodes.every((node) => !node.credentials) && exportJson.nodes.filter((node) => node.type === 'n8n-nodes-base.httpRequest').every((node) => node.disabled === true) && !/(gsk_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9_-]{20,}|sb_secret_|ghp_[A-Za-z0-9]{20,}|BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY)/.test(exportSource));
+  check(`${workflow.id}: valid names and connections`, nodeNames.size === exportJson.nodes.length && connectionTargets.every((target) => nodeNames.has(target)));
+  check(`${workflow.id}: n8n export contains reliability and human boundaries`, ['Claim Idempotency Key [MOCK]', 'Route Retry Budget', 'Human Decision Required', 'Append Final Audit Event [MOCK]'].every((name) => nodeNames.has(name)) && exportSource.includes('externalWritePerformed'));
+  const terminalItems = executeN8nExport(exportJson);
+  const reviewItems = terminalItems.get('Terminal - Inspectable Review Package') ?? [];
+  check(`${workflow.id}: six n8n test cases execute locally`, [...terminalItems.values()].reduce((sum, items) => sum + items.length, 0) === 6);
+  check(`${workflow.id}: visible invalid, replay and retry terminals`, (terminalItems.get('Terminal - Manual Data Repair')?.length ?? 0) === 1 && (terminalItems.get('Terminal - Replay Safe')?.length ?? 0) === 1 && (terminalItems.get('Terminal - Bounded Retry Queue')?.length ?? 0) === 1);
+  check(`${workflow.id}: domain routes reach human review`, reviewItems.length === 3 && new Set(reviewItems.map((item) => item.json.decision.status)).size === 3);
+  check(`${workflow.id}: every n8n terminal performs zero writes`, [...terminalItems.values()].flat().every((item) => item.json.externalWritePerformed !== true && (item.json.adapter?.writesPerformed ?? 0) === 0));
+  check(`${workflow.id}: executed n8n screenshot exists`, (await stat(`docs/screenshots/n8n/${workflow.slug}-inspectable-executed.png`)).size > 50_000);
+  check(`${workflow.id}: diagram generated`, (await stat(`docs/diagrams/${workflow.slug}.svg`)).size > 1500);
+  await access(`content/linkedin/${workflow.slug}/POST_01_DE.md`);
+  await access(`content/linkedin/${workflow.slug}/POST_02_DE.md`);
+  await access(`content/linkedin/${workflow.slug}/VISUAL_BRIEF_DE.md`);
+  check(`${workflow.id}: exception screenshot exists`, (await stat(`content/linkedin/${workflow.slug}/assets/demo-exception.png`)).size > 50_000);
+  if (workflow.polished) {
+    await access(`content/linkedin/${workflow.slug}/POST_03_DE.md`);
+    await access(`content/linkedin/${workflow.slug}/CAROUSEL_STORYBOARD_DE.md`);
+    await access(`content/linkedin/${workflow.slug}/VIDEO_SCRIPT_DE.md`);
+    check(`${workflow.id}: detailed n8n error screenshot exists`, (await stat(`docs/screenshots/n8n/${workflow.slug}-error-handling-detail.png`)).size > 50_000);
+    check(`${workflow.id}: short video asset exists`, (await stat(`content/linkedin/${workflow.slug}/assets/demo-30s.mp4`)).size > 200_000);
+  }
+}
+
 for (const [name, passed] of checks) console.log(`${passed ? 'PASS' : 'FAIL'} ${name}`);
-if (checks.some(([, passed]) => !passed)) process.exitCode = 1;
+const failures = checks.filter(([, passed]) => !passed);
+console.log(`\n${checks.length - failures.length}/${checks.length} checks passed`);
+if (failures.length) process.exitCode = 1;

@@ -1,0 +1,20 @@
+{
+  "workflow": "supplier-docs",
+  "scenario": "missing-declaration",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "DOC-DEMO-8003",
+    "supplier": "Muster Kabeltechnik GmbH",
+    "expected": [
+      "ISO 9001",
+      "RoHS"
+    ],
+    "documents": [
+      {
+        "type": "ISO 9001",
+        "version": "2025-4",
+        "validUntil": "2028-04-20"
+      }
+    ]
+  }
+}

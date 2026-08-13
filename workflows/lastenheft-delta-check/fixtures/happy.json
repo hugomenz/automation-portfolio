@@ -1,0 +1,40 @@
+{
+  "workflow": "spec-delta",
+  "scenario": "bounded-delta",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "LST-DEMO-4001",
+    "customerSpec": "Lastenheft_Musterlinie.pdf",
+    "internalStandard": "Werksstandard_WS-04.pdf",
+    "requirements": [
+      {
+        "id": "R-12",
+        "text": "Taktzeit ≤ 18 s",
+        "page": 8,
+        "standard": "≤ 20 s",
+        "state": "delta"
+      },
+      {
+        "id": "R-27",
+        "text": "Profinet-Schnittstelle",
+        "page": 14,
+        "standard": "Profinet vorgesehen",
+        "state": "match"
+      },
+      {
+        "id": "R-41",
+        "text": "Schaltschrank IP54",
+        "page": 22,
+        "standard": "IP54",
+        "state": "match"
+      }
+    ],
+    "evidence": [
+      {
+        "source": "Lastenheft_Musterlinie.pdf",
+        "page": 8,
+        "field": "R-12"
+      }
+    ]
+  }
+}

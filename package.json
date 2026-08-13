@@ -1,11 +1,12 @@
 {
-  "name": "automation-portfolio",
-  "version": "0.1.0",
+  "name": "hugo-menz-industrial-automation-lab",
+  "version": "0.8.0",
   "private": true,
   "type": "module",
   "scripts": {
+    "artifacts": "node scripts/generate-artifacts.mjs && node scripts/generate-content.mjs",
     "build": "node scripts/build.mjs",
     "test": "node scripts/test.mjs",
-    "check": "npm run test && npm run build"
+    "check": "npm run artifacts && npm run test && npm run build"
   }
 }

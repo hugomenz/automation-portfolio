@@ -1,0 +1,58 @@
+{
+  "workflow": "invoice-match",
+  "scenario": "iban-change",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "INV-DEMO-5003",
+    "invoice": {
+      "number": "RE-2026-0824",
+      "supplier": "Muster Pneumatik GmbH",
+      "supplierId": "L-2091",
+      "po": "PO-78133",
+      "net": 940,
+      "tax": 178.6,
+      "gross": 1118.6,
+      "iban": "DE02100100100000000999",
+      "items": [
+        {
+          "sku": "VLV-24",
+          "quantity": 10,
+          "unitPrice": 94
+        }
+      ]
+    },
+    "purchaseOrder": {
+      "number": "PO-78133",
+      "supplierId": "L-2091",
+      "items": [
+        {
+          "sku": "VLV-24",
+          "quantity": 10,
+          "unitPrice": 94
+        }
+      ]
+    },
+    "goodsReceipt": {
+      "po": "PO-78133",
+      "items": [
+        {
+          "sku": "VLV-24",
+          "quantity": 10
+        }
+      ]
+    },
+    "supplierMaster": {
+      "iban": "DE02100100100000000004"
+    },
+    "evidence": [
+      {
+        "source": "RE-2026-0824.pdf",
+        "field": "IBAN"
+      },
+      {
+        "source": "Lieferantenstamm L-2091",
+        "field": "freigegebene IBAN"
+      }
+    ]
+  }
+}

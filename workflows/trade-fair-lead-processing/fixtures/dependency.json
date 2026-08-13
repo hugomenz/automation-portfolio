@@ -1,0 +1,23 @@
+{
+  "workflow": "trade-fair-lead",
+  "scenario": "qualified-lead-dependency",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "LEAD-DEMO-10001-DEP",
+    "badge": {
+      "company": "Muster Automation GmbH",
+      "name": "Lena Beispiel",
+      "role": "Leitung Produktion",
+      "email": "lena.beispiel@example.invalid"
+    },
+    "notes": "Interesse an Service-Triage für drei Werke. Rückruf in KW 35 vereinbart.",
+    "interest": "Machine Service Triage",
+    "consent": {
+      "followUp": true,
+      "source": "Gesprächsnotiz"
+    },
+    "existingContact": false,
+    "adapterAvailable": false,
+    "retryAttempt": 1
+  }
+}

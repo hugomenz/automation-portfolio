@@ -1,0 +1,58 @@
+{
+  "workflow": "invoice-match",
+  "scenario": "three-way-match-invalid",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": null,
+    "invoice": {
+      "number": "RE-2026-0814",
+      "supplier": "Demo Komponenten GmbH",
+      "supplierId": "L-2044",
+      "po": "PO-78031",
+      "net": 4820,
+      "tax": 915.8,
+      "gross": 5735.8,
+      "iban": "DE02100100100000000002",
+      "items": [
+        {
+          "sku": "KUG-25",
+          "quantity": 20,
+          "unitPrice": 241
+        }
+      ]
+    },
+    "purchaseOrder": {
+      "number": "PO-78031",
+      "supplierId": "L-2044",
+      "items": [
+        {
+          "sku": "KUG-25",
+          "quantity": 20,
+          "unitPrice": 241
+        }
+      ]
+    },
+    "goodsReceipt": {
+      "po": "PO-78031",
+      "items": [
+        {
+          "sku": "KUG-25",
+          "quantity": 20
+        }
+      ]
+    },
+    "supplierMaster": {
+      "iban": "DE02100100100000000002"
+    },
+    "evidence": [
+      {
+        "source": "XRechnung_RE-2026-0814.xml",
+        "field": "Beträge und IBAN"
+      },
+      {
+        "source": "ERP PO-78031",
+        "field": "Bestellposition"
+      }
+    ]
+  }
+}

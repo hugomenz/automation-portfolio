@@ -1,0 +1,31 @@
+{
+  "workflow": "service-triage",
+  "scenario": "safety-stop",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "SRV-DEMO-2003",
+    "receivedAt": "2026-08-12T07:43:00Z",
+    "sender": "schichtleitung@demoform.example",
+    "machineNumber": "MX-22-0091",
+    "subject": "Schutztürmeldung nach Umbau",
+    "errorCodes": [
+      "S-044"
+    ],
+    "symptoms": "Meldung nach mechanischem Umbau; Produktion pausiert.",
+    "attachments": [],
+    "productionStopped": true,
+    "safetyConcern": true,
+    "machine": {
+      "family": "Prüfzelle PX-8",
+      "site": "Werk Heilbronn",
+      "warranty": "abgelaufen",
+      "lastService": "2024-04-09"
+    },
+    "evidence": [
+      {
+        "source": "E-Mail",
+        "field": "Umbau und Schutztürmeldung"
+      }
+    ]
+  }
+}

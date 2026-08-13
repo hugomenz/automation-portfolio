@@ -1,0 +1,33 @@
+{
+  "workflow": "spec-delta",
+  "scenario": "missing-acceptance",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "LST-DEMO-4002",
+    "customerSpec": "Lastenheft_Prüfzelle.pdf",
+    "internalStandard": "Werksstandard_WS-04.pdf",
+    "requirements": [
+      {
+        "id": "R-08",
+        "text": "Hohe Prüfgenauigkeit",
+        "page": 6,
+        "standard": "Messunsicherheit angeben",
+        "state": "missing-measure"
+      },
+      {
+        "id": "R-19",
+        "text": "CSV-Export",
+        "page": 11,
+        "standard": "CSV oder OPC UA",
+        "state": "match"
+      }
+    ],
+    "evidence": [
+      {
+        "source": "Lastenheft_Prüfzelle.pdf",
+        "page": 6,
+        "field": "R-08"
+      }
+    ]
+  }
+}

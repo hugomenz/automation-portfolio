@@ -1,6 +1,7 @@
-name: Deploy portfolio
+name: Verify and deploy Industrial Automation Lab
 
 on:
+  pull_request:
   push:
     branches: [main]
   workflow_dispatch:
@@ -11,11 +12,22 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run check
+
   deploy:
+    if: github.event_name != 'pull_request'
+    needs: verify
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

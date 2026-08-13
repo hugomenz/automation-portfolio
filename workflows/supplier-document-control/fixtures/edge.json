@@ -1,0 +1,26 @@
+{
+  "workflow": "supplier-docs",
+  "scenario": "expiring-cert",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "DOC-DEMO-8002",
+    "supplier": "Fiktiv Messtechnik KG",
+    "expected": [
+      "ISO 9001",
+      "Kalibrierschein"
+    ],
+    "referenceDate": "2026-08-13",
+    "documents": [
+      {
+        "type": "ISO 9001",
+        "version": "2024-1",
+        "validUntil": "2026-09-02"
+      },
+      {
+        "type": "Kalibrierschein",
+        "version": "K-260101",
+        "validUntil": "2027-01-01"
+      }
+    ]
+  }
+}

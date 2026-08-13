@@ -1,0 +1,24 @@
+{
+  "workflow": "quality-8d",
+  "scenario": "contained-complaint-dependency",
+  "evidenceType": "Synthetic Demo",
+  "input": {
+    "eventId": "QLT-DEMO-7001-DEP",
+    "complaint": "Bohrungsdurchmesser außerhalb Toleranz",
+    "product": "Trägerplatte TP-44",
+    "lot": "L-260812-A",
+    "quantityAffected": 7,
+    "evidenceFiles": [
+      "messprotokoll.csv",
+      "teilfoto.jpg"
+    ],
+    "containment": [
+      "Bestand L-260812-A sperren",
+      "100%-Prüfung vorbereiten"
+    ],
+    "rootCause": null,
+    "missing": [],
+    "adapterAvailable": false,
+    "retryAttempt": 1
+  }
+}
