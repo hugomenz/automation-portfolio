@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#0b1110" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#111916" />
     <title>Industrial Automation Lab — Hugo Menz</title>
-    <meta name="description" content="Zehn getestete Prozessprototypen für Maschinenbau, Service, Einkauf und Operations—mit synthetischen Daten, Ausnahmen und menschlicher Freigabe." />
+    <meta name="description" content="Drei testbare industrielle Control Towers und sieben Prozessprototypen: Dokumente lesen, Abweichungen erkennen, Abteilungen koordinieren und Menschen entscheiden lassen." />
     <meta name="robots" content="index,follow" />
     <link rel="canonical" href="https://hugomenz.github.io/automation-portfolio/" />
     <link rel="stylesheet" href="./app.css" />
@@ -20,95 +20,102 @@
         <span><strong>Industrial Automation Lab</strong><small>Hugo Menz · Stuttgart</small></span>
       </a>
       <nav aria-label="Hauptnavigation">
-        <a href="#experimente">Experimente</a>
-        <a href="#matrix">Bewertung</a>
-        <a href="#prinzip">Prinzip</a>
-        <a class="nav-cta" href="https://github.com/hugomenz/automation-portfolio">Repository</a>
+        <a href="#control-towers">Control Towers</a>
+        <a href="#lab">10 Experimente</a>
+        <a class="nav-cta" href="https://github.com/hugomenz/automation-portfolio">GitHub ↗</a>
       </nav>
     </header>
 
     <main id="main">
-      <section class="hero shell" aria-labelledby="hero-title">
+      <section class="hero shell">
         <div class="hero-copy">
-          <p class="kicker"><span class="live-dot"></span> Laborstand · August 2026</p>
-          <h1 id="hero-title">Weniger Reibung in industriellen Abläufen.</h1>
-          <p class="hero-lede">Zehn funktionale Prozessprototypen für Maschinenbau und Sondermaschinenbau. Nicht als „AI-Agenten“ verkauft, sondern als prüfbare Vorbereitung: Eingang strukturieren, Abweichungen erkennen, Menschen entscheiden lassen.</p>
+          <p class="eyebrow"><span></span> Test-account integration · Synthetic data</p>
+          <h1>Automatisierung, die mehrere Abteilungen zusammenbringt.</h1>
+          <p>Dokumente und Bilder werden mit Groq gelesen, gegen synthetische Stammdaten in Supabase geprüft und als kontrollierte Übergabe vorbereitet. Kritische Entscheidungen bleiben beim Menschen.</p>
           <div class="hero-actions">
-            <a class="button button-primary" href="#top-demos">Drei Demos prüfen</a>
-            <a class="button button-secondary" href="#matrix">Priorisierung ansehen</a>
+            <a class="button primary" href="#control-towers">Drei Systeme ansehen</a>
+            <a class="button secondary" href="#lab">Alle 10 Workflows</a>
           </div>
+          <div class="truth-line"><strong>Built and testable</strong><span>Keine Kundendaten</span><span>Keine Produktions-Claims</span><span>Keine ERP-Writes</span></div>
         </div>
-        <aside class="control-panel" aria-label="Laborstatus">
-          <div class="panel-head"><span>LAB / CONTROL</span><span>DE-STG</span></div>
-          <div class="signal-grid">
-            <div><strong>10</strong><span>Workflows<br />Built and testable</span></div>
-            <div><strong>3</strong><span>interaktive<br />Demos</span></div>
-            <div><strong>0</strong><span>Customer<br />Validated</span></div>
-            <div><strong>0</strong><span>externe<br />Writes</span></div>
+
+        <div class="hero-console" aria-label="Beispiel eines abteilungsübergreifenden Kontrollsystems">
+          <div class="console-top"><span>ORDER / 900144</span><span class="status review">Prüfung erforderlich</span></div>
+          <div class="console-body">
+            <div class="mini-document">
+              <span>BESTELLUNG</span><b>PO 900144</b>
+              <i></i><i></i><i></i>
+              <div><small>HM-GRD-500</small><strong>221,00 €</strong></div>
+            </div>
+            <div class="console-analysis">
+              <span class="agent-tag">GROQ · EVIDENCE</span>
+              <strong>Preisabweichung erkannt</strong>
+              <p>Bestellung 221,00 €<br />Stammpreis 240,50 €</p>
+              <div class="delta">−8,1 %</div>
+            </div>
           </div>
-          <p class="panel-note"><span aria-hidden="true">↳</span> Alle Daten sind synthetisch. ERP, CRM, QMS und Ticketsysteme bleiben führend.</p>
-        </aside>
-      </section>
-
-      <section class="problem-strip" aria-label="Verbesserungsziele">
-        <div class="shell strip-track">
-          <span>Weniger Copy/Paste</span><span>Frühere Ausnahmen</span><span>Kürzere Reaktionszeit</span><span>Nachvollziehbare Entscheidungen</span><span>Keine stille Automatisierung</span>
+          <div class="console-flow" aria-label="Abteilungen">
+            <span class="sales">Vertrieb</span><i>→</i><span class="data">Stammdaten</span><i>→</i><span class="planning">Planung</span><i>→</i><span class="human">Freigabe</span>
+          </div>
+          <div class="console-foot"><span>Supabase audit trail</span><b>ERP-Entwurf wartet auf Mensch</b></div>
         </div>
       </section>
 
-      <section id="top-demos" class="section shell">
-        <div class="section-heading">
-          <div><p class="kicker">01 / Ausgewählte Beweise</p><h2>Drei Prozesse, die man in 90 Sekunden versteht.</h2></div>
-          <p>Ausgewählt nach Frequenz, Fehlerkosten, Datenzugang und Klarheit des Buyers. Das ist eine Implementierungshypothese—noch kein Marktbeweis.</p>
-        </div>
-        <div id="featured-list" class="featured-list"></div>
-      </section>
-
-      <section id="experimente" class="section section-ink">
+      <section class="proof-bar" aria-label="Technische Evidenz">
         <div class="shell">
-          <div class="section-heading light">
-            <div><p class="kicker">02 / Das Labor</p><h2>Zehn Abläufe. Immer mit Ausnahmeweg.</h2></div>
-            <p>Jeder Fall folgt demselben prüfbaren Vertrag: Problem → Eingang → Prüfung → Ausnahme → menschliche Entscheidung → vorbereiteter Output.</p>
+          <span><b>10</b> funktionale Workflows</span>
+          <span><b>3</b> multimodale Control Towers</span>
+          <span><b>6</b> Supabase Lab-Tabellen</span>
+          <span><b>0</b> autonome Produktiv-Writes</span>
+        </div>
+      </section>
+
+      <section id="control-towers" class="section shell">
+        <div class="section-heading compact">
+          <div><p class="eyebrow"><span></span> Flagship systems</p><h2>Drei Prozesse, drei unterschiedliche Systeme.</h2></div>
+          <p>Jede Demo beginnt beim echten Arbeitsgegenstand: Bestellung, Service-E-Mail oder Rechnung. Die Technik bleibt nachvollziehbar im Hintergrund.</p>
+        </div>
+        <div id="featured-list" class="tower-grid"></div>
+      </section>
+
+      <section class="orchestration-section">
+        <div class="shell orchestration-grid">
+          <div>
+            <p class="eyebrow light"><span></span> Nicht nur „E-Mail → Liste“</p>
+            <h2>Ein Fall bewegt sich durch Rollen, Regeln und Freigaben.</h2>
           </div>
-          <div id="workflow-index" class="workflow-index"></div>
+          <div class="orchestration-map">
+            <div class="map-lane"><span>01</span><strong>Eingang</strong><small>PDF · Bild · E-Mail</small></div>
+            <div class="map-lane"><span>02</span><strong>Evidence AI</strong><small>Groq · Quellen</small></div>
+            <div class="map-lane"><span>03</span><strong>Operations Data</strong><small>Supabase · Stamm</small></div>
+            <div class="map-lane"><span>04</span><strong>Fachbereiche</strong><small>Vertrieb · Service · Einkauf</small></div>
+            <div class="map-lane human"><span>05</span><strong>Mensch</strong><small>Freigeben · Stoppen</small></div>
+          </div>
         </div>
       </section>
 
-      <section id="matrix" class="section shell">
-        <div class="section-heading">
-          <div><p class="kicker">03 / Opportunity Matrix</p><h2>Nicht alles, was baubar ist, ist zuerst verkaufbar.</h2></div>
-          <p>Skala 1–5. Hohe Integrations- und Risikowerte bedeuten hier: leicht beherrschbar. Beobachtetes Interesse und bezahlte Validierung bleiben bei null.</p>
+      <section id="lab" class="section shell">
+        <div class="section-heading compact">
+          <div><p class="eyebrow"><span></span> Industrial Automation Lab</p><h2>Zehn Experimente, ein klares Sicherheitsprinzip.</h2></div>
+          <p>Alle Fälle sind mit synthetischen Daten testbar. Die sieben kleineren Prototypen bleiben bewusst kompakt; die drei Control Towers sind visuell und technisch vertieft.</p>
         </div>
-        <div class="matrix-summary" id="matrix-summary"></div>
-        <div class="table-wrap" tabindex="0" aria-label="Opportunity Matrix horizontal scrollbar">
-          <table class="matrix-table">
-            <thead><tr><th>Prozess</th><th>Buyer</th><th>Frequenz</th><th>Impact</th><th>Daten</th><th>Machbar</th><th>Erklärbar</th><th>Verkauf</th><th>Gesamt</th><th>Interesse</th><th>Paid</th></tr></thead>
-            <tbody id="matrix-body"></tbody>
-          </table>
-        </div>
-        <p class="matrix-note">Gesamt enthält außerdem Wiederholung, Integrationsbeherrschbarkeit, Risiko und externe Nachfrage-Signale. Die vollständige Begründung liegt im Repository.</p>
+        <div id="workflow-index" class="workflow-grid"></div>
       </section>
 
-      <section id="prinzip" class="section shell principle-section">
-        <div class="principle-card">
-          <p class="kicker">04 / Leitplanke</p>
-          <blockquote>„Dieser Workflow hat nicht weitergemacht. Und genau das war das richtige Ergebnis.“</blockquote>
-          <p>Unbekannter Artikel, unklare Maschine, widersprüchliche Taktzeit oder geänderte IBAN: Ein glaubwürdiges System macht Unsicherheit sichtbar und stoppt, bevor ein Fehler im führenden System landet.</p>
-        </div>
-        <div class="principle-steps" aria-label="Sicherheitsprinzipien">
-          <div><span>01</span><strong>Quelle zeigen</strong><p>Feld, Datei, Seite oder Stammdatensatz bleiben sichtbar.</p></div>
-          <div><span>02</span><strong>Unsicherheit benennen</strong><p>Confidence ist Hinweis, keine technische Wahrheit.</p></div>
-          <div><span>03</span><strong>Entscheidung trennen</strong><p>Das System bereitet vor. Der verantwortliche Mensch gibt frei.</p></div>
-          <div><span>04</span><strong>Write begrenzen</strong><p>Diese Demos schreiben in kein reales ERP, CRM oder QMS.</p></div>
+      <section class="decision-section shell">
+        <div class="decision-card">
+          <span class="decision-icon">!</span>
+          <div><p class="eyebrow"><span></span> Human-controlled AI</p><h2>Manchmal ist „nicht weitermachen“ das beste Ergebnis.</h2></div>
+          <p>Unbekannter Artikel, unklare Maschine, widersprüchliche Anforderung oder geänderte IBAN: Unsicherheit wird sichtbar, der Vorgang stoppt und die zuständige Person bekommt eine prüfbare Entscheidungsgrundlage.</p>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
       <div class="shell footer-grid">
-        <div><strong>Hugo Menz</strong><p>Industrial automation experience × software systems.<br />Stuttgart, Deutschland.</p></div>
-        <div><span>STATUS</span><p>Synthetic Demo<br />Built and testable<br />Nicht kundenvalidiert</p></div>
-        <div><span>KONTAKT / EVIDENZ</span><a href="https://github.com/hugomenz">GitHub</a><a href="https://www.hugomenz.de/">hugomenz.de</a><a href="https://www.linkedin.com/in/hugomartin-menz">LinkedIn</a></div>
+        <div><strong>Hugo Menz</strong><p>Sondermaschinenbau × Software × kontrollierte Automatisierung.<br />Stuttgart, Deutschland.</p></div>
+        <div><span>WAHRHEITSSTATUS</span><p>Synthetic Demo<br />Built and testable<br />Nicht kundenvalidiert</p></div>
+        <div><span>EVIDENZ</span><a href="https://github.com/hugomenz/automation-portfolio">Repository ↗</a><a href="https://github.com/hugomenz">GitHub Profil ↗</a></div>
       </div>
     </footer>
   </body>

@@ -2,7 +2,7 @@
 
 [Public lab](https://hugomenz.github.io/automation-portfolio/) · [Opportunity matrix](docs/OPPORTUNITY_MATRIX.md) · [n8n proof layer](n8n/README.md) · [German content factory](content/linkedin/README.md)
 
-![Industrial Automation Lab home](docs/screenshots/lab/home-desktop.png)
+![Industrial Automation Lab home](docs/screenshots/lab/home-control-towers-v2.png)
 
 Ten functional industrial workflow prototypes for machinery, service, procurement, quality and operations. The lab starts with a person losing time or capacity and ends with a concrete, inspectable improvement. Technology remains implementation infrastructure rather than the commercial promise.
 
@@ -10,7 +10,8 @@ Ten functional industrial workflow prototypes for machinery, service, procuremen
 
 - Every case is a **Synthetic Demo**.
 - Workflow engines and fixtures are **Built and testable**.
-- External ERP, CRM, QMS, DMS, CMMS and ticket integrations are **Mocked adapter**.
+- The three flagship systems use **Test-account integration** with Groq and Supabase; their ERP, ticket and finance adapters remain disabled.
+- The other seven experiments keep **Mocked adapter** boundaries.
 - None is customer validated, production deployed or backed by measured ROI.
 - Every critical outcome requires a human decision and performs zero external writes.
 
@@ -35,9 +36,9 @@ The implementation hypothesis prioritises Order Intake, Service Triage and Invoi
 
 | Demo | Strong stop condition | Product UI | Executed n8n canvas | 35-second demo |
 |---|---|---|---|---|
-| Customer Order Intake | unknown article or price deviation | [PNG](docs/screenshots/lab/customer-order-intake-exception.png) | [PNG](docs/screenshots/n8n/customer-order-intake-inspectable-executed.png) | [MP4](content/linkedin/customer-order-intake/assets/demo-30s.mp4) |
-| Machine Service Triage | safety-related message; no remote diagnosis | [PNG](docs/screenshots/lab/machine-service-triage-exception.png) | [PNG](docs/screenshots/n8n/machine-service-triage-inspectable-executed.png) | [MP4](content/linkedin/machine-service-triage/assets/demo-30s.mp4) |
-| Invoice / PO Matching | changed IBAN always stops | [PNG](docs/screenshots/lab/invoice-po-matching-exception.png) | [PNG](docs/screenshots/n8n/invoice-po-matching-inspectable-executed.png) | [MP4](content/linkedin/invoice-po-matching/assets/demo-30s.mp4) |
+| Order-to-ERP Control Tower | unknown article or price deviation | [PNG](docs/screenshots/lab/order-control-tower-exception.png) | [PNG](docs/screenshots/n8n/customer-order-intake-inspectable-executed.png) | [MP4](content/linkedin/customer-order-intake/assets/demo-30s.mp4) |
+| Service Incident Command | safety-related message; no remote diagnosis | [PNG](docs/screenshots/lab/service-incident-command.png) | [PNG](docs/screenshots/n8n/machine-service-triage-inspectable-executed.png) | [MP4](content/linkedin/machine-service-triage/assets/demo-30s.mp4) |
+| Procure-to-Pay Exception Control | changed IBAN always stops | [PNG](docs/screenshots/lab/invoice-hard-stop-control.png) | [PNG](docs/screenshots/n8n/invoice-po-matching-inspectable-executed.png) | [MP4](content/linkedin/invoice-po-matching/assets/demo-30s.mp4) |
 
 This is not market validation. `Observed interest` and `Paid validation` remain negative in the matrix.
 
@@ -68,11 +69,12 @@ Open `http://127.0.0.1:4173/`. Every detail route offers three scenarios plus du
 - `src/data/catalog.js` — problem, buyer, opportunity scores and synthetic scenarios.
 - `src/lib/engine.js` — deterministic domain checks and shared run controls.
 - `workflows/` — one README and three fixtures per workflow.
-- `n8n/workflows/` — importable sanitized exports, each with 40 operational nodes, six test routes and `active: false`.
+- `n8n/workflows/` — importable sanitized exports: 40-node deterministic prototypes plus three 46–48-node Groq/Supabase control towers, all with `active: false`.
+- `supabase/` — idempotent synthetic test schema and master-data seed; no credential material.
 - `content/linkedin/` — local German posts, visual briefs, storyboards, video scripts and assets; nothing published.
 - `docs/screenshots/lab/` — desktop, mobile and exception evidence.
 - `docs/OPPORTUNITY_MATRIX.md` — ranking with explicit validation gaps.
 
 ## n8n boundary
 
-The ten detailed exports were imported into Hugo's n8n Personal test project and manually executed with six synthetic routes each on 2026-08-14. Contract rejection, duplicate replay, bounded retry, business stop and human review are separate visible branches. No credential was attached, no trigger was published and no external write occurred. See [n8n/README.md](n8n/README.md).
+The seven deterministic exports were imported and exercised with six synthetic routes each. The three flagships add multimodal Groq evidence extraction, two independent agents, read-only Supabase master-data tools and synthetic audit writes. They remain unpublished; no trigger or target-system adapter is active. See [n8n/README.md](n8n/README.md).
