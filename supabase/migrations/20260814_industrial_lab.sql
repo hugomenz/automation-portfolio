@@ -44,7 +44,7 @@ create table if not exists public.industrial_lab_events (
   case_id uuid not null references public.industrial_lab_cases(id) on delete cascade,
   event_type text not null,
   department text,
-  actor_type text not null,
+  actor_type text not null check (actor_type in ('system', 'agent', 'human')),
   actor_label text not null,
   payload jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
@@ -73,7 +73,7 @@ create table if not exists public.industrial_lab_agent_runs (
   model_provider text not null,
   model_id text not null,
   task text not null,
-  status text not null,
+  status text not null check (status in ('started', 'completed', 'failed', 'guardrail_stop')),
   confidence numeric,
   input_refs jsonb not null default '{}'::jsonb,
   output jsonb not null default '{}'::jsonb,
@@ -105,8 +105,10 @@ alter table public.industrial_lab_master_data enable row level security;
 insert into public.industrial_lab_master_data (domain, external_key, data)
 values
   ('customer', 'K-1042', '{"name":"Musterwerk Sued GmbH","terms":"30 Tage netto","ship_to":"Werkstrasse 18, Stuttgart","synthetic":true}'::jsonb),
+  ('customer', 'K-1088', '{"name":"Neckar Montagebau GmbH","terms":"45 Tage netto","ship_to":"Industriestrasse 4, 71638 Ludwigsburg","synthetic":true}'::jsonb),
   ('article', 'HM-AX-240', '{"description":"Achseinheit 240","price":1280,"currency":"EUR","status":"released","synthetic":true}'::jsonb),
   ('article', 'HM-SEN-18', '{"description":"Naeherungssensor M18","price":84.5,"currency":"EUR","status":"released","synthetic":true}'::jsonb),
+  ('article', 'HM-GRD-500', '{"description":"Schutzgitter 500","price":240.5,"currency":"EUR","status":"released","synthetic":true}'::jsonb),
   ('machine', 'MX-24-0187', '{"family":"Montagezelle MX-24","site":"Werk Stuttgart","last_service":"2025-11-14","synthetic":true}'::jsonb),
   ('error_code', 'E-217', '{"label":"Axis reference not completed","boundary":"context_only_no_diagnosis","synthetic":true}'::jsonb),
   ('supplier', 'L-2091', '{"name":"Muster Pneumatik GmbH","approved_iban":"DE02100100100000000004","synthetic":true}'::jsonb),

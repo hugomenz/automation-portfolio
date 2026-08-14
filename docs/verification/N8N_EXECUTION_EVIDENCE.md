@@ -2,46 +2,53 @@
 
 Date: 2026-08-14
 
-Result: **PASS — test-only, unpublished and inspectable**
+Result: **PASS - synthetic test-account integrations, unpublished and inspectable**
 
-The ten previously created Personal-project workflows were upgraded in place from the four-node proof to the detailed versioned exports. No workflow was deleted and no duplicate workflow was created.
+## Flagship cloud executions
 
-## Imported and executed
+| Control tower | Cloud execution | Result | Canvas | Human boundary |
+| --- | --- | --- | --- | --- |
+| Order-to-ERP Control Tower | `#30` | Succeeded in 5.802 s | 46 nodes, 5 department lanes, Groq multimodal reader, 2 Groq agents, 2 Supabase master-data tools | One pending sales approval; ERP adapter disabled |
+| Service Incident Command | `#31` | Succeeded in 8.383 s | 47 nodes, 5 department lanes, Groq multimodal reader, 2 Groq agents, installed-base and error-code tools | One pending service-lead approval; ticket adapter disabled |
+| Procure-to-Pay Exception Control | `#32` | Succeeded in 6.629 s | 48 nodes, 5 department lanes, Groq multimodal reader, 2 Groq agents, supplier/PO/goods-receipt tools | Two pending approvals; accounting/payment adapter disabled |
 
-1. `LAB 01 - Customer Order Intake - Inspectable`
-2. `LAB 02 - Machine Service Triage - Inspectable`
-3. `LAB 03 - Spare Parts Inquiry - Inspectable`
-4. `LAB 04 - Lastenheft Delta Check - Inspectable`
-5. `LAB 05 - Invoice / PO Matching - Inspectable`
-6. `LAB 06 - RFQ Prequalification - Inspectable`
-7. `LAB 07 - Quality Complaint / 8D Preparation - Inspectable`
-8. `LAB 08 - Supplier Document Control - Inspectable`
-9. `LAB 09 - Maintenance Report → Actions - Inspectable`
-10. `LAB 10 - Trade Fair Lead Processing - Inspectable`
+Every run used the synthetic focus case shown in the public demo. The AI steps extracted or challenged evidence; deterministic code retained control of price, safety, bank-data and release decisions.
 
-## Observed execution
+## Supabase test-account proof
 
-For every workflow, Browser verification observed:
+Immediately after the three successful runs, a scoped query over the three synthetic correlation IDs returned:
 
-- 40 operational canvas nodes and 6 explanatory Sticky Notes;
-- six input items emitted from the Manual Trigger;
-- an invalid-contract route ending in `Terminal - Manual Data Repair`;
-- a duplicate route ending in `Terminal - Replay Safe`;
-- a transient dependency route ending in `Terminal - Bounded Retry Queue`;
-- happy, recoverable-deviation and critical-stop items passing through domain-specific deterministic guardrails;
-- three domain items reaching `Human Decision Required` and a draft-only review package;
-- successful manual execution;
-- a visibly disabled HTTP target adapter with no credential attached;
-- no publish or activation action;
-- zero production executions and zero external writes.
+| Table | Rows |
+| --- | ---: |
+| `industrial_lab_cases` | 3 |
+| `industrial_lab_agent_runs` | 3 |
+| `industrial_lab_events` | 3 |
+| `industrial_lab_approvals` | 4 |
 
-This execution proves the observed synthetic paths in the current n8n test project. It does not prove a real ERP, CRM, QMS, DMS, CMMS or ticket integration.
+The rows are synthetic audit evidence only. Master data includes the synthetic customer/article, installed-base/error-code and supplier/PO/goods-receipt records required by the demos.
+
+## Reliability boundaries observed
+
+- Invalid intake has an explicit quarantine route.
+- Multimodal and agent failures have evidence-only fallbacks.
+- Case creation is the idempotency boundary.
+- Supabase failures route through classified, bounded retry handling and then an operator incident.
+- Every material business result enters a human review queue.
+- ERP, service-ticket and accounting target adapters are visibly disabled.
+- The workflows remain unpublished and performed no production-system write.
+- Exported JSON is sanitized and contains no credential reference.
+
+## Remaining seven workflows
+
+The other seven lab workflows remain functional deterministic prototypes with six executable synthetic routes each: happy path, recoverable exception, critical stop, invalid contract, replay-safe duplicate and bounded dependency retry. They remain deliberately lighter than the three flagships.
+
+The previous cloud versions were not deleted. Order-to-ERP was upgraded in place; the Service and Procure-to-Pay flagships were created as separate iterations so the earlier prototypes remain recoverable.
 
 ## Visual evidence
 
-- [`workflow-inventory-10-inspectable.png`](../screenshots/n8n/workflow-inventory-10-inspectable.png)
 - [`customer-order-intake-inspectable-executed.png`](../screenshots/n8n/customer-order-intake-inspectable-executed.png)
 - [`machine-service-triage-inspectable-executed.png`](../screenshots/n8n/machine-service-triage-inspectable-executed.png)
 - [`invoice-po-matching-inspectable-executed.png`](../screenshots/n8n/invoice-po-matching-inspectable-executed.png)
+- [`workflow-inventory-10-inspectable.png`](../screenshots/n8n/workflow-inventory-10-inspectable.png)
 
-Cloud editor URLs are kept in the private control-repository handoff rather than in this public repository.
+Cloud editor URLs are recorded only in the private control-repository handoff.

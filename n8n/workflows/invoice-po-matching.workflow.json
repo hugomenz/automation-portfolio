@@ -397,7 +397,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const safe = value => value === undefined ? null : JSON.parse(JSON.stringify(value)); const candidates = items.map(item => item.json || {}); const source = candidates.find(item => !item.technicalFailure && item.challengeResult && !item.challengeResult.fallback) || candidates.find(item => !item.technicalFailure) || candidates[0] || {}; return [{ json: { correlation_id: String(source.correlationId || source.sourceInput?.eventId || 'MISSING'), workflow_code: String(source.workflowCode || \"INV\"), title: \"Procure-to-Pay Exception Control - Geänderte IBAN\", source_type: String(source.sourceType || 'synthetic_document'), source_asset_url: String(source.sourceAssetUrl || ''), status: String(source.status || 'HUMAN_REVIEW_REQUIRED'), priority: \"critical\", current_department: \"Finance Exception Queue\", extracted_data: { visual: safe(source.visualEvidence), evidence_agent: safe(source.agentResult), challenger: safe(source.challengeResult), prepared_output: safe(source.preparedOutput) }, exception_data: { exceptions: safe(Array.isArray(source.exceptions) ? source.exceptions : []), signals: safe(Array.isArray(source.signals) ? source.signals : []) }, human_decision: safe(source.humanDecision || { required: true, state: 'pending', owner: \"Einkauf + Finance\" }) } }];"
+        "jsCode": "const safe = value => value === undefined ? null : JSON.parse(JSON.stringify(value)); const candidates = items.map(item => item.json || {}); const source = candidates.find(item => !item.technicalFailure && item.challengeResult && !item.challengeResult.fallback) || candidates.find(item => !item.technicalFailure) || candidates[0] || {}; return [{ json: { id: \"49cdc773-48cd-45e0-abcd-ca994acdc906\", correlation_id: String(source.correlationId || source.sourceInput?.eventId || 'MISSING'), workflow_code: String(source.workflowCode || \"INV\"), title: \"Procure-to-Pay Exception Control - Geänderte IBAN\", source_type: String(source.sourceType || 'synthetic_document'), source_asset_url: String(source.sourceAssetUrl || ''), status: String(source.status || 'HUMAN_REVIEW_REQUIRED'), priority: \"critical\", current_department: \"Finance Exception Queue\", extracted_data: { visual: safe(source.visualEvidence), evidence_agent: safe(source.agentResult), challenger: safe(source.challengeResult), prepared_output: safe(source.preparedOutput) }, exception_data: { exceptions: safe(Array.isArray(source.exceptions) ? source.exceptions : []), signals: safe(Array.isArray(source.signals) ? source.signals : []) }, human_decision: safe(source.humanDecision || { required: true, state: 'pending', owner: \"Einkauf + Finance\" }) } }];"
       },
       "id": "d09f1ae2-d19f-4c75-ae9f-17bccf9f194f",
       "name": "Prepare Supabase Case Record",
@@ -424,11 +424,12 @@
         2310,
         -120
       ],
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "alwaysOutputData": true
     },
     {
       "parameters": {
-        "jsCode": "const run = $('Deterministic Decision Guardrails').first().json; const caseId = $json.id || $json.case_id; return [{ json: { case_id: caseId, correlation_id: String(run.correlationId || run.sourceInput?.eventId || 'MISSING'), agent_name: \"Three-Way Match Agent + Payment Fraud Challenger Agent\", model_provider: 'Groq', model_id: 'qwen/qwen3.6-27b + llama-3.3-70b-versatile', task: \"Procure-to-Pay Exception Control\", status: String(run.status || 'HUMAN_REVIEW_REQUIRED'), confidence: Number(run.confidence || 0), input_refs: { source_asset_url: run.sourceAssetUrl || '', source_type: run.sourceType || 'synthetic_document' }, output: { evidence_agent: run.agentResult || null, challenger: run.challengeResult || null }, error: run.technicalFailure || null, latency_ms: null } }];"
+        "jsCode": "const run = $('Deterministic Decision Guardrails').first().json; const caseId = $('Prepare Supabase Case Record').first().json.id; const agentStatus = run.technicalFailure ? 'failed' : 'completed'; return [{ json: { case_id: caseId, correlation_id: String(run.correlationId || run.sourceInput?.eventId || 'MISSING'), agent_name: \"Three-Way Match Agent + Payment Fraud Challenger Agent\", model_provider: 'Groq', model_id: 'qwen/qwen3.6-27b + llama-3.3-70b-versatile', task: \"Procure-to-Pay Exception Control\", status: agentStatus, confidence: Number(run.confidence || 0), input_refs: { source_asset_url: run.sourceAssetUrl || '', source_type: run.sourceType || 'synthetic_document' }, output: { business_status: String(run.status || 'HUMAN_REVIEW_REQUIRED'), evidence_agent: run.agentResult || null, challenger: run.challengeResult || null }, error: run.technicalFailure || null, latency_ms: null } }];"
       },
       "id": "acbe4369-abbe-41d6-aabe-4043a9be3eb0",
       "name": "Build Agent Run Audit",
@@ -455,11 +456,12 @@
         2840,
         -120
       ],
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "alwaysOutputData": true
     },
     {
       "parameters": {
-        "jsCode": "const run = $('Build Agent Run Audit').first().json; return [{ json: { case_id: run.case_id, event_type: 'HUMAN_REVIEW_REQUESTED', department: \"Finance Exception Queue\", actor_type: 'workflow', actor_label: \"Procure-to-Pay Exception Control\", payload: { status: run.status, agent_name: run.agent_name, external_write_performed: false } } }];"
+        "jsCode": "const run = $('Build Agent Run Audit').first().json; return [{ json: { case_id: run.case_id, event_type: 'HUMAN_REVIEW_REQUESTED', department: \"Finance Exception Queue\", actor_type: 'system', actor_label: \"Procure-to-Pay Exception Control\", payload: { agent_status: run.status, business_status: run.output?.business_status || 'HUMAN_REVIEW_REQUIRED', agent_name: run.agent_name, external_write_performed: false } } }];"
       },
       "id": "ee15cb12-ef15-4ca5-ac15-c7eced15c97f",
       "name": "Build Department Handoff Event",
@@ -486,7 +488,8 @@
         3360,
         -120
       ],
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "alwaysOutputData": true
     },
     {
       "parameters": {
@@ -517,11 +520,12 @@
         3880,
         -120
       ],
-      "onError": "continueErrorOutput"
+      "onError": "continueErrorOutput",
+      "alwaysOutputData": true
     },
     {
       "parameters": {
-        "jsCode": "const run = $('Deterministic Decision Guardrails').first().json; return [{ json: { correlationId: run.correlationId, status: run.status, approvalTasks: items.map(item => ({ department: item.json.department, decision: item.json.decision })), preparedOutput: run.preparedOutput, externalWritePerformed: false, terminalState: 'WAITING_FOR_HUMAN_DECISION', evidence: { source: run.sourceAssetUrl, groq: true, supabase: true } } }];"
+        "jsCode": "const run = $('Deterministic Decision Guardrails').first().json; return [{ json: { correlationId: run.correlationId, status: run.status, approvalTasks: [\"Einkauf\",\"Finance\"].map(department => ({ department, decision: 'pending' })), preparedOutput: run.preparedOutput, externalWritePerformed: false, terminalState: 'WAITING_FOR_HUMAN_DECISION', evidence: { source: run.sourceAssetUrl, groq: true, supabase: true } } }];"
       },
       "id": "e5bc8227-e4bc-4094-a7bc-854de6bc83ba",
       "name": "HUMAN GATE - Review Required",
