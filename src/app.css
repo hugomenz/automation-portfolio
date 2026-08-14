@@ -327,7 +327,8 @@ img { max-width: 100%; }
 @media (max-width: 1000px) {
   :root { --shell: min(100% - 40px, 1050px); }
   .site-header { padding-inline: 20px; }
-  .hero { grid-template-columns: 1fr; }
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .hero-copy, .hero-console { min-width: 0; }
   .hero-console { max-width: 760px; }
   .tower-grid { grid-template-columns: 1fr; }
   .tower-card { display: grid; grid-template-columns: .9fr 1.1fr; }
@@ -349,7 +350,7 @@ img { max-width: 100%; }
   .brand small, .site-header nav > a:not(.nav-cta) { display: none; }
   .site-header nav { gap: 7px; }
   .site-header nav .nav-cta { padding: 8px 10px; }
-  .hero { min-height: auto; padding-block: 65px 80px; grid-template-columns: 1fr; gap: 55px; }
+  .hero { min-height: auto; padding-block: 65px 80px; grid-template-columns: minmax(0, 1fr); gap: 55px; }
   .hero-copy h1 { font-size: clamp(48px, 14vw, 66px); }
   .hero-copy > p:not(.eyebrow) { font-size: 15px; }
   .hero-actions { flex-direction: column; }
