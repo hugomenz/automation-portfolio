@@ -3,18 +3,31 @@
 ## Status
 
 - 10 sanitized, importable workflow exports.
-- 46 nodes per workflow: 40 operational nodes plus 6 explanatory Sticky Notes.
-- 6 executable synthetic routes per workflow: nominal, recoverable deviation, critical stop, duplicate delivery, transient dependency failure and invalid contract.
+- Three 46–48-node flagship control towers: Order-to-ERP, Service Incident Command and Procure-to-Pay Exception Control.
+- Seven deterministic 46-node prototypes with six executable synthetic routes: nominal, recoverable deviation, critical stop, duplicate delivery, transient dependency failure and invalid contract.
 - `active: false` in every versioned JSON file; Manual Trigger only.
-- One visible HTTP target adapter per workflow, intentionally disabled and pointed at `example.invalid`.
+- One visible target adapter per workflow, intentionally disabled and pointed at `example.invalid`.
 - No credential reference, environment secret, account identifier or real personal data in the exports.
 - Every terminal route reports zero external writes.
-- All ten detailed versions were imported into Hugo's n8n Personal test project and executed manually on 2026-08-14.
-- None was published or activated; the n8n production-execution counter remained at zero.
+- The flagship exports require separately selected Groq and Supabase test-account credentials after import. Credentials are not present in these files.
+- None is published or activated; no ERP, ticket, payment, e-mail or other production side effect is permitted.
+
+## Flagship control towers
+
+Each flagship visibly separates five departmental lanes and includes:
+
+1. Manual synthetic evidence intake with correlation and idempotency keys.
+2. Groq multimodal evidence extraction from a rendered PDF or HMI photo.
+3. An evidence agent using read-only Supabase master-data tools.
+4. An independent Groq challenger agent.
+5. Deterministic hard stops that remain outside the model prompt.
+6. Supabase case, agent-run, event and pending-approval audit writes.
+7. No-claim AI fallbacks, classified database failure, bounded retry and operator incident.
+8. An explicit human gate before a disabled target adapter.
 
 ## Inspectable canvas contract
 
-Each workflow separates the concerns that were previously hidden in one code block:
+The seven compact prototypes separate the concerns that were previously hidden in one code block:
 
 1. `Manual Trigger` and `Load 6 Synthetic Test Cases`.
 2. `Normalize Intake Envelope` and `Validate Required Contract`.
@@ -31,13 +44,13 @@ This is deliberate portfolio evidence rather than decorative complexity. The wor
 
 ## Reproduce locally
 
-Run `npm run check`. The test harness parses every export and executes its graph without n8n-specific hidden state. It verifies all six routes, valid connections, unique node names, deterministic domain outcomes, disabled adapters and zero writes.
+Run `npm run check`. The test harness parses every export, verifies valid cross-type connections, unique node names, the exact Groq/Supabase/human-boundary structure of each flagship, all six routes in the seven deterministic prototypes, disabled target adapters and secret-free exports.
 
 Each workflow directory also contains an `N8N_RUNBOOK.md` and six matching fixtures.
 
 ## Safe import
 
-Import a JSON file from `n8n/workflows/` into a development/test project. Keep it unpublished. Execute only with the Manual Trigger. The disabled HTTP adapter is illustrative: do not activate it or attach credentials without a separately approved test-account integration and rollback plan.
+Import a JSON file from `n8n/workflows/` into a development/test project. Keep it unpublished. Execute only with the Manual Trigger. For a flagship, select a Groq test credential on the model/vision nodes and a Supabase test credential on the tools/audit nodes. Never enable the final target adapter.
 
 ## Visual evidence
 

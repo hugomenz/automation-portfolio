@@ -6,13 +6,13 @@ An editorial industrial control sheet: warm technical paper outside, near-black 
 
 ## Hierarchy
 
-The first viewport states the operational outcome and truth status. It does not lead with n8n, agents or an integration-logo wall. Direct workflow discovery uses a numbered ruled list; no carousel hides evidence.
+The first viewport states the operational outcome and shows a compact cross-department control console. It does not lead with n8n or an integration-logo wall. Direct workflow discovery uses three flagship cards plus a compact ten-workflow index; no carousel hides evidence.
 
-Each detail page follows problem and buyer, concrete improvement, six-stage process, synthetic input, checks, exception, human decision, prepared output, audit and limitations.
+Each flagship detail page is a two-pane operations console: the original PDF/image on the left and the extracted control package on the right. Department handoffs and bounded agent roles sit directly below; the n8n canvas is available as progressive-disclosure engineering evidence.
 
 ## Typography and colour
 
-Use system sans-serif for durable rendering and system monospace for IDs, sources, states and controls. Core colours are near-black `#0b1110`, warm paper `#f1f0e9`, lime `#b9f34c`, exception orange `#ff6a3d`, stop red `#ff605c` and evidence blue `#8dd7ff`.
+Use system sans-serif for durable rendering and system monospace for IDs, sources, states and controls. Core colours are near-black `#111916`, technical paper `#f3f4f0`, lime `#b8f34b`, exception orange `#ff7043`, stop red `#e54e45`, evidence blue `#5575f5` and agent purple `#8c68e8`.
 
 ## Interaction
 

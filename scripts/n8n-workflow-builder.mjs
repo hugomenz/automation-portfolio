@@ -1,3 +1,5 @@
+import { buildFlagshipN8nExport, isFlagshipWorkflow } from './flagship-workflow-builder.mjs';
+
 const profiles = {
   'order-intake': {
     intake: 'E-Mail + PDF / Excel Bestellung',
@@ -230,6 +232,7 @@ function domainEvaluationCode(profile) {
 }
 
 export function buildN8nExport(workflow) {
+  if (isFlagshipWorkflow(workflow.id)) return buildFlagshipN8nExport(workflow);
   const profile = profiles[workflow.id];
   if (!profile) throw new Error(`Missing n8n profile for ${workflow.id}`);
   const cases = syntheticCases(workflow);

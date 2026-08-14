@@ -3,7 +3,7 @@
 ## Canvas contract
 
 - Intake: Badge + Visitenkarte + Gesprächsnotiz.
-- Context adapter: CRM Dubletten- und Consent-Prüfung (**Mocked adapter**).
+- Integration status: Mocked adapter.
 - Human owner: Sales Operations.
 - Prepared target: CRM Lead Draft; external adapter remains disabled.
 
@@ -18,4 +18,4 @@
 
 ## Reliability evidence
 
-The canvas separates contract validation, idempotency, dependency health, domain processing, deterministic guardrails, human decision and adapter boundary. Every terminal output includes correlation, audit state and zero external writes. Run the workflow manually while unpublished; no credential is required.
+The canvas separates contract validation, idempotency, dependency health, domain processing, deterministic guardrails, human decision and adapter boundary. Every terminal output includes correlation, audit state and zero production writes. Run the workflow manually while unpublished. No credential is required.
