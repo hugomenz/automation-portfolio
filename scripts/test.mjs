@@ -109,11 +109,20 @@ for (const workflow of workflows) {
   const exportSource = await readFile(`n8n/workflows/${workflow.slug}.workflow.json`, 'utf8');
   const exportJson = JSON.parse(exportSource);
   const operationalNodes = exportJson.nodes.filter((node) => node.type !== 'n8n-nodes-base.stickyNote');
+  const codeNodesAreSyntacticallyValid = exportJson.nodes.filter((node) => node.type === 'n8n-nodes-base.code').every((node) => {
+    try {
+      new Function('items', node.parameters.jsCode);
+      return true;
+    } catch {
+      return false;
+    }
+  });
   const nodeNames = new Set(exportJson.nodes.map((node) => node.name));
   const connectionTargets = Object.values(exportJson.connections).flatMap((connection) => Object.values(connection).flatMap((branches) => branches.flat().map(({ node }) => node)));
   check(`${workflow.id}: detailed disabled n8n export`, exportJson.active === false && operationalNodes.length >= (workflow.polished ? 35 : 35) && exportJson.nodes.filter((node) => node.type === 'n8n-nodes-base.switch').length >= (workflow.polished ? 2 : 6));
   check(`${workflow.id}: sanitized adapter boundary`, exportJson.nodes.every((node) => !node.credentials) && exportJson.nodes.filter((node) => node.type === 'n8n-nodes-base.httpRequest' && /example\.invalid/.test(node.parameters.url || '')).every((node) => node.disabled === true) && !/(gsk_[A-Za-z0-9]{20,}|sk-[A-Za-z0-9_-]{20,}|sb_secret_|ghp_[A-Za-z0-9]{20,}|BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY)/.test(exportSource));
   check(`${workflow.id}: valid names and connections`, nodeNames.size === exportJson.nodes.length && connectionTargets.every((target) => nodeNames.has(target)));
+  check(`${workflow.id}: code nodes parse`, codeNodesAreSyntacticallyValid);
   if (workflow.polished) {
     check(`${workflow.id}: flagship has Groq agents and Supabase tools`, exportJson.nodes.filter((node) => node.type === '@n8n/n8n-nodes-langchain.agent').length === 2 && exportJson.nodes.filter((node) => node.type === '@n8n/n8n-nodes-langchain.lmChatGroq').length === 2 && exportJson.nodes.filter((node) => /supabase/i.test(node.type)).length >= 6);
     check(`${workflow.id}: flagship has multimodal evidence and human boundary`, nodeNames.has('Groq Multimodal Evidence Reader') && nodeNames.has('Deterministic Decision Guardrails') && nodeNames.has('HUMAN GATE - Review Required') && exportSource.includes('externalWritePerformed'));
